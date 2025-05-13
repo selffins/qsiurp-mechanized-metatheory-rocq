@@ -18,6 +18,8 @@ GitHub repo: [[https://github.com/selffins/qsiurp-mechanized-metatheory-rocq
 [[https://docs.google.com/document/d/1a2aj9vDFRQNm6qs9QAtJ1ke0oAE4_gVO/edit?usp=sharing&ouid=106287385083655542886&rtpof=true&sd=true][Project Proposal]]
 ** Proof Theory Notes
 [[https://docs.google.com/presentation/d/1pKhSRDCueyRUT_4oaNlKhG_3YqA5DCR8Xfu6Dj3Zg74/edit?usp=sharing][Proof Theory Notes]]
+** May 13: coq-ll paper
+[[file:coq-ll.org][coq-ll Notes]]
 
 * Important Dates
 |------------------+-----------------|

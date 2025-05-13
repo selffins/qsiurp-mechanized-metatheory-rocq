@@ -1,0 +1,192 @@
+#+title: Linear Logic in Coq
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="custom.css">
+#+OPTIONS: num:2 toc:2
+
+------
+[[file:index.org][Homepage]]
+
+I present some notes and some todos about the paper.
+
+* Paper
+- [[https://gisellereis.com/papers/ll-coq.pdf]]
+- Mechanizing Focused Linear Logic in Coq
+- Xavier, Olarte, Reis, Nigam
+
+
+* Summary
+- Formalized propositional and first order linear logic and proved them to be equivalent.
+- Proved cut-elimination and completeness of focusing
+- Encoded LJ into LL
+- Implementation: https://github.com/meta-logic/coq-ll
+* Intro
+
+** Basic notions
+- Linear logic. A family of proof systems that lacks weakening and contraction; viewing formulas as resources  and has symmetry via distinguishing between multiplicative and additive connectives.
+- Cut-elimination. Metatheorem stating that any proof using cut can be a proof without cut.
+- Cut-elimination consequences. Implies consistency and subformula property.
+- Focusing. Enforces that rules sharing properties (particularly invertibility) are grouped together
+- Completeness of focusing. Metatheorem that if a proof of a formula exists a focused proof also exists
+** Contributions
+  The paper presents a formalization of linear logic in Coq. Their main contributions are:
+*** Quantifiers
+They use parametric HOAS to encode LL, which avoids the bureaucracy regarding substition and variable binding. However, this causes them to introduce some axioms.
+*** Focusing completeness
+They provide the first formalization of first-order LL's cut-elimination and LL's focused proof system completeness.
+*** TODO Encoding proof systems
+They encode LJ into LL.
+*** Treatment of contexts
+For LL, contexts are multisets due to the lack of contraction and weakening. They show admissibility of exchange. They use the Coq library =Morphisms= in order to substitute between equivalent multisets. They had to extend the =Morphisms= library. They also developed tactics that handle the proofs on multisets.
+*** Induction measures
+They follow Andreoli's proof of cut elimination closely.
+* Syntax
+
+**  Linear Logic connectives
+There are =(+,-)= atoms, multiplicative connectives: tensor, 1, bot, par, additive connectives: oplus, and, 0, top, quantifiers: existential, universal, and exponential modalities: ! and ?.
+** Some notes
+
+I have notes but I don't really understand them, especially the nuances about higher-order abstract syntax.
+
+- Using =(var -> formula) -> formula= for quantifiers means dealing with bureaucracy about variable capture and substitution.
+- So, they do =Qx.F= (=Q= being a quantifier) as =Q(\lambda x. F)=, of type =(term -> formula) -> formula=. This is called higher-order abstract syntax.
+- However, =term -> formula= is problematic as one can return arbitrary formulas (? - Chlipala)
+- Instead, they use parametrized higher-order abstract syntax. The parameter is =T= for quantifier variables. The new type for quantifiers is now =foraall T, (T -> formula) -> formula=.
+- Apparently, per Chlipala, this makes it impossible to compute size of formula.
+- They parametrize T outside of the constructors; they parametrize in the meta level outside the syntax specification. See page 4.
+- Here is the syntax implemented:
+
+#+BEGIN_SRC coq
+Section Sec_lExp.
+Variable T: Type. (* Parameter for building variables *)
+Inductive term := (* Terms *)
+| var (t: T) | cte (e: A) (* variables and constants *)
+| fc1 (n: nat) (t: term) | fc2 (n: nat) (t1 t2: term). (* family of functions *)
+Inductive aprop := (* Atomic propositions *)
+| a0: nat → aprop (* 0-ary predicates *)
+| a1: nat → term → aprop | a2: nat → term → term → aprop. (* family of predicates *)
+Inductive lexp := (* Formulas *)
+| atom (a :aprop) ) | perp (a: aprop) (* positive/negated atoms *)
+| top | bot | zero | one (* units *)
+| tensor (F G: lexp) | par (F G: lexp) (* multiplicative *)
+| plus (F G: lexp) | witH (F G: lexp) (* additive *)
+| bang (F: lexp) | quest (F: lexp) (* exponentials *)
+| ex (f: T → lexp) | fx (f: T → lexp). (* quantifiers *)
+End Sec_lExp.
+#+END_SRC
+
+- Type of top is not =lexp= but =forall t: T, lexp t=, e.g. =top nat : lexp nat=. But we do not want that; hence we define connectives as functions taking =T=, e.g. =Top : Lexp= is =fun T => top=. =T= is not destructed; instead it is irrelevant, so it doesn't interfere with structure.
+
+  #+BEGIN_SRC coq
+Definition Term := forall T: Type, term T. (* type for terms *)
+Definition AProp := forall T: Type, aprop T. (* type for atomic propositions *)
+Definition Lexp := forall T: Type, lexp T. (* Type for formulas *)
+
+Definition Top: Lexp := fun T ⇒ top. (* formula >*)
+Definition Atom (P: AProp): Lexp := fun T ⇒ atom (P T). (* building atomic propositions *)
+Definition Tensor (F G: Lexp): Lexp := fun T ⇒ tensor (F T) (G T). (* formula F ⊗ G *)
+...
+#+END_SRC
+- =Lexp= is a polymorphic function, not inductive type. Hence, induction on =F:Lexp= can't use Coq's tactics: =destruct=, =induction=, =inversion=.
+- Hence, we define a "closed formulas" inductive type. We will have to provide an axiom that closed structures can be built. This axiom is consistent with Coq but cannot be proven in Coq.
+
+#+BEGIN_SRC coq
+Inductive ClosedT: Term → Prop :=
+| cl_cte: forall C, ClosedT (Cte C)
+| cl_fc1: forall n t1, ClosedT t1 → ClosedT (FC1 n t1)
+| cl_fc2: forall n t1 t2, ClosedT t1 → ClosedT t2 → ClosedT (FC2 n t1 t2).
+Inductive ClosedA : AProp → Prop :=
+| cl_a0: forall n, ClosedA (A0 n)
+| cl_a1: forall n t, ClosedT t → ClosedA (fun _ ⇒ a1 n (t _)).
+| cl_a2: forall n t t’, ClosedT t → ClosedT t’ → ClosedA (fun _ ⇒ a2 n (t _) (t’ _)).
+Inductive Closed : Lexp → Prop :=
+| cl_atom: forall A, ClosedA A → Closed (Atom A )
+| cl_perp: forall A, ClosedA A → Closed (Perp A )
+| cl_one: Closed One
+| cl_tensor: forall F G, Closed F → Closed G → Closed (Tensor F G)
+| cl_fx: forall FX, Closed (Fx FX)
+[...]
+  #+END_SRC
+
+  The axioms:
+
+  #+BEGIN_SRC coq
+Axiom ax_closedT: forall X: Term, ClosedT X.
+Axiom ax_closedA: forall A: AProp, ClosedA A.
+Axiom ax_closed : forall F: Lexp, Closed F
+ #+END_SRC
+- Why are closed terms needed? Consider an example: If =1= is the identifier of proposition =P=, =c= is a constant of type =A=, then we represent =P(c)= as:
+  #+BEGIN_SRC coq
+Pc : Lexp => fun T : Type => atom (a1 1 (cte c))
+  #+END_SRC
+
+- This is fine. But now consider =P(x)= where =x= is a free variable. Our representation of =P(x)= is:
+    #+BEGIN_SRC coq
+Px : Lexp => fun T : Type => atom (a1 1 (var ??))
+  #+END_SRC
+  We have =??= in there. Looking at the definition of =var=, we would need to provide a =t : T=. But we don't know anything about this generic =T=, yet we are asked to provide an inhabitant of =T= (what if it is uninhabited?). Hence we must use closed terms and formulas without these free variables.
+- They define a type =Subs= for substitutions and a substition function =Subst= taking a =S : Subs= and a =X : Term=. =X= is substituted in =S=.
+  #+BEGIN_SRC coq
+  Definition Subs := forall T: Type, T → lexp T.
+  Definition Subst (S: Subs) (X: Term) : Lexp := fun T: Type ⇒ flatten (S (term T) (X T)).
+
+  (** Example *)
+
+  Definition S: Subs := fun (T: Type) (x: T) ⇒ tensor top (atom (a2 1 (fc1 1 (var x)) (cte c))).
+Definition t1: Term := fun T ⇒ (cte d).
+Eval compute in Subst S t1.
+(* Result: fun T:Type ⇒ tensor one (atom (a2 4 (fc1 1 (cte d)) (cte c)))
+#+END_SRC
+- They prove two formulas are equivalent modulo remaining of bound variables. (?). ...
+
+
+
+* TODO Sequent Calculi
+
+- They depict classical first order linear logic. Fig 1, page 7.
+  - Then they study a different version with dyadic sequents, via Andreoli. An excerpt:
+#+BEGIN_SRC coq
+Inductive sig2: list Lexp → list Lexp → Prop :=
+| sig2_init : forall B L A, L =mul= (A +) :: [A −] → ` B ; L
+| sig2_bang: forall B F L , L =mul= [! F] → ` B ; [F] → ` B ; L
+| sig2_ex : forall B L FX M t, L =mul= E{FX} :: M → ` B ; ( Subst FX t) :: M → ` B ; L
+| sig2_fx : forall B L FX M, L =mul= (F{FX}) :: M → (forall x, ` B ; [Subst FX x] ++ M) → ` B ; L
+#+END_SRC
+
+** Focused system
+*** Focusing in LL
+Focusing is a discipline by Andreoli aiming to reduce non-determinism. Proof as organized in two alternating phases, called negative phase (which contains only invertible rules) and positive phase (containing only non-invertible rules). The invertible connectives: are par, bot, and, top, ?, universal quantifier. The non-invertible connectives are: tensor, 1, oplus, !, existential quantifier.
+*** LLF (Triadic focusing system for LL)
+- =\vbar \Theta : \Gamma \uparrow L= belongs to the negative phase. All positive formulas and atoms are moved to =\Gamma=.
+- =\vbar \Theta : \Gamma \downarrow A= belongs to the positive phase.
+*** TODO Try out focusing
+It might be pedagogical to do a handwritten proof of a focused sequent: (see page 9 for proper rendering)
+#+BEGIN_SRC coq
+Example sequent: ` [] ; [] ; UP( [ ( p−Nq−) O ⊥ O ?p+ O ?q+ ] ).
+Proof with unfold p;unfold q;InvTac.
+NegPhase. (* Negative phase *)
+eapply tri_dec2 with (F:= p+) ... (* apply the decision rule on the classical context *)
+eapply tri_dec2 with (F:= q+) ...
+Qed.
+#+END_SRC
+
+Note that the formalized proof use user-defined tactics (from the authors) like InvTac, NegPhase, etc.
+
+* TODO Metatheory
+This section formalizes cut-elimination for the dyadic LL and completeness of focusing. They show the equivalence of all the systems and prove the consistency of LL as a corollary. (?).
+
+** TODO Cut-Elimination proof
+(...)
+**
+
+* TODO Applications
+They encode LJ into LL.
+
+* TODO Related and Future Work
+(...)
+
+* TODO The implementation
+I plan to check out the implementation and run the proofs. However, I am facing some difficulties compiling it right now.
+
+* Key papers
+- Andreoli's proofs on focused linear logic
+- Chlipala on parametric higher order syntax
