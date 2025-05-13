@@ -1,0 +1,24 @@
+#+title: Template
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="custom.css">
+#+OPTIONS: num:2 toc:2
+
+------
+[[file:index.org][Homepage]] | [[file:sf-notes.org][Previous: Basics.v]] | [[file:sf-notes-2.org][Next: TBD]]
+
+#+BEGIN_CENTER
+Under construction.
+#+END_CENTER
+* Summary
+** Terms
+* Notes
+* Exercises
+* Scores
+* Questions
+* Metacognition
+* Further Knowledge
+* TODOs
+* Next up
+
+------
+[[file:sf-notes.org][Back to Top]]
