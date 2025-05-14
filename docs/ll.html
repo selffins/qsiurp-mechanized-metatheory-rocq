@@ -1,0 +1,613 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2025-05-14 Wed 15:59 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Some Linear Logic Notes</title>
+<meta name="author" content="selffins" />
+<meta name="generator" content="Org Mode" />
+<style type="text/css">
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="custom.css">
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Some Linear Logic Notes</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org1729704">1. This Document</a></li>
+<li><a href="#orgd473e14">2. Linear Logic intro</a></li>
+<li><a href="#org22e6509">3. Multiplicative Conjunction <code>\tens</code></a>
+<ul>
+<li><a href="#org71ec3a4">3.1. Also known as</a></li>
+<li><a href="#org46caaea">3.2. Intuition</a></li>
+<li><a href="#org897e51f">3.3. Intro Rule</a></li>
+<li><a href="#orgaaf44a0">3.4. Elimination Rule</a></li>
+<li><a href="#org14f5213">3.5. Soundness</a></li>
+<li><a href="#org9b9a341">3.6. Completeness</a></li>
+</ul>
+</li>
+<li><a href="#org22c174e">4. Additive Conjunction</a>
+<ul>
+<li><a href="#orgabfd23d">4.1. Also known as</a></li>
+<li><a href="#org0d7a54d">4.2. Intuition</a></li>
+<li><a href="#orgd16df21">4.3. Intro rule</a></li>
+<li><a href="#orge5776fa">4.4. Difference between Multiplicative and Additive connectives</a></li>
+<li><a href="#org6ca49fb">4.5. Elim rule</a></li>
+<li><a href="#org3055962">4.6. LL additive conjunction is LJ conjunction</a></li>
+</ul>
+</li>
+<li><a href="#org7eb4a98">5. Linear Implication</a>
+<ul>
+<li><a href="#org6de0fa3">5.1. Also known as</a></li>
+<li><a href="#org41ff41f">5.2. Intuition</a></li>
+<li><a href="#org463eaf5">5.3. Intro</a></li>
+<li><a href="#org7cf31a9">5.4. Elimination</a></li>
+</ul>
+</li>
+<li><a href="#org1c79cf3">6. Unit</a>
+<ul>
+<li><a href="#orge1c2869">6.1. Intro</a></li>
+<li><a href="#org9eb5bbb">6.2. Elim</a></li>
+</ul>
+</li>
+<li><a href="#org5234f5c">7. Top</a></li>
+<li><a href="#org0dcc439">8. <span class="todo TODO">TODO</span> Disjunction</a>
+<ul>
+<li><a href="#org77dcde1">8.1. Also known as</a></li>
+<li><a href="#org73b1e26">8.2. <span class="todo TODO">TODO</span> Intuition</a></li>
+</ul>
+</li>
+<li><a href="#org2918159">9. Impossibility</a></li>
+<li><a href="#orga85a520">10. <span class="todo TODO">TODO</span> Modalities</a>
+<ul>
+<li><a href="#org7a908c8">10.1. Of course</a></li>
+<li><a href="#orgf46853d">10.2. Why not</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<hr />
+<p>
+<a href="index.html">Homepage</a>
+</p>
+<div id="outline-container-org1729704" class="outline-2">
+<h2 id="org1729704"><span class="section-number-2">1.</span> This Document</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+We follow <a href="https://ncatlab.org/nlab/files/Pfenning-LinearLogic98.pdf">Pfenning</a> (1998)&rsquo;s exposition Linear Logic in pages 22-30. We discuss the intro and elimination rules of the connectives as well as some metatheorems.
+</p>
+
+<p>
+Note: the system being described here is a natural deduction system, not a sequent calculus.
+</p>
+
+<p>
+However, it is important for purposes of intuition about linear logic - most presentations will be similar and contain the same connectives, have similar proofs of metatheorems.
+</p>
+
+<p>
+I don&rsquo;t have the capability to insert LaTeX in org-mode, so we will have to make do without the proper syntax and diagrams.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd473e14" class="outline-2">
+<h2 id="orgd473e14"><span class="section-number-2">2.</span> Linear Logic intro</h2>
+<div class="outline-text-2" id="text-2">
+<ul class="org-ul">
+<li>The linear judgement has the form &ldquo;<code>J_2</code> provided resource <code>J_1</code>&rdquo;.</li>
+<li>Example: I own book <code>b</code> provided I own <code>$5</code> (if book <code>b</code> is available and costs <code>5$</code>). If we had <code>$5</code>, we could have achieve a situation in which we owned the book.</li>
+<li>We can reread the judgement <code>\Delta |- A</code> as, we can use resources <code>\Delta</code> to achieve <code>A</code>.</li>
+<li>Linear hypotheses are used exactly once (consumed).</li>
+<li>This makes linear logic a logic of resources, as well as a logic of state, because we have to keep track of which resources have been used.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org22e6509" class="outline-2">
+<h2 id="org22e6509"><span class="section-number-2">3.</span> Multiplicative Conjunction <code>\tens</code></h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org71ec3a4" class="outline-3">
+<h3 id="org71ec3a4"><span class="section-number-3">3.1.</span> Also known as</h3>
+<div class="outline-text-3" id="text-3-1">
+<ul class="org-ul">
+<li>Tensor</li>
+<li>Simultaneous conjunction</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org46caaea" class="outline-3">
+<h3 id="org46caaea"><span class="section-number-3">3.2.</span> Intuition</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+Assume we have resources <code>\Delta</code>, and we want to achieve both goals <code>A</code> and <code>B</code> simultaneously. We would have to split our resources into <code>\Delta_1</code> to achieve <code>A</code>, and <code>\Delta_2</code> to achieve <code>B</code>. This split (bottom-up) or merge (top-down) is a non-deterministic operation. This splitting of resources is key to the difference between this and additive conjunction (<code>\par</code>).
+</p>
+</div>
+</div>
+<div id="outline-container-org897e51f" class="outline-3">
+<h3 id="org897e51f"><span class="section-number-3">3.3.</span> Intro Rule</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+Our intro rule (<code>tens I</code>) for multiplicative conjunction is then:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">   D_1 |- A    D_2 |- B
+ -------------------------- \tens I
+  D_1 x D_2 |- A \tens B
+</pre>
+</div>
+
+<p>
+Where <code>x</code> is the non-deterministic merge operation.
+</p>
+</div>
+</div>
+<div id="outline-container-orgaaf44a0" class="outline-3">
+<h3 id="orgaaf44a0"><span class="section-number-3">3.4.</span> Elimination Rule</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+We start by knowing that we could achieve <code>A \tens B</code> simultaneously from <code>\D</code>, i.e. <code>\D |- A \tens B</code>.
+We have to break this connective in order to derive something else (that&rsquo;s what an elimination rule is).
+Now with <code>A</code> and <code>B</code>, and any additional resources <code>\D'\</code>, we could achieve <code>C</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">    D |- A \tens B    D', A, B |- C
+---------------------------------------- \tens E
+          D x D' |- C
+</pre>
+</div>
+
+<p>
+Basically, we achieve <code>C</code> by first commiting <code>D'</code> to achieve <code>A</code> and <code>B</code> simultaneously, which we commit with <code>\D'</code> in order to achieve <code>C</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org14f5213" class="outline-3">
+<h3 id="org14f5213"><span class="section-number-3">3.5.</span> Soundness</h3>
+<div class="outline-text-3" id="text-3-5">
+<p>
+To do a proof of (local) soundness, we assume we have the derivations <code>Deriv_1 : \D_1 |- A</code>, <code>Deriv_2 : \D_1 |- B</code>, <code>Deriv_3 : \D', A, B |- C</code> and apply the intro (<code>\tens I</code>) and elimination rules (<code>\tens E</code> to derive <code>\D' x \D_1 x \D_2 |- C</code>.
+</p>
+
+<p>
+Then we show that we can prove this conclusion directly <code>\D' x \D_1 x \D_2 |- C</code> using the given derivations <code>Deriv_1, Deriv_2, Deriv_3</code> without having to use the introduction and elimination rules for that connective.
+</p>
+
+<p>
+Basically, we have to show that introducing and eliminating the connective does not give us any new information compared to a proof without that connective.
+</p>
+</div>
+</div>
+<div id="outline-container-org9b9a341" class="outline-3">
+<h3 id="org9b9a341"><span class="section-number-3">3.6.</span> Completeness</h3>
+<div class="outline-text-3" id="text-3-6">
+<p>
+Completeness is similar to soundness, but from the other direction. We have a direct proof <code>Deriv_1</code> of a formula that has the connective: <code>A \tens B</code>, and then we show that we can break it (bottom-up) into its consituents <code>A</code> and <code>B</code> (and that we do not obtain more judgements that we used to introduce the simultaneous conjunction.)
+</p>
+
+<p>
+We verify that the elimination rules are strong enough that we can reconstitute the connective from the constituents that we obtain from the elimination rule.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org22c174e" class="outline-2">
+<h2 id="org22c174e"><span class="section-number-2">4.</span> Additive Conjunction</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-orgabfd23d" class="outline-3">
+<h3 id="orgabfd23d"><span class="section-number-3">4.1.</span> Also known as</h3>
+<div class="outline-text-3" id="text-4-1">
+<ul class="org-ul">
+<li>Alternative conjunction</li>
+<li>With</li>
+<li>Internal choice</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org0d7a54d" class="outline-3">
+<h3 id="org0d7a54d"><span class="section-number-3">4.2.</span> Intuition</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+Suppose two books <code>b_1</code>, <code>b_2</code> cost <code>5$</code>. We have <code>5$</code>. Therefore given <code>5$</code>,we can get books <code>A</code> and <code>B</code>, although not simultaneously; we have to make a choice. But the capability to buy <span class="underline">both</span> of them from <code>$5</code> explains why this is a &ldquo;conjunction&rdquo;.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd16df21" class="outline-3">
+<h3 id="orgd16df21"><span class="section-number-3">4.3.</span> Intro rule</h3>
+<div class="outline-text-3" id="text-4-3">
+<div class="org-src-container">
+<pre class="src src-nil">    \D |- A    \D |- B
+-------------------------- &amp;I
+        \D |- A &amp; B
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orge5776fa" class="outline-3">
+<h3 id="orge5776fa"><span class="section-number-3">4.4.</span> Difference between Multiplicative and Additive connectives</h3>
+<div class="outline-text-3" id="text-4-4">
+<p>
+We notice that we have the hypotheses <code>\D |- A</code> and <code>\D |- B</code>. As in, we do not split our resources unlike <code>\tens</code>, with its <code>\D_1 |- A</code> and <code>\D_2 |- B</code> to get <code>\D_1 x \D_2 |- A \tens B</code>. This is key to the difference between multiplicative and additve connectives: rules for multiplicative connectives have to split the context.
+</p>
+</div>
+</div>
+<div id="outline-container-org6ca49fb" class="outline-3">
+<h3 id="org6ca49fb"><span class="section-number-3">4.5.</span> Elim rule</h3>
+<div class="outline-text-3" id="text-4-5">
+<div class="org-src-container">
+<pre class="src src-nil">    \D |- A &amp; B
+------------------- &amp; E_L
+      \D |- A
+
+    \D |- A &amp; B
+------------------- &amp; E_R
+      \D |- B
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org3055962" class="outline-3">
+<h3 id="org3055962"><span class="section-number-3">4.6.</span> LL additive conjunction is LJ conjunction</h3>
+<div class="outline-text-3" id="text-4-6">
+<p>
+Notice the intro rule and elim rules for LL additive conjunction. It&rsquo;s exactly the same as the rules for LJ conjunction. Thus, when we encode LJ into LL, we correspond <code>/\</code> with <code>&amp;</code>.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org7eb4a98" class="outline-2">
+<h2 id="org7eb4a98"><span class="section-number-2">5.</span> Linear Implication</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+<div id="outline-container-org6de0fa3" class="outline-3">
+<h3 id="org6de0fa3"><span class="section-number-3">5.1.</span> Also known as</h3>
+<div class="outline-text-3" id="text-5-1">
+<ul class="org-ul">
+<li>resource implication</li>
+<li>linear implication</li>
+<li>lollipop</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org41ff41f" class="outline-3">
+<h3 id="org41ff41f"><span class="section-number-3">5.2.</span> Intuition</h3>
+<div class="outline-text-3" id="text-5-2">
+<p>
+The linear implication internalizes the linear judgement at the level of propositions &#x2013; <code>A -o B</code> for the goal of achieving <code>B</code> with resource <code>A</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org463eaf5" class="outline-3">
+<h3 id="org463eaf5"><span class="section-number-3">5.3.</span> Intro</h3>
+<div class="outline-text-3" id="text-5-3">
+<p>
+Hence the intro is:
+</p>
+<div class="org-src-container">
+<pre class="src src-nil">     \D, A |- B
+------------------- -o I
+     \D |- A -o B
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org7cf31a9" class="outline-3">
+<h3 id="org7cf31a9"><span class="section-number-3">5.4.</span> Elimination</h3>
+<div class="outline-text-3" id="text-5-4">
+<p>
+If we know <code>A -o B</code>, we can obtain <code>B</code> from a derivation of <code>A</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">    \D |- A -o B    \D' |- A
+-------------------------------- -o E
+          \D x \D' |- B
+</pre>
+</div>
+
+<p>
+This is like modus ponens, HOWEVER, notice that we split our resources to prove <code>A -o B</code>, then prove <code>A</code>. This is like multiplicative rules: we need both <code>A -o B</code> and <code>A</code>, so we cannot use all of our resources to prove <code>A -o B</code> only or <code>A</code> only, hence the splitting.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org1c79cf3" class="outline-2">
+<h2 id="org1c79cf3"><span class="section-number-2">6.</span> Unit</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+The trivial goal which requires no resources is <code>1</code>. It is the unit of <code>\tens</code>, as in, <code>1 \tens A</code> is equivalent to <code>A</code>.
+</p>
+</div>
+<div id="outline-container-orge1c2869" class="outline-3">
+<h3 id="orge1c2869"><span class="section-number-3">6.1.</span> Intro</h3>
+<div class="outline-text-3" id="text-6-1">
+<div class="org-src-container">
+<pre class="src src-nil">-------------- 1 I
+    . |- 1
+</pre>
+</div>
+
+<p>
+Notice that we need an empty context (no resources) to prove <code>1</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org9eb5bbb" class="outline-3">
+<h3 id="org9eb5bbb"><span class="section-number-3">6.2.</span> Elim</h3>
+<div class="outline-text-3" id="text-6-2">
+<div class="org-src-container">
+<pre class="src src-nil">    \D |- 1    \D' |- C
+--------------------------- 1 I
+        \D' x \D |- C
+</pre>
+</div>
+
+<p>
+If we can achieve <code>1</code> from some resources <code>\D</code> (? Wouldn&rsquo;t this imply <code>\D</code> is <code>.</code>?), then we can consume <code>\D</code>, and proceed with achieving <code>C</code> using some other resources <code>\D'</code>. Therefore <code>D x D' |- C</code>.
+</p>
+
+<p>
+Notice again the splitting; this is why it is a multiplicative unit.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org5234f5c" class="outline-2">
+<h2 id="org5234f5c"><span class="section-number-2">7.</span> Top</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+The goal that consumes all resources. Unit of <code>&amp;</code>. It follows the same rules as intuitionistic truth. There is only one rule: intro, and no elimination.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">------------------- \top I
+    \D |- \top
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0dcc439" class="outline-2">
+<h2 id="org0dcc439"><span class="section-number-2">8.</span> <span class="todo TODO">TODO</span> Disjunction</h2>
+<div class="outline-text-2" id="text-8">
+</div>
+<div id="outline-container-org77dcde1" class="outline-3">
+<h3 id="org77dcde1"><span class="section-number-3">8.1.</span> Also known as</h3>
+<div class="outline-text-3" id="text-8-1">
+<ul class="org-ul">
+<li>External choice</li>
+<li>oplus</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org73b1e26" class="outline-3">
+<h3 id="org73b1e26"><span class="section-number-3">8.2.</span> <span class="todo TODO">TODO</span> Intuition</h3>
+<div class="outline-text-3" id="text-8-2">
+<p>
+We ignore this for now.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org2918159" class="outline-2">
+<h2 id="org2918159"><span class="section-number-2">9.</span> Impossibility</h2>
+<div class="outline-text-2" id="text-9">
+<p>
+Denoted as <code>0</code>. This is the case of a disjunction between zero alternatives and so is the unit of <code>\oplus</code>. This goal is impossible to prove, so there is no introduction rule, only an elimination.
+</p>
+<div class="org-src-container">
+<pre class="src src-nil">        \D |- 0
+ --------------------- 0 E
+     \D' x \D |- C
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orga85a520" class="outline-2">
+<h2 id="orga85a520"><span class="section-number-2">10.</span> <span class="todo TODO">TODO</span> Modalities</h2>
+<div class="outline-text-2" id="text-10">
+</div>
+<div id="outline-container-org7a908c8" class="outline-3">
+<h3 id="org7a908c8"><span class="section-number-3">10.1.</span> Of course</h3>
+</div>
+<div id="outline-container-orgf46853d" class="outline-3">
+<h3 id="orgf46853d"><span class="section-number-3">10.2.</span> Why not</h3>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: selffins</p>
+<p class="date">Created: 2025-05-14 Wed 15:59</p>
+</div>
+</body>
+</html>

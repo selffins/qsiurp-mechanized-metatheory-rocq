@@ -1,0 +1,179 @@
+#+title: Some Linear Logic Notes
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="custom.css">
+#+OPTIONS: num:2 toc:2
+
+------
+[[file:index.org][Homepage]]
+
+* This Document
+We follow [[https://ncatlab.org/nlab/files/Pfenning-LinearLogic98.pdf][Pfenning]] (1998)'s exposition Linear Logic in pages 22-30. We discuss the intro and elimination rules of the connectives as well as some metatheorems.
+
+Note: the system being described here is a natural deduction system, not a sequent calculus.
+
+However, it is important for purposes of intuition about linear logic - most presentations will be similar and contain the same connectives, have similar proofs of metatheorems.
+
+I don't have the capability to insert LaTeX in org-mode, so we will have to make do without the proper syntax and diagrams.
+
+* Linear Logic intro
+- The linear judgement has the form "=J_2= provided resource =J_1=".
+- Example: I own book =b= provided I own =$5= (if book =b= is available and costs =5$=). If we had =$5=, we could have achieve a situation in which we owned the book.
+- We can reread the judgement =\Delta |- A= as, we can use resources =\Delta= to achieve =A=.
+- Linear hypotheses are used exactly once (consumed).
+- This makes linear logic a logic of resources, as well as a logic of state, because we have to keep track of which resources have been used.
+
+
+* Multiplicative Conjunction =\tens=
+
+** Also known as
+- Tensor
+- Simultaneous conjunction
+
+** Intuition
+
+Assume we have resources =\Delta=, and we want to achieve both goals =A= and =B= simultaneously. We would have to split our resources into =\Delta_1= to achieve =A=, and =\Delta_2= to achieve =B=. This split (bottom-up) or merge (top-down) is a non-deterministic operation. This splitting of resources is key to the difference between this and additive conjunction (=\par=).
+
+** Intro Rule
+
+Our intro rule (=tens I=) for multiplicative conjunction is then:
+
+#+BEGIN_SRC
+   D_1 |- A    D_2 |- B
+ -------------------------- \tens I
+  D_1 x D_2 |- A \tens B
+#+END_SRC
+
+Where =x= is the non-deterministic merge operation.
+** Elimination Rule
+
+We start by knowing that we could achieve =A \tens B= simultaneously from =\D=, i.e. =\D |- A \tens B=.
+We have to break this connective in order to derive something else (that's what an elimination rule is).
+Now with =A= and =B=, and any additional resources =\D'\=, we could achieve =C=.
+
+#+BEGIN_SRC
+    D |- A \tens B    D', A, B |- C
+---------------------------------------- \tens E
+          D x D' |- C
+#+END_SRC
+
+Basically, we achieve =C= by first commiting =D'= to achieve =A= and =B= simultaneously, which we commit with =\D'= in order to achieve =C=.
+** Soundness
+
+To do a proof of (local) soundness, we assume we have the derivations =Deriv_1 : \D_1 |- A=, =Deriv_2 : \D_1 |- B=, =Deriv_3 : \D', A, B |- C= and apply the intro (=\tens I=) and elimination rules (=\tens E= to derive =\D' x \D_1 x \D_2 |- C=.
+
+Then we show that we can prove this conclusion directly =\D' x \D_1 x \D_2 |- C= using the given derivations =Deriv_1, Deriv_2, Deriv_3= without having to use the introduction and elimination rules for that connective.
+
+Basically, we have to show that introducing and eliminating the connective does not give us any new information compared to a proof without that connective.
+
+** Completeness
+
+Completeness is similar to soundness, but from the other direction. We have a direct proof =Deriv_1= of a formula that has the connective: =A \tens B=, and then we show that we can break it (bottom-up) into its consituents =A= and =B= (and that we do not obtain more judgements that we used to introduce the simultaneous conjunction.)
+
+We verify that the elimination rules are strong enough that we can reconstitute the connective from the constituents that we obtain from the elimination rule.
+
+* Additive Conjunction
+** Also known as
+- Alternative conjunction
+- With
+- Internal choice
+** Intuition
+Suppose two books =b_1=, =b_2= cost =5$=. We have =5$=. Therefore given =5$=,we can get books =A= and =B=, although not simultaneously; we have to make a choice. But the capability to buy _both_ of them from =$5= explains why this is a "conjunction".
+
+** Intro rule
+#+BEGIN_SRC
+    \D |- A    \D |- B
+-------------------------- &I
+        \D |- A & B
+#+END_SRC
+
+
+** Difference between Multiplicative and Additive connectives
+We notice that we have the hypotheses =\D |- A= and =\D |- B=. As in, we do not split our resources unlike =\tens=, with its =\D_1 |- A= and =\D_2 |- B= to get =\D_1 x \D_2 |- A \tens B=. This is key to the difference between multiplicative and additve connectives: rules for multiplicative connectives have to split the context.
+
+** Elim rule
+#+BEGIN_SRC
+    \D |- A & B
+------------------- & E_L
+      \D |- A
+
+    \D |- A & B
+------------------- & E_R
+      \D |- B
+#+END_SRC
+
+** LL additive conjunction is LJ conjunction
+
+Notice the intro rule and elim rules for LL additive conjunction. It's exactly the same as the rules for LJ conjunction. Thus, when we encode LJ into LL, we correspond =/\= with =&=.
+
+* Linear Implication
+** Also known as
+- resource implication
+- linear implication
+- lollipop
+** Intuition
+The linear implication internalizes the linear judgement at the level of propositions -- =A -o B= for the goal of achieving =B= with resource =A=.
+
+** Intro
+
+Hence the intro is:
+#+BEGIN_SRC
+     \D, A |- B
+------------------- -o I
+     \D |- A -o B
+#+END_SRC
+
+** Elimination
+
+If we know =A -o B=, we can obtain =B= from a derivation of =A=.
+
+#+BEGIN_SRC
+    \D |- A -o B    \D' |- A
+-------------------------------- -o E
+          \D x \D' |- B
+#+END_SRC
+
+This is like modus ponens, HOWEVER, notice that we split our resources to prove =A -o B=, then prove =A=. This is like multiplicative rules: we need both =A -o B= and =A=, so we cannot use all of our resources to prove =A -o B= only or =A= only, hence the splitting.
+
+* Unit
+The trivial goal which requires no resources is =1=. It is the unit of =\tens=, as in, =1 \tens A= is equivalent to =A=.
+** Intro
+#+BEGIN_SRC
+-------------- 1 I
+    . |- 1
+#+END_SRC
+
+Notice that we need an empty context (no resources) to prove =1=.
+** Elim
+#+BEGIN_SRC
+    \D |- 1    \D' |- C
+--------------------------- 1 I
+        \D' x \D |- C
+#+END_SRC
+
+If we can achieve =1= from some resources =\D= (? Wouldn't this imply =\D= is =.=?), then we can consume =\D=, and proceed with achieving =C= using some other resources =\D'=. Therefore =D x D' |- C=.
+
+Notice again the splitting; this is why it is a multiplicative unit.
+* Top
+The goal that consumes all resources. Unit of =&=. It follows the same rules as intuitionistic truth. There is only one rule: intro, and no elimination.
+
+#+BEGIN_SRC
+------------------- \top I
+    \D |- \top
+#+END_SRC
+* TODO Disjunction
+** Also known as
+- External choice
+- oplus
+
+** TODO Intuition
+We ignore this for now.
+* Impossibility
+ Denoted as =0=. This is the case of a disjunction between zero alternatives and so is the unit of =\oplus=. This goal is impossible to prove, so there is no introduction rule, only an elimination.
+ #+BEGIN_SRC
+        \D |- 0
+ --------------------- 0 E
+     \D' x \D |- C
+#+END_SRC
+* TODO Modalities
+** Of course
+** Why not

@@ -9,15 +9,9 @@ jobs:
   notify-discord:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Discord Commit Notification
+      - name: Discord Commits
         uses: Sniddl/discord-commits@v1.6
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          template: |
-            **🛠️ New commit pushed!**
-            **Repo:** ${{ github.repository }}
-            **Branch:** `${{ github.ref_name }}`
-            **Pusher:** ${{ github.actor }}
-            **Message:** `${{ github.event.head_commit.message }}`
-            **[🔗 View Commit](${{ github.event.head_commit.url }})`
+          template: "avatar-with-link"
           include-extras: true
