@@ -3,8 +3,7 @@
 #+OPTIONS: num:2 toc:1
 
 * Repository
-GitHub repo: [[https://github.com/selffins/qsiurp-mechanized-metatheory-rocq
-]]
+GitHub repo: [[https://github.com/selffins/qsiurp-mechanized-metatheory-rocq]]
 * Information
 *** Advisor: [[https://gisellereis.com/][Giselle Reis]] (greis)
 *** Student: (Earl) [[https:selffins.github.io/personal-website][Louis Quilling]] (equillin)
@@ -27,7 +26,7 @@ GitHub repo: [[https://github.com/selffins/qsiurp-mechanized-metatheory-rocq
 |        | <2025-05-14 Wed> | Meeting, ll-coq, ll           |
 |        | <2025-05-15 Thu> | list-perm-abella paper        |
 |        | <2025-05-18 Sun> | ll-trans-coq paper            |
-|        | <2025-05-19 Mon> |                               |
+|        | <2025-05-19 Mon> | carve-beluga paper            |
 |        | <2025-05-20 Tue> | Report                        |
 |--------+------------------+-------------------------------|
 | Week 2 |                  |                               |
