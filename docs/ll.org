@@ -132,7 +132,7 @@ If we know =A -o B=, we can obtain =B= from a derivation of =A=.
           \D x \D' |- B
 #+END_SRC
 
-This is like modus ponens, HOWEVER, notice that we split our resources to prove =A -o B=, then prove =A=. This is like multiplicative rules: we need both =A -o B= and =A=, so we cannot use all of our resources to prove =A -o B= only or =A= only, hence the splitting.
+This is like modus ponens, HOWEVER, notice that we split our resources to prove =A -o B=, then prove =A=. This is a multiplicative rule: we need both =A -o B= and =A=, so we cannot use all of our resources to prove =A -o B= only or =A= only, hence the splitting.
 
 * Unit
 The trivial goal which requires no resources is =1=. It is the unit of =\tens=, as in, =1 \tens A= is equivalent to =A=.

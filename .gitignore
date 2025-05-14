@@ -1,0 +1,9 @@
+# Ignoring rocq compilation files
+*.vo
+*.vok
+*.vos
+*.glob
+
+.*.aux
+
+.lia.cache

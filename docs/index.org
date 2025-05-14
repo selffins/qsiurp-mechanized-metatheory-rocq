@@ -16,25 +16,26 @@ GitHub repo: [[https://github.com/selffins/qsiurp-mechanized-metatheory-rocq]]
 ** [[file:ll-coq.org][ll-coq Notes]]
 ** [[file:ll.org][ll]] Notes
 ** [[https://docs.google.com/document/d/1nkUQMIwF58XunfpXqHyUzl_fvke-eUNLtPJ2vJo16Ys/edit?usp=sharing][Meeting Notes]]
+** [[file:~/qsiurp/playground/lj/lj.html][lj]] playground
 
 * Progress
 
-|--------+------------------+-------------------------------|
-|        | Date             | What                          |
-|--------+------------------+-------------------------------|
-| Week 1 | <2025-05-13 Tue> | ll-coq, GitHub Repo and Pages |
-|        | <2025-05-14 Wed> | Meeting, ll-coq, ll           |
-|        | <2025-05-15 Thu> | list-perm-abella paper        |
-|        | <2025-05-18 Sun> | ll-trans-coq paper            |
-|        | <2025-05-19 Mon> | carve-beluga paper            |
-|        | <2025-05-20 Tue> | Report                        |
-|--------+------------------+-------------------------------|
-| Week 2 |                  |                               |
-|        |                  |                               |
-|        |                  |                               |
-|        |                  |                               |
-|        |                  |                               |
-|--------+------------------+-------------------------------|
+|--------+------------------+--------------------------------------|
+|        | Date             | What                                 |
+|--------+------------------+--------------------------------------|
+| Week 1 | <2025-05-13 Tue> | ll-coq, GitHub Repo and Pages        |
+|        | <2025-05-14 Wed> | Meeting, ll-coq, ll, ./playground/lj |
+|        | <2025-05-15 Thu> | list-perm-abella paper               |
+|        | <2025-05-18 Sun> | ll-trans-coq paper                   |
+|        | <2025-05-19 Mon> | carve-beluga paper                   |
+|        | <2025-05-20 Tue> | Report                               |
+|--------+------------------+--------------------------------------|
+| Week 2 |                  |                                      |
+|        |                  |                                      |
+|        |                  |                                      |
+|        |                  |                                      |
+|        |                  |                                      |
+|--------+------------------+--------------------------------------|
 
 * Important Dates
 |------------------+-----------------|
