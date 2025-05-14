@@ -13,12 +13,15 @@ I present some notes and some todos about the paper.
 - Mechanizing Focused Linear Logic in Coq
 - Xavier, Olarte, Reis, Nigam
 
-
 * Summary
 - Formalized propositional and first order linear logic and proved them to be equivalent.
-- Proved cut-elimination and completeness of focusing
-- Encoded LJ into LL
+  - Two-sided, one-sided, dyadic, triadic FOLL.
+- Proved cut-elimination by cases, soundness, completeness, admissibility of structural rules.
+- Encoded LJ into LL and proved adequacy of encoding
 - Implementation: https://github.com/meta-logic/coq-ll
+  - Two parts: FOLL, and PLL.
+  - Used extended (extra theorems) Multisets library as context representation.
+  - Proofs proceeded by strong induction (which is defined in a file).
 * Intro
 
 ** Basic notions
@@ -138,12 +141,15 @@ Eval compute in Subst S t1.
 #+END_SRC
 - They prove two formulas are equivalent modulo remaining of bound variables. (?). ...
 
-
-
 * TODO Sequent Calculi
 
 - They depict classical first order linear logic. Fig 1, page 7.
-  - Then they study a different version with dyadic sequents, via Andreoli. An excerpt:
+  - Then they study a different version with dyadic sequents, via Andreoli.
+
+** TODO Multisets
+
+Excerpt of proofs about multiset equality.
+
 #+BEGIN_SRC coq
 Inductive sig2: list Lexp → list Lexp → Prop :=
 | sig2_init : forall B L A, L =mul= (A +) :: [A −] → ` B ; L
@@ -158,6 +164,7 @@ Focusing is a discipline by Andreoli aiming to reduce non-determinism. Proof as 
 *** LLF (Triadic focusing system for LL)
 - =\vbar \Theta : \Gamma \uparrow L= belongs to the negative phase. All positive formulas and atoms are moved to =\Gamma=.
 - =\vbar \Theta : \Gamma \downarrow A= belongs to the positive phase.
+- Also written as (in the implementation): =|-F- B ; M ; X=, where =B= is the classical context, =M= contains only positive formulas, =X= is an arrow that can be either =UP L=, where =L= is a list of forumlas in the negative phase, or =DW F=, where F is a formula in the positive phase.
 *** TODO Try out focusing
 It might be pedagogical to do a handwritten proof of a focused sequent: (see page 9 for proper rendering)
 #+BEGIN_SRC coq
@@ -175,17 +182,119 @@ Note that the formalized proof use user-defined tactics (from the authors) like 
 This section formalizes cut-elimination for the dyadic LL and completeness of focusing. They show the equivalence of all the systems and prove the consistency of LL as a corollary. (?).
 
 ** TODO Cut-Elimination proof
-(...)
-**
+*** TODO How is this stated?
+*** TODO What are the details of the proof?
 
 * TODO Applications
-They encode LJ into LL.
+They encode LJ into LL and prove adequacy of the encoding.
 
 * TODO Related and Future Work
 (...)
 
-* TODO The implementation
-I plan to check out the implementation and run the proofs. However, I am facing some difficulties compiling it right now.
+* TODO Implementation: FOLL
+These are the contents of the .v files in the FOLL library.
+
+** Files:
+1. Completeness.v
+2. CutElimination.v
+3. Eqset.v
+4. Multisets.v
+5. SequentCalculi.v
+6. StrongInduction.v
+7. CutCases.v
+8. CutTactics.v
+9. FLLMetaTheory.v
+10. SequentCalculi
+11. BasicTheory.v
+12. Soundness.v
+13. Syntax.v
+
+Weirdly enough, the directory structure is different (there are no folders). But the README describes the following directories:
+
+** LL/SyntaxLL
+- Defines syntax of linear logic and its notation.
+- Defines negative and positive formulas, polarity of atoms, etc. needed for the focused system.
+
+Here is the documentation in the Syntax.v file:
+
+Formulas in LL are built from the following syntax (in BNF):
+
+#+BEGIN_SRC
+F ::= A       (* atom *)
+  |   A ^     (* negated atom *)
+  |   ⊤       (* unit *)
+  |   ⊥       (* unit *)
+  |   0       (* unit *)
+  |   1       (* unit *)
+  |   F ** F  (* multiplicative conjunction / tensor *)
+  |   F $ F   (* multiplicative disjunction / par *)
+  |   F ⊕ F   (* additive and / oplus *)
+  |   F & F   (* additive disjunction / with *)
+  |   ! F     (* exponential; dereliction *)
+  |   ? F     (* exponential *)
+  |   E{ FX}  (* existential quantifier / of course *)
+  |   F{ FX}  (* universal quantifier / why not *)
+#+END_SRC
+
+where
+e - =A= is an atom.
+ - =A ^= is the negation of the atom =A=.
+ - =⊤,⊥,0,1= are the units
+ - =F ** F= is multiplicative conjunction (tensor)
+ - =F $ F= is multiplicative disjunction (par)
+ - =F & F= is additive conjunction (oplus)
+ - =F ⊕ F= is additive disjunction (oplus)
+ - =!, ?= are the exponentials.
+ - =E {FX}= existential quantifier
+ - =F {FX}= universal quantifier
+
+The usual dualities, moving negation inwards,  can be computed by [Dual_LExp] (notation [A°]).
+
+The linear implication [F -o F] is defined as [A° $ B].
+
+
+The weight (or complexity) of a formula can be obtained via [Lexp_weight].
+
+This file also defines the polarity of formulas following Andreoli's focused system (https://www.cs.cmu.edu/~fp/courses/15816-s12/misc/andreoli92jlc.pdf). Many lemmas on polarities are proved in Section [Polarities].
+
+** LL/Multisets
+- Representation of multisets and needed results
+** LL/SequentCalculi
+- We formalize different sequent calculi: two-sided, one-sided, dyadic, triadic systems.
+** LL/StrongInduction
+- Most of the proofs require the strong induction principle, which is defined here.
+** LL/StructuralRules
+
+*** TODO Admissibility of exchange rule (for all systems)
+
+**** TODO How is this statement written?
+**** TODO How does the proof proceed? Written and/or in implementation
+
+*** TODO Admissibility of weakening and contraction (for dyadic system)
+**** TODO How is this statement written?
+**** TODO How does the proof proceed? Written and/or in implementation
+
+** LL/CutCases
+Proves cut-elimination cases. Each lemma corresponds to one of the connectives and its dual.
+*** TODO Try out one case of the cut-elimination proof, written and/or ina implementation
+*** TODO Where do these cases sit in context of the full cut-elimination proof?
+** LL/MetaTheory/CutElimination
+In this file they prove the cases for the elimination of the rule cut.
+
+** LL/Soundness
+Proof of soundness of the focused system.
+*** TODO How is soundness written?
+*** TODO How does the proof proceed? Written and/or in implementation
+** LL/Completeness
+Proof of completeness for the focused system.
+*** TODO How is completeness written?
+*** TODO How does the proof proceed? Written and/or in implementation
+** LL/Examples/LJLL
+Proof of adequacy of the encoding of LJ into LL.
+*** TODO What is adequacy?
+*** TODO How is LJ encoded into LL?
+*** TODO How does the proof proceed? Written and/or in implementation
+* TODO Implemenation: PLL
 
 * Key papers
 - Andreoli's proofs on focused linear logic

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-05-13 Tue 15:06 -->
+<!-- 2025-05-14 Wed 07:50 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Linear Logic in Coq</title>
@@ -202,34 +202,50 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orge3c5037">1. Paper</a></li>
-<li><a href="#orgc6bf629">2. Summary</a></li>
-<li><a href="#orgf036289">3. Intro</a>
+<li><a href="#org13793eb">1. Paper</a></li>
+<li><a href="#org67ab693">2. Summary</a></li>
+<li><a href="#org36675fa">3. Intro</a>
 <ul>
-<li><a href="#org0bbc8f6">3.1. Basic notions</a></li>
-<li><a href="#org73f2922">3.2. Contributions</a></li>
+<li><a href="#orgbb8b1a6">3.1. Basic notions</a></li>
+<li><a href="#orga44cb28">3.2. Contributions</a></li>
 </ul>
 </li>
-<li><a href="#org1ad5fd1">4. Syntax</a>
+<li><a href="#org3487448">4. Syntax</a>
 <ul>
-<li><a href="#orgcdc6baf">4.1. Linear Logic connectives</a></li>
-<li><a href="#orgc160d7d">4.2. Some notes</a></li>
+<li><a href="#orga198cf8">4.1. Linear Logic connectives</a></li>
+<li><a href="#orgb02dd12">4.2. Some notes</a></li>
 </ul>
 </li>
-<li><a href="#org6bbc940">5. <span class="todo TODO">TODO</span> Sequent Calculi</a>
+<li><a href="#org72051f8">5. <span class="todo TODO">TODO</span> Sequent Calculi</a>
 <ul>
-<li><a href="#orgb7aaf79">5.1. Focused system</a></li>
+<li><a href="#org4dbcd71">5.1. <span class="todo TODO">TODO</span> Multisets</a></li>
+<li><a href="#org4192854">5.2. Focused system</a></li>
 </ul>
 </li>
-<li><a href="#org6810df7">6. <span class="todo TODO">TODO</span> Metatheory</a>
+<li><a href="#orgded570d">6. <span class="todo TODO">TODO</span> Metatheory</a>
 <ul>
-<li><a href="#org5da1420">6.1. <span class="todo TODO">TODO</span> Cut-Elimination proof</a></li>
+<li><a href="#org32aa337">6.1. <span class="todo TODO">TODO</span> Cut-Elimination proof</a></li>
 </ul>
 </li>
-<li><a href="#org5109aa5">7. <span class="todo TODO">TODO</span> Applications</a></li>
-<li><a href="#orgf1eb938">8. <span class="todo TODO">TODO</span> Related and Future Work</a></li>
-<li><a href="#org8aa4146">9. <span class="todo TODO">TODO</span> The implementation</a></li>
-<li><a href="#org93452cd">10. Key papers</a></li>
+<li><a href="#orgc5fb5aa">7. <span class="todo TODO">TODO</span> Applications</a></li>
+<li><a href="#org51d44d3">8. <span class="todo TODO">TODO</span> Related and Future Work</a></li>
+<li><a href="#orge98e794">9. <span class="todo TODO">TODO</span> Implementation: FOLL</a>
+<ul>
+<li><a href="#orge37c6f3">9.1. Files:</a></li>
+<li><a href="#orgb44194c">9.2. LL/SyntaxLL</a></li>
+<li><a href="#org4f8c77a">9.3. LL/Multisets</a></li>
+<li><a href="#org454e17f">9.4. LL/SequentCalculi</a></li>
+<li><a href="#org0f3dc40">9.5. LL/StrongInduction</a></li>
+<li><a href="#org9b9359a">9.6. LL/StructuralRules</a></li>
+<li><a href="#orgd1b55da">9.7. LL/CutCases</a></li>
+<li><a href="#orgf2ceae3">9.8. LL/MetaTheory/CutElimination</a></li>
+<li><a href="#orge5b89bd">9.9. LL/Soundness</a></li>
+<li><a href="#orgcb5779b">9.10. LL/Completeness</a></li>
+<li><a href="#orgde71fb9">9.11. LL/Examples/LJLL</a></li>
+</ul>
+</li>
+<li><a href="#org5f78a0b">10. <span class="todo TODO">TODO</span> Implemenation: PLL</a></li>
+<li><a href="#org36c84f2">11. Key papers</a></li>
 </ul>
 </div>
 </div>
@@ -241,8 +257,8 @@
 <p>
 I present some notes and some todos about the paper.
 </p>
-<div id="outline-container-orge3c5037" class="outline-2">
-<h2 id="orge3c5037"><span class="section-number-2">1.</span> Paper</h2>
+<div id="outline-container-org13793eb" class="outline-2">
+<h2 id="org13793eb"><span class="section-number-2">1.</span> Paper</h2>
 <div class="outline-text-2" id="text-1">
 <ul class="org-ul">
 <li><a href="https://gisellereis.com/papers/ll-coq.pdf">https://gisellereis.com/papers/ll-coq.pdf</a></li>
@@ -251,23 +267,31 @@ I present some notes and some todos about the paper.
 </ul>
 </div>
 </div>
-<div id="outline-container-orgc6bf629" class="outline-2">
-<h2 id="orgc6bf629"><span class="section-number-2">2.</span> Summary</h2>
+<div id="outline-container-org67ab693" class="outline-2">
+<h2 id="org67ab693"><span class="section-number-2">2.</span> Summary</h2>
 <div class="outline-text-2" id="text-2">
 <ul class="org-ul">
-<li>Formalized propositional and first order linear logic and proved them to be equivalent.</li>
-<li>Proved cut-elimination and completeness of focusing</li>
-<li>Encoded LJ into LL</li>
-<li>Implementation: <a href="https://github.com/meta-logic/coq-ll">https://github.com/meta-logic/coq-ll</a></li>
+<li>Formalized propositional and first order linear logic and proved them to be equivalent.
+<ul class="org-ul">
+<li>Two-sided, one-sided, dyadic, triadic FOLL.</li>
+</ul></li>
+<li>Proved cut-elimination by cases, soundness, completeness, admissibility of structural rules.</li>
+<li>Encoded LJ into LL and proved adequacy of encoding</li>
+<li>Implementation: <a href="https://github.com/meta-logic/coq-ll">https://github.com/meta-logic/coq-ll</a>
+<ul class="org-ul">
+<li>Two parts: FOLL, and PLL.</li>
+<li>Used extended (extra theorems) Multisets library as context representation.</li>
+<li>Proofs proceeded by strong induction (which is defined in a file).</li>
+</ul></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgf036289" class="outline-2">
-<h2 id="orgf036289"><span class="section-number-2">3.</span> Intro</h2>
+<div id="outline-container-org36675fa" class="outline-2">
+<h2 id="org36675fa"><span class="section-number-2">3.</span> Intro</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org0bbc8f6" class="outline-3">
-<h3 id="org0bbc8f6"><span class="section-number-3">3.1.</span> Basic notions</h3>
+<div id="outline-container-orgbb8b1a6" class="outline-3">
+<h3 id="orgbb8b1a6"><span class="section-number-3">3.1.</span> Basic notions</h3>
 <div class="outline-text-3" id="text-3-1">
 <ul class="org-ul">
 <li>Linear logic. A family of proof systems that lacks weakening and contraction; viewing formulas as resources  and has symmetry via distinguishing between multiplicative and additive connectives.</li>
@@ -278,48 +302,48 @@ I present some notes and some todos about the paper.
 </ul>
 </div>
 </div>
-<div id="outline-container-org73f2922" class="outline-3">
-<h3 id="org73f2922"><span class="section-number-3">3.2.</span> Contributions</h3>
+<div id="outline-container-orga44cb28" class="outline-3">
+<h3 id="orga44cb28"><span class="section-number-3">3.2.</span> Contributions</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 The paper presents a formalization of linear logic in Coq. Their main contributions are:
 </p>
 </div>
-<div id="outline-container-org3ed194f" class="outline-4">
-<h4 id="org3ed194f">Quantifiers</h4>
-<div class="outline-text-4" id="text-org3ed194f">
+<div id="outline-container-orgc8bc3b8" class="outline-4">
+<h4 id="orgc8bc3b8">Quantifiers</h4>
+<div class="outline-text-4" id="text-orgc8bc3b8">
 <p>
 They use parametric HOAS to encode LL, which avoids the bureaucracy regarding substition and variable binding. However, this causes them to introduce some axioms.
 </p>
 </div>
 </div>
-<div id="outline-container-orga86b7d7" class="outline-4">
-<h4 id="orga86b7d7">Focusing completeness</h4>
-<div class="outline-text-4" id="text-orga86b7d7">
+<div id="outline-container-org7882186" class="outline-4">
+<h4 id="org7882186">Focusing completeness</h4>
+<div class="outline-text-4" id="text-org7882186">
 <p>
 They provide the first formalization of first-order LL&rsquo;s cut-elimination and LL&rsquo;s focused proof system completeness.
 </p>
 </div>
 </div>
-<div id="outline-container-orgec1ad80" class="outline-4">
-<h4 id="orgec1ad80"><span class="todo TODO">TODO</span> Encoding proof systems</h4>
-<div class="outline-text-4" id="text-orgec1ad80">
+<div id="outline-container-org30ca669" class="outline-4">
+<h4 id="org30ca669"><span class="todo TODO">TODO</span> Encoding proof systems</h4>
+<div class="outline-text-4" id="text-org30ca669">
 <p>
 They encode LJ into LL.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc303e38" class="outline-4">
-<h4 id="orgc303e38">Treatment of contexts</h4>
-<div class="outline-text-4" id="text-orgc303e38">
+<div id="outline-container-org2d1d4d4" class="outline-4">
+<h4 id="org2d1d4d4">Treatment of contexts</h4>
+<div class="outline-text-4" id="text-org2d1d4d4">
 <p>
 For LL, contexts are multisets due to the lack of contraction and weakening. They show admissibility of exchange. They use the Coq library <code>Morphisms</code> in order to substitute between equivalent multisets. They had to extend the <code>Morphisms</code> library. They also developed tactics that handle the proofs on multisets.
 </p>
 </div>
 </div>
-<div id="outline-container-org240b241" class="outline-4">
-<h4 id="org240b241">Induction measures</h4>
-<div class="outline-text-4" id="text-org240b241">
+<div id="outline-container-org3e02723" class="outline-4">
+<h4 id="org3e02723">Induction measures</h4>
+<div class="outline-text-4" id="text-org3e02723">
 <p>
 They follow Andreoli&rsquo;s proof of cut elimination closely.
 </p>
@@ -327,20 +351,20 @@ They follow Andreoli&rsquo;s proof of cut elimination closely.
 </div>
 </div>
 </div>
-<div id="outline-container-org1ad5fd1" class="outline-2">
-<h2 id="org1ad5fd1"><span class="section-number-2">4.</span> Syntax</h2>
+<div id="outline-container-org3487448" class="outline-2">
+<h2 id="org3487448"><span class="section-number-2">4.</span> Syntax</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-orgcdc6baf" class="outline-3">
-<h3 id="orgcdc6baf"><span class="section-number-3">4.1.</span> Linear Logic connectives</h3>
+<div id="outline-container-orga198cf8" class="outline-3">
+<h3 id="orga198cf8"><span class="section-number-3">4.1.</span> Linear Logic connectives</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 There are <code>(+,-)</code> atoms, multiplicative connectives: tensor, 1, bot, par, additive connectives: oplus, and, 0, top, quantifiers: existential, universal, and exponential modalities: ! and ?.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc160d7d" class="outline-3">
-<h3 id="orgc160d7d"><span class="section-number-3">4.2.</span> Some notes</h3>
+<div id="outline-container-orgb02dd12" class="outline-3">
+<h3 id="orgb02dd12"><span class="section-number-3">4.2.</span> Some notes</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 I have notes but I don&rsquo;t really understand them, especially the nuances about higher-order abstract syntax.
@@ -464,15 +488,23 @@ They define a type <code>Subs</code> for substitutions and a substition function
 </div>
 </div>
 </div>
-<div id="outline-container-org6bbc940" class="outline-2">
-<h2 id="org6bbc940"><span class="section-number-2">5.</span> <span class="todo TODO">TODO</span> Sequent Calculi</h2>
+<div id="outline-container-org72051f8" class="outline-2">
+<h2 id="org72051f8"><span class="section-number-2">5.</span> <span class="todo TODO">TODO</span> Sequent Calculi</h2>
 <div class="outline-text-2" id="text-5">
 <ul class="org-ul">
 <li>They depict classical first order linear logic. Fig 1, page 7.
 <ul class="org-ul">
-<li>Then they study a different version with dyadic sequents, via Andreoli. An excerpt:</li>
+<li>Then they study a different version with dyadic sequents, via Andreoli.</li>
 </ul></li>
 </ul>
+</div>
+<div id="outline-container-org4dbcd71" class="outline-3">
+<h3 id="org4dbcd71"><span class="section-number-3">5.1.</span> <span class="todo TODO">TODO</span> Multisets</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+Excerpt of proofs about multiset equality.
+</p>
+
 <div class="org-src-container">
 <pre class="src src-coq"><span style="color: #FF6188;">Inductive</span> <span style="color: #A9DC76;">sig2</span>: list Lexp &#8594; list Lexp &#8594; <span style="color: #78DCE8;">Prop</span> :=
 | sig2_init : <span style="color: #78DCE8;">forall</span> <span style="color: #FCFCFA;">B L A</span>, L =mul= (A +) :: [A &#8722;] &#8594; ` B ; L
@@ -482,30 +514,32 @@ They define a type <code>Subs</code> for substitutions and a substition function
 </pre>
 </div>
 </div>
-<div id="outline-container-orgb7aaf79" class="outline-3">
-<h3 id="orgb7aaf79"><span class="section-number-3">5.1.</span> Focused system</h3>
-<div class="outline-text-3" id="text-5-1">
 </div>
-<div id="outline-container-org88125bb" class="outline-4">
-<h4 id="org88125bb">Focusing in LL</h4>
-<div class="outline-text-4" id="text-org88125bb">
+<div id="outline-container-org4192854" class="outline-3">
+<h3 id="org4192854"><span class="section-number-3">5.2.</span> Focused system</h3>
+<div class="outline-text-3" id="text-5-2">
+</div>
+<div id="outline-container-org3cbda75" class="outline-4">
+<h4 id="org3cbda75">Focusing in LL</h4>
+<div class="outline-text-4" id="text-org3cbda75">
 <p>
 Focusing is a discipline by Andreoli aiming to reduce non-determinism. Proof as organized in two alternating phases, called negative phase (which contains only invertible rules) and positive phase (containing only non-invertible rules). The invertible connectives: are par, bot, and, top, ?, universal quantifier. The non-invertible connectives are: tensor, 1, oplus, !, existential quantifier.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb0d1e25" class="outline-4">
-<h4 id="orgb0d1e25">LLF (Triadic focusing system for LL)</h4>
-<div class="outline-text-4" id="text-orgb0d1e25">
+<div id="outline-container-orgeda4ed2" class="outline-4">
+<h4 id="orgeda4ed2">LLF (Triadic focusing system for LL)</h4>
+<div class="outline-text-4" id="text-orgeda4ed2">
 <ul class="org-ul">
 <li><code>\vbar \Theta : \Gamma \uparrow L</code> belongs to the negative phase. All positive formulas and atoms are moved to <code>\Gamma</code>.</li>
 <li><code>\vbar \Theta : \Gamma \downarrow A</code> belongs to the positive phase.</li>
+<li>Also written as (in the implementation): <code>|-F- B ; M ; X</code>, where <code>B</code> is the classical context, <code>M</code> contains only positive formulas, <code>X</code> is an arrow that can be either <code>UP L</code>, where <code>L</code> is a list of forumlas in the negative phase, or <code>DW F</code>, where F is a formula in the positive phase.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org6c6bb41" class="outline-4">
-<h4 id="org6c6bb41"><span class="todo TODO">TODO</span> Try out focusing</h4>
-<div class="outline-text-4" id="text-org6c6bb41">
+<div id="outline-container-org3b26963" class="outline-4">
+<h4 id="org3b26963"><span class="todo TODO">TODO</span> Try out focusing</h4>
+<div class="outline-text-4" id="text-org3b26963">
 <p>
 It might be pedagogical to do a handwritten proof of a focused sequent: (see page 9 for proper rendering)
 </p>
@@ -526,50 +560,262 @@ Note that the formalized proof use user-defined tactics (from the authors) like 
 </div>
 </div>
 </div>
-<div id="outline-container-org6810df7" class="outline-2">
-<h2 id="org6810df7"><span class="section-number-2">6.</span> <span class="todo TODO">TODO</span> Metatheory</h2>
+<div id="outline-container-orgded570d" class="outline-2">
+<h2 id="orgded570d"><span class="section-number-2">6.</span> <span class="todo TODO">TODO</span> Metatheory</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 This section formalizes cut-elimination for the dyadic LL and completeness of focusing. They show the equivalence of all the systems and prove the consistency of LL as a corollary. (?).
 </p>
 </div>
-<div id="outline-container-org5da1420" class="outline-3">
-<h3 id="org5da1420"><span class="section-number-3">6.1.</span> <span class="todo TODO">TODO</span> Cut-Elimination proof</h3>
+<div id="outline-container-org32aa337" class="outline-3">
+<h3 id="org32aa337"><span class="section-number-3">6.1.</span> <span class="todo TODO">TODO</span> Cut-Elimination proof</h3>
 <div class="outline-text-3" id="text-6-1">
-<p>
-(&#x2026;)
-**
-</p>
+</div>
+<div id="outline-container-org49adf7c" class="outline-4">
+<h4 id="org49adf7c"><span class="todo TODO">TODO</span> How is this stated?</h4>
+</div>
+<div id="outline-container-org5bf05e2" class="outline-4">
+<h4 id="org5bf05e2"><span class="todo TODO">TODO</span> What are the details of the proof?</h4>
 </div>
 </div>
 </div>
-<div id="outline-container-org5109aa5" class="outline-2">
-<h2 id="org5109aa5"><span class="section-number-2">7.</span> <span class="todo TODO">TODO</span> Applications</h2>
+<div id="outline-container-orgc5fb5aa" class="outline-2">
+<h2 id="orgc5fb5aa"><span class="section-number-2">7.</span> <span class="todo TODO">TODO</span> Applications</h2>
 <div class="outline-text-2" id="text-7">
 <p>
-They encode LJ into LL.
+They encode LJ into LL and prove adequacy of the encoding.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf1eb938" class="outline-2">
-<h2 id="orgf1eb938"><span class="section-number-2">8.</span> <span class="todo TODO">TODO</span> Related and Future Work</h2>
+<div id="outline-container-org51d44d3" class="outline-2">
+<h2 id="org51d44d3"><span class="section-number-2">8.</span> <span class="todo TODO">TODO</span> Related and Future Work</h2>
 <div class="outline-text-2" id="text-8">
 <p>
 (&#x2026;)
 </p>
 </div>
 </div>
-<div id="outline-container-org8aa4146" class="outline-2">
-<h2 id="org8aa4146"><span class="section-number-2">9.</span> <span class="todo TODO">TODO</span> The implementation</h2>
+<div id="outline-container-orge98e794" class="outline-2">
+<h2 id="orge98e794"><span class="section-number-2">9.</span> <span class="todo TODO">TODO</span> Implementation: FOLL</h2>
 <div class="outline-text-2" id="text-9">
 <p>
-I plan to check out the implementation and run the proofs. However, I am facing some difficulties compiling it right now.
+These are the contents of the .v files in the FOLL library.
+</p>
+</div>
+<div id="outline-container-orge37c6f3" class="outline-3">
+<h3 id="orge37c6f3"><span class="section-number-3">9.1.</span> Files:</h3>
+<div class="outline-text-3" id="text-9-1">
+<ol class="org-ol">
+<li>Completeness.v</li>
+<li>CutElimination.v</li>
+<li>Eqset.v</li>
+<li>Multisets.v</li>
+<li>SequentCalculi.v</li>
+<li>StrongInduction.v</li>
+<li>CutCases.v</li>
+<li>CutTactics.v</li>
+<li>FLLMetaTheory.v</li>
+<li>SequentCalculi</li>
+<li>BasicTheory.v</li>
+<li>Soundness.v</li>
+<li>Syntax.v</li>
+</ol>
+
+<p>
+Weirdly enough, the directory structure is different (there are no folders). But the README describes the following directories:
 </p>
 </div>
 </div>
-<div id="outline-container-org93452cd" class="outline-2">
-<h2 id="org93452cd"><span class="section-number-2">10.</span> Key papers</h2>
-<div class="outline-text-2" id="text-10">
+<div id="outline-container-orgb44194c" class="outline-3">
+<h3 id="orgb44194c"><span class="section-number-3">9.2.</span> LL/SyntaxLL</h3>
+<div class="outline-text-3" id="text-9-2">
+<ul class="org-ul">
+<li>Defines syntax of linear logic and its notation.</li>
+<li>Defines negative and positive formulas, polarity of atoms, etc. needed for the focused system.</li>
+</ul>
+
+<p>
+Here is the documentation in the Syntax.v file:
+</p>
+
+<p>
+Formulas in LL are built from the following syntax (in BNF):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">F ::= A
+  |   A ^
+  |   ⊤
+  |   ⊥
+  |   0
+  |   1
+  |   F ** F
+  |   F $ F
+  |   F ⊕ F
+  |   F &amp; F
+  |   ! F
+  |   ? F
+  |   E{ FX}
+  |   F{ FX}
+</pre>
+</div>
+
+<p>
+where
+</p>
+<ul class="org-ul">
+<li><code>A</code> is an atom.</li>
+<li><code>A ^</code> is the negation of the atom <code>A</code>.</li>
+<li><code>⊤,⊥,0,1</code> are the units</li>
+<li><code>F ** F</code> is multiplicative conjunction (tensor)</li>
+<li><code>F $ F</code> is multiplicative disjunction (par)</li>
+<li><code>F &amp; F</code> is additive conjunction (oplus)</li>
+<li><code>F ⊕ F</code> is additive disjunction (oplus)</li>
+<li><code>!, ?</code> are the exponentials.</li>
+<li><code>E {FX}</code> existential quantifier</li>
+<li><code>F {FX}</code> universal quantifier</li>
+</ul>
+
+<p>
+The usual dualities, moving negation inwards,  can be computed by [Dual<sub>LExp</sub>] (notation [A°]).
+</p>
+
+<p>
+The linear implication [F -o F] is defined as [A° $ B].
+</p>
+
+
+<p>
+The weight (or complexity) of a formula can be obtained via [Lexp<sub>weight</sub>].
+</p>
+
+<p>
+This file also defines the polarity of formulas following Andreoli&rsquo;s focused system (<a href="https://www.cs.cmu.edu/~fp/courses/15816-s12/misc/andreoli92jlc.pdf">https://www.cs.cmu.edu/~fp/courses/15816-s12/misc/andreoli92jlc.pdf</a>). Many lemmas on polarities are proved in Section [Polarities].
+</p>
+</div>
+</div>
+<div id="outline-container-org4f8c77a" class="outline-3">
+<h3 id="org4f8c77a"><span class="section-number-3">9.3.</span> LL/Multisets</h3>
+<div class="outline-text-3" id="text-9-3">
+<ul class="org-ul">
+<li>Representation of multisets and needed results</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org454e17f" class="outline-3">
+<h3 id="org454e17f"><span class="section-number-3">9.4.</span> LL/SequentCalculi</h3>
+<div class="outline-text-3" id="text-9-4">
+<ul class="org-ul">
+<li>We formalize different sequent calculi: two-sided, one-sided, dyadic, triadic systems.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org0f3dc40" class="outline-3">
+<h3 id="org0f3dc40"><span class="section-number-3">9.5.</span> LL/StrongInduction</h3>
+<div class="outline-text-3" id="text-9-5">
+<ul class="org-ul">
+<li>Most of the proofs require the strong induction principle, which is defined here.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org9b9359a" class="outline-3">
+<h3 id="org9b9359a"><span class="section-number-3">9.6.</span> LL/StructuralRules</h3>
+<div class="outline-text-3" id="text-9-6">
+</div>
+<div id="outline-container-org55b4b82" class="outline-4">
+<h4 id="org55b4b82"><span class="todo TODO">TODO</span> Admissibility of exchange rule (for all systems)</h4>
+<div class="outline-text-4" id="text-org55b4b82">
+</div>
+<ul class="org-ul">
+<li><a id="orge53aa4d"></a><span class="todo TODO">TODO</span> How is this statement written?<br /></li>
+<li><a id="orgd1d093f"></a><span class="todo TODO">TODO</span> How does the proof proceed? Written and/or in implementation<br /></li>
+</ul>
+</div>
+<div id="outline-container-org5342b72" class="outline-4">
+<h4 id="org5342b72"><span class="todo TODO">TODO</span> Admissibility of weakening and contraction (for dyadic system)</h4>
+<div class="outline-text-4" id="text-org5342b72">
+</div>
+<ul class="org-ul">
+<li><a id="org2bb483d"></a><span class="todo TODO">TODO</span> How is this statement written?<br /></li>
+<li><a id="orge6c5cad"></a><span class="todo TODO">TODO</span> How does the proof proceed? Written and/or in implementation<br /></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgd1b55da" class="outline-3">
+<h3 id="orgd1b55da"><span class="section-number-3">9.7.</span> LL/CutCases</h3>
+<div class="outline-text-3" id="text-9-7">
+<p>
+Proves cut-elimination cases. Each lemma corresponds to one of the connectives and its dual.
+</p>
+</div>
+<div id="outline-container-org3b95a6c" class="outline-4">
+<h4 id="org3b95a6c"><span class="todo TODO">TODO</span> Try out one case of the cut-elimination proof, written and/or ina implementation</h4>
+</div>
+<div id="outline-container-org104fb7e" class="outline-4">
+<h4 id="org104fb7e"><span class="todo TODO">TODO</span> Where do these cases sit in context of the full cut-elimination proof?</h4>
+</div>
+</div>
+<div id="outline-container-orgf2ceae3" class="outline-3">
+<h3 id="orgf2ceae3"><span class="section-number-3">9.8.</span> LL/MetaTheory/CutElimination</h3>
+<div class="outline-text-3" id="text-9-8">
+<p>
+In this file they prove the cases for the elimination of the rule cut.
+</p>
+</div>
+</div>
+<div id="outline-container-orge5b89bd" class="outline-3">
+<h3 id="orge5b89bd"><span class="section-number-3">9.9.</span> LL/Soundness</h3>
+<div class="outline-text-3" id="text-9-9">
+<p>
+Proof of soundness of the focused system.
+</p>
+</div>
+<div id="outline-container-org6b6f650" class="outline-4">
+<h4 id="org6b6f650"><span class="todo TODO">TODO</span> How is soundness written?</h4>
+</div>
+<div id="outline-container-org7ae4689" class="outline-4">
+<h4 id="org7ae4689"><span class="todo TODO">TODO</span> How does the proof proceed? Written and/or in implementation</h4>
+</div>
+</div>
+<div id="outline-container-orgcb5779b" class="outline-3">
+<h3 id="orgcb5779b"><span class="section-number-3">9.10.</span> LL/Completeness</h3>
+<div class="outline-text-3" id="text-9-10">
+<p>
+Proof of completeness for the focused system.
+</p>
+</div>
+<div id="outline-container-orgf46ae11" class="outline-4">
+<h4 id="orgf46ae11"><span class="todo TODO">TODO</span> How is completeness written?</h4>
+</div>
+<div id="outline-container-orgfd7c70c" class="outline-4">
+<h4 id="orgfd7c70c"><span class="todo TODO">TODO</span> How does the proof proceed? Written and/or in implementation</h4>
+</div>
+</div>
+<div id="outline-container-orgde71fb9" class="outline-3">
+<h3 id="orgde71fb9"><span class="section-number-3">9.11.</span> LL/Examples/LJLL</h3>
+<div class="outline-text-3" id="text-9-11">
+<p>
+Proof of adequacy of the encoding of LJ into LL.
+</p>
+</div>
+<div id="outline-container-orge8a4fbf" class="outline-4">
+<h4 id="orge8a4fbf"><span class="todo TODO">TODO</span> What is adequacy?</h4>
+</div>
+<div id="outline-container-orgda4abea" class="outline-4">
+<h4 id="orgda4abea"><span class="todo TODO">TODO</span> How is LJ encoded into LL?</h4>
+</div>
+<div id="outline-container-orgb0a130d" class="outline-4">
+<h4 id="orgb0a130d"><span class="todo TODO">TODO</span> How does the proof proceed? Written and/or in implementation</h4>
+</div>
+</div>
+</div>
+<div id="outline-container-org5f78a0b" class="outline-2">
+<h2 id="org5f78a0b"><span class="section-number-2">10.</span> <span class="todo TODO">TODO</span> Implemenation: PLL</h2>
+</div>
+
+<div id="outline-container-org36c84f2" class="outline-2">
+<h2 id="org36c84f2"><span class="section-number-2">11.</span> Key papers</h2>
+<div class="outline-text-2" id="text-11">
 <ul class="org-ul">
 <li>Andreoli&rsquo;s proofs on focused linear logic</li>
 <li>Chlipala on parametric higher order syntax</li>
@@ -579,7 +825,7 @@ I plan to check out the implementation and run the proofs. However, I am facing 
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: selffins</p>
-<p class="date">Created: 2025-05-13 Tue 15:06</p>
+<p class="date">Created: 2025-05-14 Wed 07:50</p>
 </div>
 </body>
 </html>

@@ -5,21 +5,35 @@
 * Repository
 GitHub repo: [[https://github.com/selffins/qsiurp-mechanized-metatheory-rocq
 ]]
-
 * Information
 *** Advisor: [[https://gisellereis.com/][Giselle Reis]] (greis)
 *** Student: (Earl) [[https:selffins.github.io/personal-website][Louis Quilling]] (equillin)
 
 * Documents
 
-** Presentation
-[[https://docs.google.com/presentation/d/1TJ2Zh2arbcJg1sfhH43UgxwyR4jR1v3A-tMWsmTdAkA/edit?usp=sharing][QSIURP presentation]]
-** Proposal
-[[https://docs.google.com/document/d/1a2aj9vDFRQNm6qs9QAtJ1ke0oAE4_gVO/edit?usp=sharing&ouid=106287385083655542886&rtpof=true&sd=true][Project Proposal]]
-** Proof Theory Notes
-[[https://docs.google.com/presentation/d/1pKhSRDCueyRUT_4oaNlKhG_3YqA5DCR8Xfu6Dj3Zg74/edit?usp=sharing][Proof Theory Notes]]
-** May 13: coq-ll paper
-[[file:coq-ll.org][coq-ll Notes]]
+** [[https://docs.google.com/presentation/d/1TJ2Zh2arbcJg1sfhH43UgxwyR4jR1v3A-tMWsmTdAkA/edit?usp=sharing][QSIURP presentation]]
+** [[https://docs.google.com/document/d/1a2aj9vDFRQNm6qs9QAtJ1ke0oAE4_gVO/edit?usp=sharing&ouid=106287385083655542886&rtpof=true&sd=true][Project Proposal]]
+** [[https://docs.google.com/presentation/d/1pKhSRDCueyRUT_4oaNlKhG_3YqA5DCR8Xfu6Dj3Zg74/edit?usp=sharing][Proof Theory Notes]]
+** [[file:coq-ll.org][ll-coq Notes]]
+
+* Progress
+
+|--------+------------------+-------------------------------------|
+|        | Date             | What                                |
+|--------+------------------+-------------------------------------|
+| Week 1 | <2025-05-13 Tue> | ll-coq paper, GitHub Repo and Pages |
+|        | <2025-05-14 Wed> | carve-beluga paper                  |
+|        | <2025-05-15 Thu> | list-perm-abella paper              |
+|        | <2025-05-18 Sun> | ll-trans-coq paper                  |
+|        | <2025-05-19 Mon> |                                     |
+|        | <2025-05-20 Tue> | Report                              |
+|--------+------------------+-------------------------------------|
+| Week 2 |                  |                                     |
+|        |                  |                                     |
+|        |                  |                                     |
+|        |                  |                                     |
+|        |                  |                                     |
+|--------+------------------+-------------------------------------|
 
 * Important Dates
 |------------------+-----------------|
@@ -36,3 +50,11 @@ GitHub repo: [[https://github.com/selffins/qsiurp-mechanized-metatheory-rocq
 #+CAPTION: QSIURP Schedule
 #+NAME: fig:sch
 [[./img/sch.png]]
+
+* How to Install Rocq
+We use Rocq 9.0.
+- Using opam: https://rocq-prover.org/docs/using-opam
+- VSCode for Coq: https://github.com/rocq-prover/vscoq
+- Emacs for Coq:
+  - Proof General: https://proofgeneral.github.io/. Install from MELPA.
+  - Company-Coq minor mode: https://github.com/cpitclaudel/company-coq. Install from MELPA.
