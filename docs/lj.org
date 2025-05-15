@@ -1,0 +1,60 @@
+#+title: LJ blog post
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="custom.css">
+#+OPTIONS: num:2 toc:2
+
+------
+[[file:index.org][Homepage]]
+
+One of the systems we will study and formalize using different context-representations is LJ. In this post I talk about LJ and my progress so far at a rudimentary version of LJ in Rocq. The major source is the "Encyclopedia of Proof Systems", "coq-ll" codebase, and the book "An Introduction to Proof Theory" by Zach, Galvano, Mancosu.
+
+* NJ
+
+Natural deduction was created by Gentzen in order to address the issues with axiomatic calculi - proofs in axiomatic calculi were hard to conduct because of the single inference rule modus ponens.
+
+Natural deduction focuses on inference rules and is more natural to how mathematicians conduct proof. In particular, it allows for conditional proofs; making an assumption and then discharging it. It also allows for proof by cases (compare to axiomatic calculi which does not branch).
+
+A deduction in NJ is therefore a tree, not a sequence.
+
+Natural deduction is different from sequent calculus in that the sequent is introduced; assumptions are not introduced and discharged (and many more nuances).
+
+NJ has some properties (meta-theeorems) like the subformula property which I am not too familiar with yet.
+
+* LJ
+
+LJ, also called intuitionistic sequent calclus, was introduced by Gentzen in 1935. It is the sequent calculus version of NJ, an intuitionistic natural deduction system.
+
+Intuitionistic here means that there is at most one formula at the right-hand of the sequent. This is because law of excluded middle -  is not provable when this restriction is made.
+
+LJ can be encoded into other systems and vice versa. Like NJ to LJ or LJ to NJ or LJ to LL.
+
+The next section details a "modern presentation" of LJ and my very small pseudo-Coq code of LJ.
+
+* LJ on paper
+
+We modernize Gentzen's LJ a little bit by doing rules like putting formulas in front of contexts and using =A=, =B=, =C= for formulas; greek letters for contexts.
+
+#+CAPTION: LJ syntax
+#+NAME: fig:lj-syn
+[[./img/lj-syntax.png]]
+
+* LJ in Coq
+
+Here we have the syntax and inference rules.
+
+A formula is an inductive type.
+
+#+CAPTION: LJ syntax
+#+NAME: fig:lj-syn
+[[./img/lj-syntax.png]]
+
+Inference rules are an inductive proposition.
+
+#+CAPTION: LJ inference rules
+#+NAME: fig:lj-syn
+[[./img/lj-coq.png]]
+
+
+I plan to continue by actually making this into proper coq-code and do at least a proof of the intuitionistic double negation in Coq.
+
+Unfortunately, I deleted the file that contains the work above, without doing version control. Oh well :D. At least I have it on image -- this is pseudocode anyway.

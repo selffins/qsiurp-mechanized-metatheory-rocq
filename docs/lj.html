@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-05-15 Thu 15:57 -->
+<!-- 2025-05-15 Thu 15:56 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>QSIURP: Context Representations in Mechanized Metatheory</title>
+<title>LJ blog post</title>
 <meta name="author" content="selffins" />
 <meta name="generator" content="Org Mode" />
 <style type="text/css">
@@ -197,233 +197,128 @@
 </head>
 <body>
 <div id="content" class="content">
-<h1 class="title">QSIURP: Context Representations in Mechanized Metatheory</h1>
+<h1 class="title">LJ blog post</h1>
 <div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orga5b685b">1. Repository</a></li>
-<li><a href="#org5e9b91b">2. Information</a></li>
-<li><a href="#orgb14344b">3. Documents</a></li>
-<li><a href="#orgfe83604">4. Progress</a></li>
-<li><a href="#org063ac99">5. Important Dates</a></li>
-<li><a href="#orgc7413af">6. Schedule</a></li>
-<li><a href="#org884aba6">7. How to Install Rocq</a></li>
+<li><a href="#org9f1f8ee">1. NJ</a></li>
+<li><a href="#orgaaac7a7">2. LJ</a></li>
+<li><a href="#org73ce169">3. LJ on paper</a></li>
+<li><a href="#orgb56035e">4. LJ in Coq</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orga5b685b" class="outline-2">
-<h2 id="orga5b685b"><span class="section-number-2">1.</span> Repository</h2>
+<hr />
+<p>
+<a href="index.html">Homepage</a>
+</p>
+
+<p>
+One of the systems we will study and formalize using different context-representations is LJ. In this post I talk about LJ and my progress so far at a rudimentary version of LJ in Rocq. The major source is the &ldquo;Encyclopedia of Proof Systems&rdquo;, &ldquo;coq-ll&rdquo; codebase, and the book &ldquo;An Introduction to Proof Theory&rdquo; by Zach, Galvano, Mancosu.
+</p>
+<div id="outline-container-org9f1f8ee" class="outline-2">
+<h2 id="org9f1f8ee"><span class="section-number-2">1.</span> NJ</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-GitHub repo: <a href="https://github.com/selffins/qsiurp-mechanized-metatheory-rocq">https://github.com/selffins/qsiurp-mechanized-metatheory-rocq</a>
+Natural deduction was created by Gentzen in order to address the issues with axiomatic calculi - proofs in axiomatic calculi were hard to conduct because of the single inference rule modus ponens.
 </p>
-</div>
-</div>
-<div id="outline-container-org5e9b91b" class="outline-2">
-<h2 id="org5e9b91b"><span class="section-number-2">2.</span> Information</h2>
-<div class="outline-text-2" id="text-2">
-</div>
-<div id="outline-container-orgcd9e0dd" class="outline-4">
-<h4 id="orgcd9e0dd">Advisor: <a href="https://gisellereis.com/">Giselle Reis</a> (greis)</h4>
-</div>
-<div id="outline-container-org54659ab" class="outline-4">
-<h4 id="org54659ab">Student: (Earl) <a href="https:selffins.github.io/personal-website">Louis Quilling</a> (equillin)</h4>
-</div>
-</div>
-<div id="outline-container-orgb14344b" class="outline-2">
-<h2 id="orgb14344b"><span class="section-number-2">3.</span> Documents</h2>
-<div class="outline-text-2" id="text-3">
-</div>
-<div id="outline-container-org361bbcd" class="outline-3">
-<h3 id="org361bbcd"><span class="section-number-3">3.1.</span> <a href="https://docs.google.com/presentation/d/1TJ2Zh2arbcJg1sfhH43UgxwyR4jR1v3A-tMWsmTdAkA/edit?usp=sharing">QSIURP presentation</a></h3>
-</div>
-<div id="outline-container-orgc39160b" class="outline-3">
-<h3 id="orgc39160b"><span class="section-number-3">3.2.</span> <a href="https://docs.google.com/document/d/1a2aj9vDFRQNm6qs9QAtJ1ke0oAE4_gVO/edit?usp=sharing&amp;ouid=106287385083655542886&amp;rtpof=true&amp;sd=true">Project Proposal</a></h3>
-</div>
-<div id="outline-container-orgc481601" class="outline-3">
-<h3 id="orgc481601"><span class="section-number-3">3.3.</span> <a href="https://docs.google.com/presentation/d/1pKhSRDCueyRUT_4oaNlKhG_3YqA5DCR8Xfu6Dj3Zg74/edit?usp=sharing">Proof Theory Notes</a></h3>
-</div>
-<div id="outline-container-orgbd8d60b" class="outline-3">
-<h3 id="orgbd8d60b"><span class="section-number-3">3.4.</span> <a href="ll-coq.html">ll-coq Notes</a></h3>
-</div>
-<div id="outline-container-org9d47d5f" class="outline-3">
-<h3 id="org9d47d5f"><span class="section-number-3">3.5.</span> <a href="ll.html">ll</a> Notes</h3>
-</div>
-<div id="outline-container-org69bb446" class="outline-3">
-<h3 id="org69bb446"><span class="section-number-3">3.6.</span> <a href="https://docs.google.com/document/d/1nkUQMIwF58XunfpXqHyUzl_fvke-eUNLtPJ2vJo16Ys/edit?usp=sharing">Meeting Notes</a></h3>
-</div>
-<div id="outline-container-org410cda1" class="outline-3">
-<h3 id="org410cda1"><span class="section-number-3">3.7.</span> <a href="file:///home/selffins/qsiurp/playground/lj/lj.html">lj</a> playground</h3>
-</div>
-<div id="outline-container-org16b1854" class="outline-3">
-<h3 id="org16b1854"><span class="section-number-3">3.8.</span> <a href="lj.html">lj blog post</a></h3>
-</div>
-</div>
-<div id="outline-container-orgfe83604" class="outline-2">
-<h2 id="orgfe83604"><span class="section-number-2">4.</span> Progress</h2>
-<div class="outline-text-2" id="text-4">
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
-
-<colgroup>
-<col  class="org-left" />
-
-<col  class="org-left" />
-
-<col  class="org-left" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-left">&#xa0;</th>
-<th scope="col" class="org-left">Date</th>
-<th scope="col" class="org-left">What</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-left">Week 1</td>
-<td class="org-left"><span class="timestamp-wrapper"><span class="timestamp">&lt;2025-05-13 Tue&gt;</span></span></td>
-<td class="org-left">ll-coq, GitHub Repo and Pages</td>
-</tr>
-
-<tr>
-<td class="org-left">&#xa0;</td>
-<td class="org-left"><span class="timestamp-wrapper"><span class="timestamp">&lt;2025-05-14 Wed&gt;</span></span></td>
-<td class="org-left">Meeting, ll-coq, ll, ./playground/lj</td>
-</tr>
-
-<tr>
-<td class="org-left">&#xa0;</td>
-<td class="org-left"><span class="timestamp-wrapper"><span class="timestamp">&lt;2025-05-15 Thu&gt;</span></span></td>
-<td class="org-left">ll-coq compile, lj code, lj post</td>
-</tr>
-
-<tr>
-<td class="org-left">&#xa0;</td>
-<td class="org-left"><span class="timestamp-wrapper"><span class="timestamp">&lt;2025-05-18 Sun&gt;</span></span></td>
-<td class="org-left">ll-trans-coq paper</td>
-</tr>
-
-<tr>
-<td class="org-left">&#xa0;</td>
-<td class="org-left"><span class="timestamp-wrapper"><span class="timestamp">&lt;2025-05-19 Mon&gt;</span></span></td>
-<td class="org-left">carve-beluga paper</td>
-</tr>
-
-<tr>
-<td class="org-left">&#xa0;</td>
-<td class="org-left"><span class="timestamp-wrapper"><span class="timestamp">&lt;2025-05-20 Tue&gt;</span></span></td>
-<td class="org-left">Report</td>
-</tr>
-</tbody>
-<tbody>
-<tr>
-<td class="org-left">Week 2</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="outline-container-org063ac99" class="outline-2">
-<h2 id="org063ac99"><span class="section-number-2">5.</span> Important Dates</h2>
-<div class="outline-text-2" id="text-5">
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="org-left" />
-
-<col  class="org-left" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-left">Date</th>
-<th scope="col" class="org-left">What</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-left">May 13</td>
-<td class="org-left">Project Start</td>
-</tr>
-
-<tr>
-<td class="org-left">June 16</td>
-<td class="org-left">Progress Report</td>
-</tr>
-
-<tr>
-<td class="org-left">June 22 - July 6</td>
-<td class="org-left">OPLSS</td>
-</tr>
-
-<tr>
-<td class="org-left">Aug 3</td>
-<td class="org-left">Final Report</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="outline-container-orgc7413af" class="outline-2">
-<h2 id="orgc7413af"><span class="section-number-2">6.</span> Schedule</h2>
-<div class="outline-text-2" id="text-6">
-
-<div id="org37bfe61" class="figure">
-<p><img src="./img/sch.png" alt="sch.png" />
-</p>
-<p><span class="figure-number">Figure 1: </span>QSIURP Schedule</p>
-</div>
-</div>
-</div>
-<div id="outline-container-org884aba6" class="outline-2">
-<h2 id="org884aba6"><span class="section-number-2">7.</span> How to Install Rocq</h2>
-<div class="outline-text-2" id="text-7">
 <p>
-We use Rocq 9.0.
+Natural deduction focuses on inference rules and is more natural to how mathematicians conduct proof. In particular, it allows for conditional proofs; making an assumption and then discharging it. It also allows for proof by cases (compare to axiomatic calculi which does not branch).
 </p>
-<ul class="org-ul">
-<li>Using opam: <a href="https://rocq-prover.org/docs/using-opam">https://rocq-prover.org/docs/using-opam</a></li>
-<li>VSCode for Coq: <a href="https://github.com/rocq-prover/vscoq">https://github.com/rocq-prover/vscoq</a></li>
-<li>Emacs for Coq:
-<ul class="org-ul">
-<li>Proof General: <a href="https://proofgeneral.github.io/">https://proofgeneral.github.io/</a>. Install from MELPA.</li>
-<li>Company-Coq minor mode: <a href="https://github.com/cpitclaudel/company-coq">https://github.com/cpitclaudel/company-coq</a>. Install from MELPA.</li>
-</ul></li>
-</ul>
+
+<p>
+A deduction in NJ is therefore a tree, not a sequence.
+</p>
+
+<p>
+Natural deduction is different from sequent calculus in that the sequent is introduced; assumptions are not introduced and discharged (and many more nuances).
+</p>
+
+<p>
+NJ has some properties (meta-theeorems) like the subformula property which I am not too familiar with yet.
+</p>
+</div>
+</div>
+<div id="outline-container-orgaaac7a7" class="outline-2">
+<h2 id="orgaaac7a7"><span class="section-number-2">2.</span> LJ</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+LJ, also called intuitionistic sequent calclus, was introduced by Gentzen in 1935. It is the sequent calculus version of NJ, an intuitionistic natural deduction system.
+</p>
+
+<p>
+Intuitionistic here means that there is at most one formula at the right-hand of the sequent. This is because law of excluded middle -  is not provable when this restriction is made.
+</p>
+
+<p>
+LJ can be encoded into other systems and vice versa. Like NJ to LJ or LJ to NJ or LJ to LL.
+</p>
+
+<p>
+The next section details a &ldquo;modern presentation&rdquo; of LJ and my very small pseudo-Coq code of LJ.
+</p>
+</div>
+</div>
+<div id="outline-container-org73ce169" class="outline-2">
+<h2 id="org73ce169"><span class="section-number-2">3.</span> LJ on paper</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+We modernize Gentzen&rsquo;s LJ a little bit by doing rules like putting formulas in front of contexts and using <code>A</code>, <code>B</code>, <code>C</code> for formulas; greek letters for contexts.
+</p>
+
+
+<div id="org193829f" class="figure">
+<p><img src="./img/lj-syntax.png" alt="lj-syntax.png" />
+</p>
+<p><span class="figure-number">Figure 1: </span>LJ syntax</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb56035e" class="outline-2">
+<h2 id="orgb56035e"><span class="section-number-2">4.</span> LJ in Coq</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Here we have the syntax and inference rules.
+</p>
+
+<p>
+A formula is an inductive type.
+</p>
+
+
+<div id="org39a872b" class="figure">
+<p><img src="./img/lj-syntax.png" alt="lj-syntax.png" />
+</p>
+<p><span class="figure-number">Figure 2: </span>LJ syntax</p>
+</div>
+
+<p>
+Inference rules are an inductive proposition.
+</p>
+
+
+<div id="orgdcb7f75" class="figure">
+<p><img src="./img/lj-coq.png" alt="lj-coq.png" />
+</p>
+<p><span class="figure-number">Figure 3: </span>LJ inference rules</p>
+</div>
+
+
+<p>
+I plan to continue by actually making this into proper coq-code and do at least a proof of the intuitionistic double negation in Coq.
+</p>
+
+<p>
+Unfortunately, I deleted the file that contains the work above, without doing version control. Oh well :D. At least I have it on image &#x2013; this is pseudocode anyway.
+</p>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: selffins</p>
-<p class="date">Created: 2025-05-15 Thu 15:57</p>
+<p class="date">Created: 2025-05-15 Thu 15:56</p>
 </div>
 </body>
 </html>

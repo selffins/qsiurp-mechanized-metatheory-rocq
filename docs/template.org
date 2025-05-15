@@ -5,6 +5,3 @@
 
 ------
 [[file:index.org][Homepage]]
-
-------
-[[file:sf-notes.org][Back to Top]]
