@@ -36,7 +36,7 @@ We modernize Gentzen's LJ a little bit by doing rules like putting formulas in f
 
 #+CAPTION: LJ syntax
 #+NAME: fig:lj-syn
-[[./img/lj-syntax.png]]
+[[./img/lj.png]]
 
 * LJ in Coq
 

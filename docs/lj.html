@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-05-15 Thu 15:56 -->
+<!-- 2025-05-15 Thu 15:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>LJ blog post</title>
@@ -202,10 +202,10 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org9f1f8ee">1. NJ</a></li>
-<li><a href="#orgaaac7a7">2. LJ</a></li>
-<li><a href="#org73ce169">3. LJ on paper</a></li>
-<li><a href="#orgb56035e">4. LJ in Coq</a></li>
+<li><a href="#orgdc9b5f6">1. NJ</a></li>
+<li><a href="#orgbf368dc">2. LJ</a></li>
+<li><a href="#orgb6b1e45">3. LJ on paper</a></li>
+<li><a href="#orgab022ba">4. LJ in Coq</a></li>
 </ul>
 </div>
 </div>
@@ -217,8 +217,8 @@
 <p>
 One of the systems we will study and formalize using different context-representations is LJ. In this post I talk about LJ and my progress so far at a rudimentary version of LJ in Rocq. The major source is the &ldquo;Encyclopedia of Proof Systems&rdquo;, &ldquo;coq-ll&rdquo; codebase, and the book &ldquo;An Introduction to Proof Theory&rdquo; by Zach, Galvano, Mancosu.
 </p>
-<div id="outline-container-org9f1f8ee" class="outline-2">
-<h2 id="org9f1f8ee"><span class="section-number-2">1.</span> NJ</h2>
+<div id="outline-container-orgdc9b5f6" class="outline-2">
+<h2 id="orgdc9b5f6"><span class="section-number-2">1.</span> NJ</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Natural deduction was created by Gentzen in order to address the issues with axiomatic calculi - proofs in axiomatic calculi were hard to conduct because of the single inference rule modus ponens.
@@ -241,8 +241,8 @@ NJ has some properties (meta-theeorems) like the subformula property which I am 
 </p>
 </div>
 </div>
-<div id="outline-container-orgaaac7a7" class="outline-2">
-<h2 id="orgaaac7a7"><span class="section-number-2">2.</span> LJ</h2>
+<div id="outline-container-orgbf368dc" class="outline-2">
+<h2 id="orgbf368dc"><span class="section-number-2">2.</span> LJ</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 LJ, also called intuitionistic sequent calclus, was introduced by Gentzen in 1935. It is the sequent calculus version of NJ, an intuitionistic natural deduction system.
@@ -261,23 +261,23 @@ The next section details a &ldquo;modern presentation&rdquo; of LJ and my very s
 </p>
 </div>
 </div>
-<div id="outline-container-org73ce169" class="outline-2">
-<h2 id="org73ce169"><span class="section-number-2">3.</span> LJ on paper</h2>
+<div id="outline-container-orgb6b1e45" class="outline-2">
+<h2 id="orgb6b1e45"><span class="section-number-2">3.</span> LJ on paper</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 We modernize Gentzen&rsquo;s LJ a little bit by doing rules like putting formulas in front of contexts and using <code>A</code>, <code>B</code>, <code>C</code> for formulas; greek letters for contexts.
 </p>
 
 
-<div id="org193829f" class="figure">
-<p><img src="./img/lj-syntax.png" alt="lj-syntax.png" />
+<div id="orgd925027" class="figure">
+<p><img src="./img/lj.png" alt="lj.png" />
 </p>
 <p><span class="figure-number">Figure 1: </span>LJ syntax</p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgb56035e" class="outline-2">
-<h2 id="orgb56035e"><span class="section-number-2">4.</span> LJ in Coq</h2>
+<div id="outline-container-orgab022ba" class="outline-2">
+<h2 id="orgab022ba"><span class="section-number-2">4.</span> LJ in Coq</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 Here we have the syntax and inference rules.
@@ -288,7 +288,7 @@ A formula is an inductive type.
 </p>
 
 
-<div id="org39a872b" class="figure">
+<div id="org4f30cae" class="figure">
 <p><img src="./img/lj-syntax.png" alt="lj-syntax.png" />
 </p>
 <p><span class="figure-number">Figure 2: </span>LJ syntax</p>
@@ -299,7 +299,7 @@ Inference rules are an inductive proposition.
 </p>
 
 
-<div id="orgdcb7f75" class="figure">
+<div id="orge9cef9b" class="figure">
 <p><img src="./img/lj-coq.png" alt="lj-coq.png" />
 </p>
 <p><span class="figure-number">Figure 3: </span>LJ inference rules</p>
@@ -318,7 +318,7 @@ Unfortunately, I deleted the file that contains the work above, without doing ve
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: selffins</p>
-<p class="date">Created: 2025-05-15 Thu 15:56</p>
+<p class="date">Created: 2025-05-15 Thu 15:58</p>
 </div>
 </body>
 </html>
