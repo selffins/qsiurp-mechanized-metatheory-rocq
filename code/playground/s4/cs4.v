@@ -58,6 +58,62 @@ Module CS4_lists.
     | rules_diamond_r : forall G A, G |- A -> G |- Diamond A
     where " A '|-' B " := (rules A B).
 
+    Lemma ctx_nil_r : forall G C, G |- C <-> G ++ [] |- C.
+    Proof.
+      intros. split;intro.
+      - rewrite app_nil_r. apply H.
+      - rewrite app_nil_r in H. apply H.
+    Qed.
+
+    Lemma ctx_nil_l : forall G C, G |- C <-> [] ++ G |- C.
+    Proof.
+      intros.
+      split;intro;apply H.
+    Qed.
+
+    (** Examples *)
+    (** This example is due to Bierman, de Paiva (2000) *)
+    Example cut_boxes : forall G D A B, (Boxes G) -> (G |- A) -> D ++ [A] |- B -> G ++ D |- B.
+    Proof.
+      intros.
+      apply rules_cut with (A := Box A).
+      - apply ctx_nil_r. apply rules_box_r.
+        -- apply H.
+        -- apply H0.
+      - apply rules_box_l. apply H1.
+    Qed.
+
+    Example cut_boxes_smaller :
+      forall G D A B, (Boxes G) -> (G |- A) -> D ++ [A] |- B -> G ++ D |- B.
+    Proof.
+      intros.
+      apply rules_cut with (A := A).
+      - apply H0.
+      - apply H1.
+    Qed.
+
+    Example cut_diamonds :
+      forall G D A B, Boxes D -> G |- A -> D ++ [A] |- Diamond B -> G ++ D |- Diamond B.
+    Proof.
+      intros.
+      apply rules_cut with (A := Diamond A).
+      - apply rules_diamond_r. apply H0.
+      - apply ctx_nil_l. apply rules_diamond_l.
+        -- apply H.
+        -- apply H1.
+    Qed.
+
+    Example cut_diamonds_smaller:
+      forall G D A B, Boxes D -> G |- A -> D ++ [A] |- Diamond B -> G ++ D |- Diamond B.
+    Proof.
+      intros.
+      apply rules_cut with (A := A).
+      - apply H0.
+      - apply H1.
+    Qed.
+
+
   End InferenceRules.
+
 
 End CS4_lists.
