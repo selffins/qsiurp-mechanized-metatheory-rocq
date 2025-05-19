@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-05-14 Wed 15:59 -->
+<!-- 2025-05-19 Mon 12:50 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Some Linear Logic Notes</title>
@@ -202,54 +202,54 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org1729704">1. This Document</a></li>
-<li><a href="#orgd473e14">2. Linear Logic intro</a></li>
-<li><a href="#org22e6509">3. Multiplicative Conjunction <code>\tens</code></a>
+<li><a href="#org86cdd76">1. This Document</a></li>
+<li><a href="#org4c1e976">2. Linear Logic intro</a></li>
+<li><a href="#org3600f80">3. Multiplicative Conjunction <code>\tens</code></a>
 <ul>
-<li><a href="#org71ec3a4">3.1. Also known as</a></li>
-<li><a href="#org46caaea">3.2. Intuition</a></li>
-<li><a href="#org897e51f">3.3. Intro Rule</a></li>
-<li><a href="#orgaaf44a0">3.4. Elimination Rule</a></li>
-<li><a href="#org14f5213">3.5. Soundness</a></li>
-<li><a href="#org9b9a341">3.6. Completeness</a></li>
+<li><a href="#org279e777">3.1. Also known as</a></li>
+<li><a href="#org9a5160d">3.2. Intuition</a></li>
+<li><a href="#org67c2aa9">3.3. Intro Rule</a></li>
+<li><a href="#org437f319">3.4. Elimination Rule</a></li>
+<li><a href="#org56eadbf">3.5. Soundness</a></li>
+<li><a href="#org2cc5944">3.6. Completeness</a></li>
 </ul>
 </li>
-<li><a href="#org22c174e">4. Additive Conjunction</a>
+<li><a href="#orgf51ed1c">4. Additive Conjunction</a>
 <ul>
-<li><a href="#orgabfd23d">4.1. Also known as</a></li>
-<li><a href="#org0d7a54d">4.2. Intuition</a></li>
-<li><a href="#orgd16df21">4.3. Intro rule</a></li>
-<li><a href="#orge5776fa">4.4. Difference between Multiplicative and Additive connectives</a></li>
-<li><a href="#org6ca49fb">4.5. Elim rule</a></li>
-<li><a href="#org3055962">4.6. LL additive conjunction is LJ conjunction</a></li>
+<li><a href="#org3008824">4.1. Also known as</a></li>
+<li><a href="#orgdd4f6ff">4.2. Intuition</a></li>
+<li><a href="#orgd622b8c">4.3. Intro rule</a></li>
+<li><a href="#orgd5a1b0d">4.4. Difference between Multiplicative and Additive connectives</a></li>
+<li><a href="#org1527b1e">4.5. Elim rule</a></li>
+<li><a href="#org4afa007">4.6. LL additive conjunction is LJ conjunction</a></li>
 </ul>
 </li>
-<li><a href="#org7eb4a98">5. Linear Implication</a>
+<li><a href="#orgae716ec">5. Linear Implication</a>
 <ul>
-<li><a href="#org6de0fa3">5.1. Also known as</a></li>
-<li><a href="#org41ff41f">5.2. Intuition</a></li>
-<li><a href="#org463eaf5">5.3. Intro</a></li>
-<li><a href="#org7cf31a9">5.4. Elimination</a></li>
+<li><a href="#org25a252d">5.1. Also known as</a></li>
+<li><a href="#org9a190d3">5.2. Intuition</a></li>
+<li><a href="#org7a354ee">5.3. Intro</a></li>
+<li><a href="#orge6aa175">5.4. Elimination</a></li>
 </ul>
 </li>
-<li><a href="#org1c79cf3">6. Unit</a>
+<li><a href="#orgfcb7d32">6. Unit</a>
 <ul>
-<li><a href="#orge1c2869">6.1. Intro</a></li>
-<li><a href="#org9eb5bbb">6.2. Elim</a></li>
+<li><a href="#orgfa3488a">6.1. Intro</a></li>
+<li><a href="#org5357e6a">6.2. Elim</a></li>
 </ul>
 </li>
-<li><a href="#org5234f5c">7. Top</a></li>
-<li><a href="#org0dcc439">8. <span class="todo TODO">TODO</span> Disjunction</a>
+<li><a href="#org59c9d7b">7. Top</a></li>
+<li><a href="#org7cb5bff">8. <span class="todo TODO">TODO</span> Disjunction</a>
 <ul>
-<li><a href="#org77dcde1">8.1. Also known as</a></li>
-<li><a href="#org73b1e26">8.2. <span class="todo TODO">TODO</span> Intuition</a></li>
+<li><a href="#orgafd045c">8.1. Also known as</a></li>
+<li><a href="#orgc751bce">8.2. <span class="todo TODO">TODO</span> Intuition</a></li>
 </ul>
 </li>
-<li><a href="#org2918159">9. Impossibility</a></li>
-<li><a href="#orga85a520">10. <span class="todo TODO">TODO</span> Modalities</a>
+<li><a href="#orgc17e1ed">9. Impossibility</a></li>
+<li><a href="#orgb3a54b4">10. <span class="todo TODO">TODO</span> Modalities</a>
 <ul>
-<li><a href="#org7a908c8">10.1. Of course</a></li>
-<li><a href="#orgf46853d">10.2. Why not</a></li>
+<li><a href="#org19d847e">10.1. Of course</a></li>
+<li><a href="#org87bc3b4">10.2. Why not</a></li>
 </ul>
 </li>
 </ul>
@@ -259,8 +259,8 @@
 <p>
 <a href="index.html">Homepage</a>
 </p>
-<div id="outline-container-org1729704" class="outline-2">
-<h2 id="org1729704"><span class="section-number-2">1.</span> This Document</h2>
+<div id="outline-container-org86cdd76" class="outline-2">
+<h2 id="org86cdd76"><span class="section-number-2">1.</span> This Document</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 We follow <a href="https://ncatlab.org/nlab/files/Pfenning-LinearLogic98.pdf">Pfenning</a> (1998)&rsquo;s exposition Linear Logic in pages 22-30. We discuss the intro and elimination rules of the connectives as well as some metatheorems.
@@ -279,8 +279,8 @@ I don&rsquo;t have the capability to insert LaTeX in org-mode, so we will have t
 </p>
 </div>
 </div>
-<div id="outline-container-orgd473e14" class="outline-2">
-<h2 id="orgd473e14"><span class="section-number-2">2.</span> Linear Logic intro</h2>
+<div id="outline-container-org4c1e976" class="outline-2">
+<h2 id="org4c1e976"><span class="section-number-2">2.</span> Linear Logic intro</h2>
 <div class="outline-text-2" id="text-2">
 <ul class="org-ul">
 <li>The linear judgement has the form &ldquo;<code>J_2</code> provided resource <code>J_1</code>&rdquo;.</li>
@@ -291,12 +291,12 @@ I don&rsquo;t have the capability to insert LaTeX in org-mode, so we will have t
 </ul>
 </div>
 </div>
-<div id="outline-container-org22e6509" class="outline-2">
-<h2 id="org22e6509"><span class="section-number-2">3.</span> Multiplicative Conjunction <code>\tens</code></h2>
+<div id="outline-container-org3600f80" class="outline-2">
+<h2 id="org3600f80"><span class="section-number-2">3.</span> Multiplicative Conjunction <code>\tens</code></h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org71ec3a4" class="outline-3">
-<h3 id="org71ec3a4"><span class="section-number-3">3.1.</span> Also known as</h3>
+<div id="outline-container-org279e777" class="outline-3">
+<h3 id="org279e777"><span class="section-number-3">3.1.</span> Also known as</h3>
 <div class="outline-text-3" id="text-3-1">
 <ul class="org-ul">
 <li>Tensor</li>
@@ -304,16 +304,16 @@ I don&rsquo;t have the capability to insert LaTeX in org-mode, so we will have t
 </ul>
 </div>
 </div>
-<div id="outline-container-org46caaea" class="outline-3">
-<h3 id="org46caaea"><span class="section-number-3">3.2.</span> Intuition</h3>
+<div id="outline-container-org9a5160d" class="outline-3">
+<h3 id="org9a5160d"><span class="section-number-3">3.2.</span> Intuition</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 Assume we have resources <code>\Delta</code>, and we want to achieve both goals <code>A</code> and <code>B</code> simultaneously. We would have to split our resources into <code>\Delta_1</code> to achieve <code>A</code>, and <code>\Delta_2</code> to achieve <code>B</code>. This split (bottom-up) or merge (top-down) is a non-deterministic operation. This splitting of resources is key to the difference between this and additive conjunction (<code>\par</code>).
 </p>
 </div>
 </div>
-<div id="outline-container-org897e51f" class="outline-3">
-<h3 id="org897e51f"><span class="section-number-3">3.3.</span> Intro Rule</h3>
+<div id="outline-container-org67c2aa9" class="outline-3">
+<h3 id="org67c2aa9"><span class="section-number-3">3.3.</span> Intro Rule</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 Our intro rule (<code>tens I</code>) for multiplicative conjunction is then:
@@ -331,8 +331,8 @@ Where <code>x</code> is the non-deterministic merge operation.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaaf44a0" class="outline-3">
-<h3 id="orgaaf44a0"><span class="section-number-3">3.4.</span> Elimination Rule</h3>
+<div id="outline-container-org437f319" class="outline-3">
+<h3 id="org437f319"><span class="section-number-3">3.4.</span> Elimination Rule</h3>
 <div class="outline-text-3" id="text-3-4">
 <p>
 We start by knowing that we could achieve <code>A \tens B</code> simultaneously from <code>\D</code>, i.e. <code>\D |- A \tens B</code>.
@@ -352,8 +352,8 @@ Basically, we achieve <code>C</code> by first commiting <code>D'</code> to achie
 </p>
 </div>
 </div>
-<div id="outline-container-org14f5213" class="outline-3">
-<h3 id="org14f5213"><span class="section-number-3">3.5.</span> Soundness</h3>
+<div id="outline-container-org56eadbf" class="outline-3">
+<h3 id="org56eadbf"><span class="section-number-3">3.5.</span> Soundness</h3>
 <div class="outline-text-3" id="text-3-5">
 <p>
 To do a proof of (local) soundness, we assume we have the derivations <code>Deriv_1 : \D_1 |- A</code>, <code>Deriv_2 : \D_1 |- B</code>, <code>Deriv_3 : \D', A, B |- C</code> and apply the intro (<code>\tens I</code>) and elimination rules (<code>\tens E</code> to derive <code>\D' x \D_1 x \D_2 |- C</code>.
@@ -368,8 +368,8 @@ Basically, we have to show that introducing and eliminating the connective does 
 </p>
 </div>
 </div>
-<div id="outline-container-org9b9a341" class="outline-3">
-<h3 id="org9b9a341"><span class="section-number-3">3.6.</span> Completeness</h3>
+<div id="outline-container-org2cc5944" class="outline-3">
+<h3 id="org2cc5944"><span class="section-number-3">3.6.</span> Completeness</h3>
 <div class="outline-text-3" id="text-3-6">
 <p>
 Completeness is similar to soundness, but from the other direction. We have a direct proof <code>Deriv_1</code> of a formula that has the connective: <code>A \tens B</code>, and then we show that we can break it (bottom-up) into its consituents <code>A</code> and <code>B</code> (and that we do not obtain more judgements that we used to introduce the simultaneous conjunction.)
@@ -381,12 +381,12 @@ We verify that the elimination rules are strong enough that we can reconstitute 
 </div>
 </div>
 </div>
-<div id="outline-container-org22c174e" class="outline-2">
-<h2 id="org22c174e"><span class="section-number-2">4.</span> Additive Conjunction</h2>
+<div id="outline-container-orgf51ed1c" class="outline-2">
+<h2 id="orgf51ed1c"><span class="section-number-2">4.</span> Additive Conjunction</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-orgabfd23d" class="outline-3">
-<h3 id="orgabfd23d"><span class="section-number-3">4.1.</span> Also known as</h3>
+<div id="outline-container-org3008824" class="outline-3">
+<h3 id="org3008824"><span class="section-number-3">4.1.</span> Also known as</h3>
 <div class="outline-text-3" id="text-4-1">
 <ul class="org-ul">
 <li>Alternative conjunction</li>
@@ -395,16 +395,16 @@ We verify that the elimination rules are strong enough that we can reconstitute 
 </ul>
 </div>
 </div>
-<div id="outline-container-org0d7a54d" class="outline-3">
-<h3 id="org0d7a54d"><span class="section-number-3">4.2.</span> Intuition</h3>
+<div id="outline-container-orgdd4f6ff" class="outline-3">
+<h3 id="orgdd4f6ff"><span class="section-number-3">4.2.</span> Intuition</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 Suppose two books <code>b_1</code>, <code>b_2</code> cost <code>5$</code>. We have <code>5$</code>. Therefore given <code>5$</code>,we can get books <code>A</code> and <code>B</code>, although not simultaneously; we have to make a choice. But the capability to buy <span class="underline">both</span> of them from <code>$5</code> explains why this is a &ldquo;conjunction&rdquo;.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd16df21" class="outline-3">
-<h3 id="orgd16df21"><span class="section-number-3">4.3.</span> Intro rule</h3>
+<div id="outline-container-orgd622b8c" class="outline-3">
+<h3 id="orgd622b8c"><span class="section-number-3">4.3.</span> Intro rule</h3>
 <div class="outline-text-3" id="text-4-3">
 <div class="org-src-container">
 <pre class="src src-nil">    \D |- A    \D |- B
@@ -414,16 +414,16 @@ Suppose two books <code>b_1</code>, <code>b_2</code> cost <code>5$</code>. We ha
 </div>
 </div>
 </div>
-<div id="outline-container-orge5776fa" class="outline-3">
-<h3 id="orge5776fa"><span class="section-number-3">4.4.</span> Difference between Multiplicative and Additive connectives</h3>
+<div id="outline-container-orgd5a1b0d" class="outline-3">
+<h3 id="orgd5a1b0d"><span class="section-number-3">4.4.</span> Difference between Multiplicative and Additive connectives</h3>
 <div class="outline-text-3" id="text-4-4">
 <p>
 We notice that we have the hypotheses <code>\D |- A</code> and <code>\D |- B</code>. As in, we do not split our resources unlike <code>\tens</code>, with its <code>\D_1 |- A</code> and <code>\D_2 |- B</code> to get <code>\D_1 x \D_2 |- A \tens B</code>. This is key to the difference between multiplicative and additve connectives: rules for multiplicative connectives have to split the context.
 </p>
 </div>
 </div>
-<div id="outline-container-org6ca49fb" class="outline-3">
-<h3 id="org6ca49fb"><span class="section-number-3">4.5.</span> Elim rule</h3>
+<div id="outline-container-org1527b1e" class="outline-3">
+<h3 id="org1527b1e"><span class="section-number-3">4.5.</span> Elim rule</h3>
 <div class="outline-text-3" id="text-4-5">
 <div class="org-src-container">
 <pre class="src src-nil">    \D |- A &amp; B
@@ -437,8 +437,8 @@ We notice that we have the hypotheses <code>\D |- A</code> and <code>\D |- B</co
 </div>
 </div>
 </div>
-<div id="outline-container-org3055962" class="outline-3">
-<h3 id="org3055962"><span class="section-number-3">4.6.</span> LL additive conjunction is LJ conjunction</h3>
+<div id="outline-container-org4afa007" class="outline-3">
+<h3 id="org4afa007"><span class="section-number-3">4.6.</span> LL additive conjunction is LJ conjunction</h3>
 <div class="outline-text-3" id="text-4-6">
 <p>
 Notice the intro rule and elim rules for LL additive conjunction. It&rsquo;s exactly the same as the rules for LJ conjunction. Thus, when we encode LJ into LL, we correspond <code>/\</code> with <code>&amp;</code>.
@@ -446,12 +446,12 @@ Notice the intro rule and elim rules for LL additive conjunction. It&rsquo;s exa
 </div>
 </div>
 </div>
-<div id="outline-container-org7eb4a98" class="outline-2">
-<h2 id="org7eb4a98"><span class="section-number-2">5.</span> Linear Implication</h2>
+<div id="outline-container-orgae716ec" class="outline-2">
+<h2 id="orgae716ec"><span class="section-number-2">5.</span> Linear Implication</h2>
 <div class="outline-text-2" id="text-5">
 </div>
-<div id="outline-container-org6de0fa3" class="outline-3">
-<h3 id="org6de0fa3"><span class="section-number-3">5.1.</span> Also known as</h3>
+<div id="outline-container-org25a252d" class="outline-3">
+<h3 id="org25a252d"><span class="section-number-3">5.1.</span> Also known as</h3>
 <div class="outline-text-3" id="text-5-1">
 <ul class="org-ul">
 <li>resource implication</li>
@@ -460,16 +460,16 @@ Notice the intro rule and elim rules for LL additive conjunction. It&rsquo;s exa
 </ul>
 </div>
 </div>
-<div id="outline-container-org41ff41f" class="outline-3">
-<h3 id="org41ff41f"><span class="section-number-3">5.2.</span> Intuition</h3>
+<div id="outline-container-org9a190d3" class="outline-3">
+<h3 id="org9a190d3"><span class="section-number-3">5.2.</span> Intuition</h3>
 <div class="outline-text-3" id="text-5-2">
 <p>
 The linear implication internalizes the linear judgement at the level of propositions &#x2013; <code>A -o B</code> for the goal of achieving <code>B</code> with resource <code>A</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org463eaf5" class="outline-3">
-<h3 id="org463eaf5"><span class="section-number-3">5.3.</span> Intro</h3>
+<div id="outline-container-org7a354ee" class="outline-3">
+<h3 id="org7a354ee"><span class="section-number-3">5.3.</span> Intro</h3>
 <div class="outline-text-3" id="text-5-3">
 <p>
 Hence the intro is:
@@ -482,8 +482,8 @@ Hence the intro is:
 </div>
 </div>
 </div>
-<div id="outline-container-org7cf31a9" class="outline-3">
-<h3 id="org7cf31a9"><span class="section-number-3">5.4.</span> Elimination</h3>
+<div id="outline-container-orge6aa175" class="outline-3">
+<h3 id="orge6aa175"><span class="section-number-3">5.4.</span> Elimination</h3>
 <div class="outline-text-3" id="text-5-4">
 <p>
 If we know <code>A -o B</code>, we can obtain <code>B</code> from a derivation of <code>A</code>.
@@ -497,20 +497,20 @@ If we know <code>A -o B</code>, we can obtain <code>B</code> from a derivation o
 </div>
 
 <p>
-This is like modus ponens, HOWEVER, notice that we split our resources to prove <code>A -o B</code>, then prove <code>A</code>. This is like multiplicative rules: we need both <code>A -o B</code> and <code>A</code>, so we cannot use all of our resources to prove <code>A -o B</code> only or <code>A</code> only, hence the splitting.
+This is like modus ponens, HOWEVER, notice that we split our resources to prove <code>A -o B</code>, then prove <code>A</code>. This is a multiplicative rule: we need both <code>A -o B</code> and <code>A</code>, so we cannot use all of our resources to prove <code>A -o B</code> only or <code>A</code> only, hence the splitting.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org1c79cf3" class="outline-2">
-<h2 id="org1c79cf3"><span class="section-number-2">6.</span> Unit</h2>
+<div id="outline-container-orgfcb7d32" class="outline-2">
+<h2 id="orgfcb7d32"><span class="section-number-2">6.</span> Unit</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 The trivial goal which requires no resources is <code>1</code>. It is the unit of <code>\tens</code>, as in, <code>1 \tens A</code> is equivalent to <code>A</code>.
 </p>
 </div>
-<div id="outline-container-orge1c2869" class="outline-3">
-<h3 id="orge1c2869"><span class="section-number-3">6.1.</span> Intro</h3>
+<div id="outline-container-orgfa3488a" class="outline-3">
+<h3 id="orgfa3488a"><span class="section-number-3">6.1.</span> Intro</h3>
 <div class="outline-text-3" id="text-6-1">
 <div class="org-src-container">
 <pre class="src src-nil">-------------- 1 I
@@ -523,8 +523,8 @@ Notice that we need an empty context (no resources) to prove <code>1</code>.
 </p>
 </div>
 </div>
-<div id="outline-container-org9eb5bbb" class="outline-3">
-<h3 id="org9eb5bbb"><span class="section-number-3">6.2.</span> Elim</h3>
+<div id="outline-container-org5357e6a" class="outline-3">
+<h3 id="org5357e6a"><span class="section-number-3">6.2.</span> Elim</h3>
 <div class="outline-text-3" id="text-6-2">
 <div class="org-src-container">
 <pre class="src src-nil">    \D |- 1    \D' |- C
@@ -543,8 +543,8 @@ Notice again the splitting; this is why it is a multiplicative unit.
 </div>
 </div>
 </div>
-<div id="outline-container-org5234f5c" class="outline-2">
-<h2 id="org5234f5c"><span class="section-number-2">7.</span> Top</h2>
+<div id="outline-container-org59c9d7b" class="outline-2">
+<h2 id="org59c9d7b"><span class="section-number-2">7.</span> Top</h2>
 <div class="outline-text-2" id="text-7">
 <p>
 The goal that consumes all resources. Unit of <code>&amp;</code>. It follows the same rules as intuitionistic truth. There is only one rule: intro, and no elimination.
@@ -557,12 +557,12 @@ The goal that consumes all resources. Unit of <code>&amp;</code>. It follows the
 </div>
 </div>
 </div>
-<div id="outline-container-org0dcc439" class="outline-2">
-<h2 id="org0dcc439"><span class="section-number-2">8.</span> <span class="todo TODO">TODO</span> Disjunction</h2>
+<div id="outline-container-org7cb5bff" class="outline-2">
+<h2 id="org7cb5bff"><span class="section-number-2">8.</span> <span class="todo TODO">TODO</span> Disjunction</h2>
 <div class="outline-text-2" id="text-8">
 </div>
-<div id="outline-container-org77dcde1" class="outline-3">
-<h3 id="org77dcde1"><span class="section-number-3">8.1.</span> Also known as</h3>
+<div id="outline-container-orgafd045c" class="outline-3">
+<h3 id="orgafd045c"><span class="section-number-3">8.1.</span> Also known as</h3>
 <div class="outline-text-3" id="text-8-1">
 <ul class="org-ul">
 <li>External choice</li>
@@ -570,8 +570,8 @@ The goal that consumes all resources. Unit of <code>&amp;</code>. It follows the
 </ul>
 </div>
 </div>
-<div id="outline-container-org73b1e26" class="outline-3">
-<h3 id="org73b1e26"><span class="section-number-3">8.2.</span> <span class="todo TODO">TODO</span> Intuition</h3>
+<div id="outline-container-orgc751bce" class="outline-3">
+<h3 id="orgc751bce"><span class="section-number-3">8.2.</span> <span class="todo TODO">TODO</span> Intuition</h3>
 <div class="outline-text-3" id="text-8-2">
 <p>
 We ignore this for now.
@@ -579,8 +579,8 @@ We ignore this for now.
 </div>
 </div>
 </div>
-<div id="outline-container-org2918159" class="outline-2">
-<h2 id="org2918159"><span class="section-number-2">9.</span> Impossibility</h2>
+<div id="outline-container-orgc17e1ed" class="outline-2">
+<h2 id="orgc17e1ed"><span class="section-number-2">9.</span> Impossibility</h2>
 <div class="outline-text-2" id="text-9">
 <p>
 Denoted as <code>0</code>. This is the case of a disjunction between zero alternatives and so is the unit of <code>\oplus</code>. This goal is impossible to prove, so there is no introduction rule, only an elimination.
@@ -593,21 +593,21 @@ Denoted as <code>0</code>. This is the case of a disjunction between zero altern
 </div>
 </div>
 </div>
-<div id="outline-container-orga85a520" class="outline-2">
-<h2 id="orga85a520"><span class="section-number-2">10.</span> <span class="todo TODO">TODO</span> Modalities</h2>
+<div id="outline-container-orgb3a54b4" class="outline-2">
+<h2 id="orgb3a54b4"><span class="section-number-2">10.</span> <span class="todo TODO">TODO</span> Modalities</h2>
 <div class="outline-text-2" id="text-10">
 </div>
-<div id="outline-container-org7a908c8" class="outline-3">
-<h3 id="org7a908c8"><span class="section-number-3">10.1.</span> Of course</h3>
+<div id="outline-container-org19d847e" class="outline-3">
+<h3 id="org19d847e"><span class="section-number-3">10.1.</span> Of course</h3>
 </div>
-<div id="outline-container-orgf46853d" class="outline-3">
-<h3 id="orgf46853d"><span class="section-number-3">10.2.</span> Why not</h3>
+<div id="outline-container-org87bc3b4" class="outline-3">
+<h3 id="org87bc3b4"><span class="section-number-3">10.2.</span> Why not</h3>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: selffins</p>
-<p class="date">Created: 2025-05-14 Wed 15:59</p>
+<p class="date">Created: 2025-05-19 Mon 12:50</p>
 </div>
 </body>
 </html>

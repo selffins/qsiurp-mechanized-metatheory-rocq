@@ -6,7 +6,7 @@
 GitHub repo: [[https://github.com/selffins/qsiurp-mechanized-metatheory-rocq]]
 * Information
 *** Advisor: [[https://gisellereis.com/][Giselle Reis]] (greis)
-*** Student: (Earl) [[https:selffins.github.io/personal-website][Louis Quilling]] (equillin)
+*** Student: (Earl) [[https://selffins.github.io/personal-website][Louis Quilling]] (equillin)
 
 * Documents
 
@@ -16,7 +16,6 @@ GitHub repo: [[https://github.com/selffins/qsiurp-mechanized-metatheory-rocq]]
 ** [[file:ll-coq.org][ll-coq Notes]]
 ** [[file:ll.org][ll]] Notes
 ** [[https://docs.google.com/document/d/1nkUQMIwF58XunfpXqHyUzl_fvke-eUNLtPJ2vJo16Ys/edit?usp=sharing][Meeting Notes]]
-** [[file:~/qsiurp/playground/lj/lj.html][lj]] playground
 ** [[file:lj.org][lj blog post]]
 * Progress
 
@@ -26,26 +25,26 @@ GitHub repo: [[https://github.com/selffins/qsiurp-mechanized-metatheory-rocq]]
 | Week 1 | <2025-05-13 Tue> | ll-coq, GitHub Repo and Pages        |
 |        | <2025-05-14 Wed> | Meeting, ll-coq, ll, ./playground/lj |
 |        | <2025-05-15 Thu> | ll-coq compile, lj code, lj post     |
-|        | <2025-05-18 Sun> | ll-trans-coq paper                   |
-|        | <2025-05-19 Mon> | carve-beluga paper                   |
-|        | <2025-05-20 Tue> | Report                               |
+|        | <2025-05-18 Sun> | Meeting, lj                          |
+|        | <2025-05-19 Mon> | More lj, ll, s4                      |
+|        | <2025-05-20 Tue> | Abella paper, Beluga paper           |
 |--------+------------------+--------------------------------------|
-| Week 2 |                  |                                      |
-|        |                  |                                      |
-|        |                  |                                      |
-|        |                  |                                      |
-|        |                  |                                      |
+| Week 2 | <2025-05-21 Wed> | Meeting, Start Abella library        |
+|        | <2025-05-22 Thu> | TBD                                  |
+|        | <2025-05-25 Sun> | Meeting                              |
+|        | <2025-05-26 Mon> | TBD                                  |
+|        | <2025-05-27 Tue> | TBD                                  |
 |--------+------------------+--------------------------------------|
 
 * Important Dates
-|------------------+-----------------|
-| Date             | What            |
-|------------------+-----------------|
-| May 13           | Project Start   |
-| June 16          | Progress Report |
-| June 22 - July 6 | OPLSS           |
-| Aug 3            | Final Report    |
-|------------------+-----------------|
+|------------------------------------+-----------------|
+| Date                               | What            |
+|------------------------------------+-----------------|
+| <2025-05-13 Tue>                   | Project Start   |
+| <2025-06-16 Mon>                   | Progress Report |
+| <2025-06-22 Sun>- <2025-07-06 Sun> | OPLSS           |
+| <2025-08-06 Wed>                   | Final Report    |
+|------------------------------------+-----------------|
 
 * Schedule
 
