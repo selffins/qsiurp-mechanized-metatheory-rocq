@@ -17,6 +17,8 @@ GitHub repo: [[https://github.com/selffins/qsiurp-mechanized-metatheory-rocq]]
 ** [[file:ll.org][ll]] Notes
 ** [[https://docs.google.com/document/d/1nkUQMIwF58XunfpXqHyUzl_fvke-eUNLtPJ2vJo16Ys/edit?usp=sharing][Meeting Notes]]
 ** [[file:lj.org][lj blog post]]
+** [[file:playground.org][May 19 blog post]]
+
 * Progress
 
 |--------+------------------+--------------------------------------|

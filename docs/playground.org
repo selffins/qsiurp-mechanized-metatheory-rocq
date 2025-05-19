@@ -1,0 +1,39 @@
+#+title: Preliminary work
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="custom.css">
+#+OPTIONS: num:2 toc:2
+
+* Playground
+
+We implemented LJ with lists, inorder to actually familiarize ourselves with (1) implementing the proof infrastructure (formulas, connectives, contexts, inference rules) and (2) formalizing metatheorems and (3) encountering the problems with context representations
+
+* LJ
+Check LJ notes for some short description of LJ and its inference rules (typesetted). Check lj.v for the code.
+
+* Design decisions
+
+- Formulas are an inductive datatype and inference rules are inductive propositions.
+- Contexts are lists of formulas.
+- Consistently put formulas at the end of the list (context).
+- Added =Bot= to represent empty sequent.
+- Redefined weakening, exchange, contraction to work on contexts and not with 1 formula to avoid some problems with ++ not being commutative  (and some other problems with lists not pattern matching with the inference rule shape). Exchange is now =G, D |- C -> D, G |- C=. Weakening is now =G |- C -> G, D |- C=. Contract is now =G, D, D |- C -> G, D |- C=.
+
+* Examples
+We show do some derivations and metatheorems to show that our implementation works.
+- init
+- two small proofs
+- two cut_elim cases
+- invertibility proof for each invertible inference rule
+
+* TODO Questions/Hmm
+- Will Abella being relational pose a problem for porting the lists-modulo-permutation to Coq?
+- There were certainly some automatable aspects to the proofs, defining our own tactics would be nice, but haven't encountered much examples yet
+- I did not do a proof that inducted on the proof tree, so I'm not so sure about what difficulties we encounter there.
+
+* For Tomorrow
+- Writing down CS4 (done) and LL using lists. In cs4.v and ll.v. There are several presentations of S4 and LL.
+- Investigating: monoids, multisets (coq lib), multisets (from ll-coq)
+- Starting reading Abella paper + Pientka paper
+
+------
+[[file:index.org][Homepage]]
