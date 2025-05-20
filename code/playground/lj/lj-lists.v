@@ -1,3 +1,4 @@
+From Stdlib Require Export Permutation.
 From Stdlib Require Export List.
 Export List.ListNotations.
 Set Implicit Arguments.
@@ -53,6 +54,20 @@ Module LJ_lists.
       intros. reflexivity.
     Qed.
 
+    Lemma ctx_nil_r : forall G C, G |- C <-> G ++ [] |- C.
+    Proof.
+      intros. split;intro.
+      - rewrite app_nil_r. apply H.
+      - rewrite app_nil_r in H. apply H.
+    Qed.
+
+    Lemma ctx_nil_l : forall G C, G |- C <-> [] ++ G |- C.
+    Proof.
+      intros.
+      split;intro;apply H.
+    Qed.
+
+
     Theorem init : forall G A, G ++ [A] |- A.
       intros.
       induction G as [| X G'].
@@ -77,18 +92,6 @@ Module LJ_lists.
       apply rules_w_l with (D := G) in H. apply H.
     Qed.
 
-    Lemma ctx_nil_r : forall G C, G |- C <-> G ++ [] |- C.
-    Proof.
-      intros. split;intro.
-      - rewrite app_nil_r. apply H.
-      - rewrite app_nil_r in H. apply H.
-    Qed.
-
-    Lemma ctx_nil_l : forall G C, G |- C <-> [] ++ G |- C.
-    Proof.
-      intros.
-      split;intro;apply H.
-    Qed.
 
     (* Example proofs *)
     Example double_negation : forall A, [A] |- Not (Not A).

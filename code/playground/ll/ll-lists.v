@@ -1,3 +1,4 @@
+From Stdlib Require Export Permutation.
 From Stdlib Require Export List.
 Export List.ListNotations.
 Set Implicit Arguments.
@@ -7,14 +8,10 @@ Set Printing Parentheses.
 Module LJ_lists.
 
   (** Atomic propositions *)
-  Section Var.
-
-    Parameter var: Set.
-
-  End Var.
+  Section Formula.
+  Definition var := nat.
 
   (** Formulas *)
-  Section Formula.
 
     Inductive formula :=
     | PosA   : var -> formula
@@ -52,6 +49,10 @@ Module LJ_lists.
   Section InferenceRules.
     Definition ctx := list formula.
 
+    Lemma cons_app_singleton : forall T (G : list T) a, a :: G = [a] ++ G.
+      intros. reflexivity.
+    Qed.
+
     Definition is_YNot (A : formula) : Prop :=
       match A with
       | YNot _ => True
@@ -64,6 +65,7 @@ Module LJ_lists.
     Inductive rules : ctx -> Prop :=
     | rules_id : forall A, |- [negation A] ++ [A]
     | rules_cut : forall G D A, |- G ++ [A] -> |- D ++ [negation A] -> |- G ++ D
+    | rules_e : forall G D, Permutation G D -> |- G -> |- D
     | rules_tensor : forall G D A B, |- G ++ [A] -> |- D ++ [B] -> |- G ++ D ++ [Tensor A B]
     | rules_par : forall G A B, |- G ++ [A] ++ [B] -> |- G ++ [Par A B]
     | rules_one : |- [One]
@@ -78,10 +80,78 @@ Module LJ_lists.
     | rules_ynot_weak : forall G A, |- G -> |- G ++ [YNot A]
     where " '|-' A " := (rules A).
 
+    Definition Impl (A B : formula) : formula := Par (negation A) (B).
 
+    Lemma ctx_nil_r : forall G, |- G <-> |- G ++ [].
+    Proof.
+      intros. split;intro.
+      - rewrite app_nil_r. apply H.
+      - rewrite app_nil_r in H. apply H.
+    Qed.
 
+    Lemma ctx_nil_l : forall G, |- G <-> |- [] ++ G.
+    Proof.
+      intros.
+      split;intro;apply H.
+    Qed.
 
+    Example exchange_123_312: |- [PosA 1; PosA 2; PosA 3] -> |- [PosA 3 ; PosA 1 ; PosA 2].
+    Proof.
+      intros.
+      apply rules_e with [PosA 1 ; PosA 2 ; PosA 3].
+      - apply Permutation_sym.
+        apply perm_trans with [PosA 1 ; PosA 3 ; PosA 2].
+        -- apply perm_swap.
+        -- apply perm_skip.
+           apply perm_swap.
+      - apply H.
+    Qed.
+
+    Example exchange_ABC_CAB: forall A B C : formula, |- [A ; B ; C] -> |- [C ; A ; B].
+    Proof.
+      intros.
+      apply rules_e with [A ; B ; C].
+      - apply Permutation_sym.
+        apply perm_trans with [A ; C ; B].
+        -- apply perm_swap.
+        -- apply perm_skip.
+           apply perm_swap.
+      - apply H.
+    Qed.
+
+    Example impl_example : forall A B, |- [negation A ; B] -> |- [Impl A B].
+    Proof.
+      - unfold Impl. intros.
+        apply ctx_nil_l.
+        apply rules_par.
+        simpl.
+        rewrite cons_app_singleton.
+        apply rules_cut with A.
+        -- apply rules_id.
+        -- apply rules_e with [negation A ; B]. apply perm_swap.
+           apply H.
+    Qed.
+
+    Example tensor_example :
+      forall A B,  |- [negation A ; negation B ; Tensor A B].
+    Proof.
+      intros.
+      change ((negation A) :: [negation B ; Tensor A B]) with ([negation A] ++ [negation B] ++ [Tensor A B]).
+      apply rules_tensor;
+      apply rules_id.
+    Qed.
+
+    (* | rules_par : forall G A B, |- G ++ [A] ++ [B] -> |- G ++ [Par A B] *)
+    Example par_example :
+      forall A B, |- [negation A; OPlus A B].
+    Proof.
+      intros.
+      rewrite cons_app_singleton.
+      apply rules_oplus_1.
+      apply rules_id.
+    Qed.
 
   End InferenceRules.
+
 
 End LL_lists.
