@@ -1,0 +1,31 @@
+#+title: May 20
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="custom.css">
+#+OPTIONS: num:2 toc:2
+
+* Concise report
+
+- I formalized =LL= (linear logic) and =CS4= (constructive S4) using lists.
+- Right now =ll-lists.v= is incomplete because one of the written rules needs a permutation (=perm G D -> |- G -> |- D=).
+- I have a post about =ll-abella=.
+
+* Wishlist
+- I don't have deduction examples and metatheorem examples yet for =LL= and =CS4=. In general I don't have a quick way to provide examples. It seems you have to dig around to find stuff.
+- It seems that for most papers about formalizing a proof system, the "biggest result" (besides the formalization) is showing proofs of cut-elimination. I need to brush up on the cut-elimination proof.
+- I haven't yet done an inductive proof of a metatheorem.
+- I also want a resource for example paper proofs of metatheorems. No resource seems to have a comprehensive one.
+- I haven't yet tried lists + permutation.
+- I haven't yet poked around Coq's libraries to see what will be useful.
+- I haven't yet tried =ll-coq='s Multiset library.
+- I don't understand the "two logic approach" in Abella
+- I haven't yet gone through an Abella tutorial and poke around the =ll-abella= code.
+
+* Today Evening / Tomorrow
+- Try Coq's permutation library and finish =ll-lists.v=
+- Look in Dag Prawitz's pages for =CS4= (He made the system as an example in the book).
+- Try Coq's multiset library.
+- Explore =ll-abella= code.
+- Start reading the =carve-beluga= paper.
+
+------
+[[file:index.org][Homepage]]

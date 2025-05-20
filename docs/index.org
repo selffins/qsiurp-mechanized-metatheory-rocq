@@ -19,6 +19,7 @@ GitHub repo: [[https://github.com/selffins/qsiurp-mechanized-metatheory-rocq]]
 ** [[file:lj.org][lj blog post]]
 ** [[file:playground.org][May 19 blog post]]
 ** [[file:ll-abella.org][ll-abella Notes]]
+** [[file:may-20.org][May 20 blog post]]
 * Progress
 
 |--------+------------------+---------------------------------------------|
