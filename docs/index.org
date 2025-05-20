@@ -18,25 +18,25 @@ GitHub repo: [[https://github.com/selffins/qsiurp-mechanized-metatheory-rocq]]
 ** [[https://docs.google.com/document/d/1nkUQMIwF58XunfpXqHyUzl_fvke-eUNLtPJ2vJo16Ys/edit?usp=sharing][Meeting Notes]]
 ** [[file:lj.org][lj blog post]]
 ** [[file:playground.org][May 19 blog post]]
-
+** [[file:ll-abella.org][ll-abella Notes]]
 * Progress
 
-|--------+------------------+--------------------------------------|
-|        | Date             | What                                 |
-|--------+------------------+--------------------------------------|
-| Week 1 | <2025-05-13 Tue> | ll-coq, GitHub Repo and Pages        |
-|        | <2025-05-14 Wed> | Meeting, ll-coq, ll, ./playground/lj |
-|        | <2025-05-15 Thu> | ll-coq compile, lj code, lj post     |
-|        | <2025-05-18 Sun> | Meeting, lj                          |
-|        | <2025-05-19 Mon> | More lj, ll, s4                      |
-|        | <2025-05-20 Tue> | Abella paper, Beluga paper           |
-|--------+------------------+--------------------------------------|
-| Week 2 | <2025-05-21 Wed> | Meeting, Start Abella library        |
-|        | <2025-05-22 Thu> | TBD                                  |
-|        | <2025-05-25 Sun> | Meeting                              |
-|        | <2025-05-26 Mon> | TBD                                  |
-|        | <2025-05-27 Tue> | TBD                                  |
-|--------+------------------+--------------------------------------|
+|--------+------------------+---------------------------------------------|
+|        | Date             | What                                        |
+|--------+------------------+---------------------------------------------|
+| Week 1 | <2025-05-13 Tue> | ll-coq notes, GitHub Repo and Pages         |
+|        | <2025-05-14 Wed> | Meeting, ll-coq, ll, ./playground/lj        |
+|        | <2025-05-15 Thu> | ll-coq compile, lj code, lj post            |
+|        | <2025-05-18 Sun> | Meeting, lj                                 |
+|        | <2025-05-19 Mon> | More experimenting with lj, ll, s4  (lists) |
+|        | <2025-05-20 Tue> | Abella paper notes, more experimenting      |
+|--------+------------------+---------------------------------------------|
+| Week 2 | <2025-05-21 Wed> | Meeting, Start Abella library               |
+|        | <2025-05-22 Thu> | TBD                                         |
+|        | <2025-05-25 Sun> | Meeting                                     |
+|        | <2025-05-26 Mon> | TBD                                         |
+|        | <2025-05-27 Tue> | TBD                                         |
+|--------+------------------+---------------------------------------------|
 
 * Important Dates
 |------------------------------------+-----------------|

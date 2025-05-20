@@ -1,0 +1,371 @@
+#+title: ll-abella paper
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="custom.css">
+#+OPTIONS: num:2 toc:2
+
+------
+[[file:index.org][Homepage]]
+
+These are (first-reading) notes and some TODOs for the ll-abella paper.
+
+* Paper
+-http://www.gisellereis.com/papers/ll-abella-long.pdf
+- Metatheory of Sequent Calculi in Abella for Linear Logic
+
+
+* TODO Summary
+- Uses Abella instead of Coq.
+- Its language is relational in that it uses rules as clauses similar to logic programming.
+- They define operations on multisets (=adj= and =merge=) for the explicit context.
+- They formalize MALL and other systems. There is a long section on the cut admissibility proof.
+- First formalization of cut-elimination for linear logic.
+
+* Intro
+
+- Informal proofs are error prone
+- Multisets (used for linear logic sequent calculi) are tricky when formalizing metatheory
+- They follow and formalize some textbook induictive proofs
+- Abella has a two level approach facilitating binders, which avoids solutions such as Parameteric HOAS.
+- Systems considered: Propositional MALL, FO MALL, Propositional MELL.
+
+* Abella
+- Based on Pure STLC for the term language
+- Equality predicate for \alpha\beta\nu-equivalence
+- Uninterpreted constants are constructors
+- Least and greatest fixed point definitions for =prop= (This is like inductive principles for Prop)
+- Underlying logic is called G.
+** Quantifiers in Abella
+- Extensional universal quantification =forall=
+- =\triangledown= is intensional quantification
+- =\exists= is existential quantification
+
+** Relational
+
+- Here is a small example of a relational definition of plus.
+
+#+BEGIN_SRC abella
+Define plus : nat -> nat -> nat -> prop
+; plus z X X
+; plus (s X) Y (s Z) := plus X Y Z
+#+END_SRC
+
+This says that zero plus =X= is =X=, and =s X= plus =Y= is =s Z= if =Z= is =plus X Y=.
+
+- Each clause is separatexd by a =;= with head and optional body.
+
+- Can have non-determinism and non-termination for unfolding relations because their heads can overlap.
+
+
+** TODO Proof by induction
+- Try the proof at page 5 in Abella:
+-
+   #+BEGIN_SRC abella
+ Theorem plus_z_2 : forall X, plus X z X.
+
+   Define is_nat : nat -> prop by
+ ; is_nat z
+ ; is_nat (s X) := is_nat X
+
+ (* Now, we rewrite the theorem as *)
+
+ Theorem plus_z_2 : forall X, is_nat X -> plus X z X
+   #+END_SRC
+
+- The proof begins by the tactic =induction on 1=, whcih indicates the induction on the first assumption on =is_nat X=. There are two cases to consider because there are two definitional clauses for =is_nat= (...)
+
+**** Annotations
+
+Abella reasons by induction on the sizee of the inductive argument.
+
+#+BEGIN_SRC abella
+IH : forall X, is_nat X * -> plus X z X
+forall X, is_nat X @ -> plus X z X
+#+END_SRC
+
+- =is_nat X *= stands for an instance of =is_nat= that is strictly smaller than the initial =is_nat X= in the goal.
+
+- =is_nat X @= indicates that its size is such that every =*=-annotated instance is strictly smaller.
+
+** TODO Induction for metatheory
+- See page 6 for an example on =ack=.
+
+- Size annotations represent strong inductions on linearly ordered sizes.
+
+- Meta-theoretic proofs however use inductions on more complex orderings such as lexicographic orderings.
+
+- While =G=, the logic under Abella has a general induction rule that can represent any well-ordering, we need to generalize it further for lexicographic induction
+
+** TODO Typing predicates
+- The rest of the paper follows a certain style of specifications (which?) where typing predicates like =is_nat= are not explicitly assumed but are produced by inversion on a different predicate.
+
+  #+BEGIN_SRC abella
+Theorem plus_is : forall X Y Z, plus X Y Z ->
+is_nat X /\ is_nat Y /\ is_nat Z.
+  #+END_SRC
+
+  WE see here that we don't need to assume both =is_nat X= and =plus X Y Z= because =plus X Y Z= derives =is_nat X=.
+
+  Now we have
+#+BEGIN_SRC abella
+Define plus : nat -> nat -> nat -> prop
+; plus z X X := is_nat X
+; plus (s X) Y (s Z) := plus X Y Z
+#+END_SRC
+
+=is_nat X= is added. This lets us prove =plus_is= (TODO) by straightforward induction on =plus X Y Z=.
+
+** TODO Two Level Logic Approach
+
+- We can define a predicate in Abella that defines the derivability of the sequent calculus in LJ. As in, we can represent inference rules as a inductive predicate, like how in Coq we have LJ as a inductive proposition.
+
+- Weakening and contraction are height-preserving admissible in LJ (?)
+
+- Two level logic approach from Gacek, Miller, Nadathur (2011)
+* Context representation design:
+
+** Problem with contexts
+We quote the motivation for defining =adj= (and =merge= and =perm=).
+
+#+BEGIN_QUOTE
+There is a wider than expected design space here. A first attempt might be
+to simply use olist as our representation of contexts, with addition of elements
+represented by list consing =(::)= and context joining with list append. This
+makes inductive reasoning on contexts rather straightforward, but, because
+linear contexts are structurally identical modulo exchange, it requires adding
+explicit exchange rules to the system, which complicates the meta-theory. An
+alternative that works is still to use olist as our representation, but to relax
+the notion of structural identity as follows: two lists are structurally identical if
+one is a permutation of the other. Thus, we need a predicate =perm : olist
+-> olist -> prop= to recognize list permutations.
+To define the addition operation with this modified notion, we could continue
+to use list cons, but this will still require an explicit exchange rule. Instead, we
+define a generalized cons operation, called =adj=
+#+END_QUOTE
+
+** Idea: =adj=, =merge=, =perm=
+- Multisets
+
+- They have typing predicates =is_o= (=o= means formula) and =is_list= (=olist= typing predicate). They are straightforward.
+
+- =adj= is a generalized, non-deterministic cons operation. =adj J A K= says that the context =K= is the same as =J= but with =K= inserted somewhere.
+
+- =perm= is list equality modulo ordering. As in, =perm J K= means that =J= and =K= have the same elements. This is done by multiple =adj=; A list =J= is a permutation of =K= if for all elements =A= in (=adj KK A K=) in =K=, it is in =L= (=adj LL A L=).
+
+- =merge J K L= says that =L= is the union of =J= and =K=.
+  =merge= is non-deterministic because it has overlapping heads.
+  It says that =L= is the union of =J= and =K= (1) if for =A= in =J= (=adj JJ A J=), it is in =L= (=adj LL A L=) and (2) similarly for =A= in =K=.
+
+
+** TODO Code
+
+Here is the code.
+
+  #+BEGIN_SRC abella
+Type is_o o - > prop .
+Define is_list : olist - > prop by
+; is_list nil
+; is_list ( A :: L ) := is_o A /\ is_list L .
+% adj J A K : K is J with A inserted somewhere
+Define adj : olist - > o - > olist - > prop by
+; adj L A ( A :: L ) := is_o A /\ is_list L
+; adj ( B :: K ) A ( B :: L ) := is_o B /\ adj K A L .
+% merge J K L : J union K equals L .
+Define merge : olist - > olist - > olist - > prop by
+; merge nil nil nil
+; merge J K L := exists A JJ LL , adj JJ A J /\ adj LL A L /\
+merge JJ K LL
+; merge J K L := exists A KK LL , adj KK A K /\ adj LL A L /\
+merge J KK LL .
+% perm J K : J and K have the same elements
+Define perm : olist - > olist - > prop by
+; perm nil nil
+; perm K L :=
+exists A KK LL , adj KK A K /\ adj LL A L /\ perm KK LL .
+  #+END_SRC
+
+  - Notice the overlapping heads for =merge=, which makes it nondeterministic.
+  - (?) Why is =adj= non-deterministic?
+  -  Why do they have the existential quantifiers?
+
+
+** Multiset Theorems
+
+The files =lib/merge.thm= and =lib/perm.thm= containts theorems about multisets.
+
+Examples:
+- =merge= is stable under permutation. If =L= is the union of =J= and =K=, and =JJ= is the same as =J= modulo permutation, then =L= is also the union of =JJ= and =K=.
+
+  #+BEGIN_SRC abella
+  Theorem perm_merge_1 : forall J K L JJ,
+  merge J K L - > perm J JJ - > merge JJ K L .
+  #+END_SRC
+
+- =merge= is associative. Apparently this requires establishing that =perm= is an equivalence (transitive, reflexive, symmetric).
+
+  #+BEGIN_SRC abella
+  Theorem merge_assoc : forall J K L JK KL JKL1 JKL2 ,
+  merge J K JK - > merge K L KL - >
+  merge J KL JKL1 - > merge JK L JKL2 - >
+  perm JKL1 JKL2 .
+#+END_SRC
+
+* MALL (Multiplicative additive linear logic)
+** Formulas
+
+We seem to define the connectives as their own types, then define a formula inductively (typing predicate). Constrast this to SML or Coq where you simply define formulas as an inductive datatype.
+
+#+BEGIN_SRC abella
+Type atom , natom atm - > o .
+Type tens , par o - > o - > o .
+Type one , bot o .
+Type wth , plus o - > o - > o .
+Type top , zero o .
+
+Define is_fm : o - > prop by
+; is_fm ( atom A )
+; is_fm ( natom A )
+; is_fm ( tens A B ) := is_fm A /\ is_fm B
+; is_fm one
+; is_fm ( par A B ) := is_fm A /\ is_fm B
+; is_fm bot
+; is_fm ( wth A B ) := is_fm A /\ is_fm B
+; is_fm top
+; is_fm ( plus A B ) := is_fm A /\ is_fm B
+; is_fm zero .
+#+END_SRC
+
+** TODO Inference rules
+
+Here is the code for the inference rules of the fragment of MALL.
+
+#+BEGIN_SRC
+Define mall : olist - > prop by
+; mall L := exists A , adj ( natom A :: nil ) ( atom A ) L
+; mall L := exists A B LL JJ KK J K ,
+adj LL ( tens A B ) L /\ merge JJ KK LL /\
+adj JJ A J /\ mall J /\ adj KK B K /\ mall K
+; mall ( one :: nil )
+; mall L := exists A B LL J K ,
+adj LL ( par A B ) L /\ adj LL A J /\ adj J B K /\ mall K
+; mall L := exists LL , adj LL bot L /\ mall LL
+; mall L := exists A B LL J K ,
+adj LL ( wth A B ) L /\ adj LL A J /\ mall J /\ adj LL B K /\
+mall K
+; mall L := exists LL , adj LL top L
+; mall L := exists A B LL J , adj LL ( plus A B ) L /\ adj LL A J
+/\ mall J
+; mall L := exists A B LL J , adj LL ( plus A B ) L /\ adj LL B J
+/\ mall J .
+#+END_SRC
+
+- Why are all the heads =mall L=?
+
+** Exchange rule (implicit)
+
+They do not have an explicit exchange rule (benefit of not using lists and also using =adj=). Instead they say that if =|- K=, and =K= is a permutation of =L=, then =|- L= as well.
+
+#+BEGIN_SRC abella
+Theorem mall_perm : forall K L , mall K - > perm K L - > mall L .
+#+END_SRC
+
+** TODO Duality and inversions
+
+- They set up the one-sided formulation in a way that the only height of the derivation containing the positive variant (not invertible) is relevant. (?)
+
+- This requires an asymmetric dual predicate.
+
+- Here is the code.
+
+#+BEGIN_SRC abella
+Define dual : o - > o - > prop by
+; dual ( atom A ) ( natom A )
+; dual ( tens A B ) ( par AA BB ) := dual A AA /\ dual B BB
+; dual one bot
+; dual ( plus A B ) ( wth AA BB ) := dual A AA /\ dual B BB
+; dual zero top .
+#+END_SRC
+
+(?) Why is this asymmetric?
+
+- Here are some inversion lemmas:
+
+  #+BEGIN_SRC abella
+Theorem bot_inv : forall J L, mall L -> adj J bot L -> mall J.
+Theorem par_inv : forall L JJ A B, mall L -> adj JJ (par A B) L -> exists KK LL, adj JJ A KK /\ adj KK B LL /\ mall LL
+  #+END_SRC
+
+
+* Cut elim for MALL
+** TODO Statement
+
+- Here is how it is encoded.
+
+#+BEGIN_SRC abella
+Theorem cut : forall A B JJ J KK K LL ,
+dual A B ->
+adj JJ A J -> mall J ->
+adj KK B K -> mall K ->
+merge JJ KK LL ->
+mall LL .
+#+END_SRC
+
+- Why is this how it's encoded?
+** TODO Proof strategy
+
+- The proof proceeds by nested induction on the first and third assumptions.
+
+- This encodes the following measure for appealing to the IHs: either the rank decreases because of case analysis of =dual A B=, or the rank stays the same and the height of =mall J=, which is the derivation that contains the positive half of the cut formula pair, decreases.
+
+- Is this what is known as a lexicographic induction?
+
+- Whe have to show that cuts can be reduced to cuts of lower rank.
+*** TODO Rest of the proof
+
+- (TODO) Read pages 13 and 14 while following the proof interactively in Abella.
+
+** TODO Cut Admissiblity for Exponential Case
+
+- Apparently, adding exponentials complicates the cut elimination proof by induction.
+- The termination measures are more complex.
+- The problem is that there is a case where a cut instance is not a lower measure.
+- They try to solve it by incorporating multiset orderings, which is apparently not yet supported by Abella's size annotations.
+- Instead, they move to a dyadic sequent calculus. Now they induct on another measure (weight).
+
+- See page 16.
+
+* TODO First-order case
+
+First order means we introduce the existential and universal quantifier.
+
+** TODO Two Level logic approcach
+
+- Recall the two-level logic approach in 2.2 that simplifies reasoning about quantifiers and instantiation.
+
+- This means we move from the code so far (which is apparently in the reasoning level) to the specification logic of  =\lambda= Prolog (henceforth LProlog).
+
+
+I haven't read this carefully yet.
+
+* TODO Focused Calculi
+
+- They also prove cut-admissibility for focused proof systems for linear logic.
+- Focused systems group connectives by polarity. Polarity is either invertible (-) or non-invertible (+).
+- Focused systems cut down on non-determinism.
+- Main difficulty with focused proofs is that "cuts are not permuted step by step above single connectives but must rather permute past entire phases".
+- They completed the cut-elimination argument for focused first-order MALL.
+
+* TODO Two Sided Calculi
+
+- They implemented two sided calculus for MALL.
+- The two sided formulation has left and right introduction rules.
+- "Cut rules apply to fomrulas on either side of the sequent rather than in terms of duality"
+
+* Related Work
+
+- Generic method for formalizing sequent calculi in Isabelle/HOL by Dawson, Gore (2010).
+  Proved cut-elimination for =GLS_v= provability logic.
+- Pattinson and Schroder formalized cut-elimination for coalgebraic logics in Coq (2013). They implemented multisets as setoids with an underlying list type and permuation relation.
+- To avoid dealing with explicit representations of contexts, some find different representations for sequent calculus rules that mention only the principal and auxiliary formula. (Pfenning, 1995) annotates sequents with proof terms, which reduces cut elimination to a type checking problem on the proof terms.
+- Pfenning's method was used by Simmons (2014) to formalize completeness of focusing in intuitionistic logic. Apparently he avoids showing invertibility lemmas.
+- Some other linear logic encodings focused on obtaining proof search engines (no proofs for metatheorems).
+- In LL-coq, they implemented a multiset library and used PHOAS for quantifiers.

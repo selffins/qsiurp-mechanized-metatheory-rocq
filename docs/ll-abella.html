@@ -1,0 +1,813 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2025-05-20 Tue 14:12 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ll-abella paper</title>
+<meta name="author" content="selffins" />
+<meta name="generator" content="Org Mode" />
+<style type="text/css">
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="custom.css">
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">ll-abella paper</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orge201526">1. Paper</a></li>
+<li><a href="#orgdf58b57">2. <span class="todo TODO">TODO</span> Summary</a></li>
+<li><a href="#org1ff6419">3. Intro</a></li>
+<li><a href="#org6cf5433">4. Abella</a>
+<ul>
+<li><a href="#org900734b">4.1. Quantifiers in Abella</a></li>
+<li><a href="#org331e827">4.2. Relational</a></li>
+<li><a href="#org0a53690">4.3. <span class="todo TODO">TODO</span> Proof by induction</a></li>
+<li><a href="#org0990ec2">4.4. <span class="todo TODO">TODO</span> Induction for metatheory</a></li>
+<li><a href="#org2ee5519">4.5. <span class="todo TODO">TODO</span> Typing predicates</a></li>
+<li><a href="#org397e7e3">4.6. <span class="todo TODO">TODO</span> Two Level Logic Approach</a></li>
+</ul>
+</li>
+<li><a href="#orgaa0a4b0">5. Context representation design:</a>
+<ul>
+<li><a href="#orgee12ab6">5.1. Problem with contexts</a></li>
+<li><a href="#orga3cd51d">5.2. Idea: <code>adj</code>, <code>merge</code>, <code>perm</code></a></li>
+<li><a href="#orgab72835">5.3. <span class="todo TODO">TODO</span> Code</a></li>
+<li><a href="#org8847120">5.4. Multiset Theorems</a></li>
+</ul>
+</li>
+<li><a href="#orge40f269">6. MALL (Multiplicative additive linear logic)</a>
+<ul>
+<li><a href="#org373c61f">6.1. Formulas</a></li>
+<li><a href="#org61a7e66">6.2. <span class="todo TODO">TODO</span> Inference rules</a></li>
+<li><a href="#org71be7db">6.3. Exchange rule (implicit)</a></li>
+<li><a href="#orgfb99796">6.4. <span class="todo TODO">TODO</span> Duality and inversions</a></li>
+</ul>
+</li>
+<li><a href="#orgac718a8">7. Cut elim for MALL</a>
+<ul>
+<li><a href="#org867cabe">7.1. <span class="todo TODO">TODO</span> Statement</a></li>
+<li><a href="#orgffb249b">7.2. <span class="todo TODO">TODO</span> Proof strategy</a></li>
+<li><a href="#orgb9d1acb">7.3. <span class="todo TODO">TODO</span> Cut Admissiblity for Exponential Case</a></li>
+</ul>
+</li>
+<li><a href="#org1fe9d83">8. <span class="todo TODO">TODO</span> First-order case</a>
+<ul>
+<li><a href="#org521cae4">8.1. <span class="todo TODO">TODO</span> Two Level logic approcach</a></li>
+</ul>
+</li>
+<li><a href="#orgfe1cb9b">9. <span class="todo TODO">TODO</span> Focused Calculi</a></li>
+<li><a href="#org0385b22">10. <span class="todo TODO">TODO</span> Two Sided Calculi</a></li>
+<li><a href="#org0134233">11. Related Work</a></li>
+</ul>
+</div>
+</div>
+<hr />
+<p>
+<a href="index.html">Homepage</a>
+</p>
+
+<p>
+These are (first-reading) notes and some TODOs for the ll-abella paper.
+</p>
+<div id="outline-container-orge201526" class="outline-2">
+<h2 id="orge201526"><span class="section-number-2">1.</span> Paper</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+-<a href="http://www.gisellereis.com/papers/ll-abella-long.pdf">http://www.gisellereis.com/papers/ll-abella-long.pdf</a>
+</p>
+<ul class="org-ul">
+<li>Metatheory of Sequent Calculi in Abella for Linear Logic</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgdf58b57" class="outline-2">
+<h2 id="orgdf58b57"><span class="section-number-2">2.</span> <span class="todo TODO">TODO</span> Summary</h2>
+<div class="outline-text-2" id="text-2">
+<ul class="org-ul">
+<li>Uses Abella instead of Coq.</li>
+<li>Its language is relational in that it uses rules as clauses similar to logic programming.</li>
+<li>They define operations on multisets (<code>adj</code> and <code>merge</code>) for the explicit context.</li>
+<li>They formalize MALL and other systems. There is a long section on the cut admissibility proof.</li>
+<li>First formalization of cut-elimination for linear logic.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org1ff6419" class="outline-2">
+<h2 id="org1ff6419"><span class="section-number-2">3.</span> Intro</h2>
+<div class="outline-text-2" id="text-3">
+<ul class="org-ul">
+<li>Informal proofs are error prone</li>
+<li>Multisets (used for linear logic sequent calculi) are tricky when formalizing metatheory</li>
+<li>They follow and formalize some textbook induictive proofs</li>
+<li>Abella has a two level approach facilitating binders, which avoids solutions such as Parameteric HOAS.</li>
+<li>Systems considered: Propositional MALL, FO MALL, Propositional MELL.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org6cf5433" class="outline-2">
+<h2 id="org6cf5433"><span class="section-number-2">4.</span> Abella</h2>
+<div class="outline-text-2" id="text-4">
+<ul class="org-ul">
+<li>Based on Pure STLC for the term language</li>
+<li>Equality predicate for &alpha;&beta;&nu;-equivalence</li>
+<li>Uninterpreted constants are constructors</li>
+<li>Least and greatest fixed point definitions for <code>prop</code> (This is like inductive principles for Prop)</li>
+<li>Underlying logic is called G.</li>
+</ul>
+</div>
+<div id="outline-container-org900734b" class="outline-3">
+<h3 id="org900734b"><span class="section-number-3">4.1.</span> Quantifiers in Abella</h3>
+<div class="outline-text-3" id="text-4-1">
+<ul class="org-ul">
+<li>Extensional universal quantification <code>forall</code></li>
+<li><code>\triangledown</code> is intensional quantification</li>
+<li><code>\exists</code> is existential quantification</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org331e827" class="outline-3">
+<h3 id="org331e827"><span class="section-number-3">4.2.</span> Relational</h3>
+<div class="outline-text-3" id="text-4-2">
+<ul class="org-ul">
+<li>Here is a small example of a relational definition of plus.</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-abella">Define plus : nat -&gt; nat -&gt; nat -&gt; prop
+; plus z X X
+; plus (s X) Y (s Z) := plus X Y Z
+</pre>
+</div>
+
+<p>
+This says that zero plus <code>X</code> is <code>X</code>, and <code>s X</code> plus <code>Y</code> is <code>s Z</code> if <code>Z</code> is <code>plus X Y</code>.
+</p>
+
+<ul class="org-ul">
+<li>Each clause is separatexd by a <code>;</code> with head and optional body.</li>
+
+<li>Can have non-determinism and non-termination for unfolding relations because their heads can overlap.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org0a53690" class="outline-3">
+<h3 id="org0a53690"><span class="section-number-3">4.3.</span> <span class="todo TODO">TODO</span> Proof by induction</h3>
+<div class="outline-text-3" id="text-4-3">
+<ul class="org-ul">
+<li>Try the proof at page 5 in Abella:</li>
+<li><div class="org-src-container">
+<pre class="src src-abella"> Theorem plus_z_2 : forall X, plus X z X.
+
+   Define is_nat : nat -&gt; prop by
+ ; is_nat z
+ ; is_nat (s X) := is_nat X
+
+ (* Now, we rewrite the theorem as *)
+
+ Theorem plus_z_2 : forall X, is_nat X -&gt; plus X z X
+</pre>
+</div></li>
+
+<li>The proof begins by the tactic <code>induction on 1</code>, whcih indicates the induction on the first assumption on <code>is_nat X</code>. There are two cases to consider because there are two definitional clauses for <code>is_nat</code> (&#x2026;)</li>
+</ul>
+</div>
+<ul class="org-ul">
+<li><a id="org1390e42"></a>Annotations<br />
+<div class="outline-text-5" id="text-org1390e42">
+<p>
+Abella reasons by induction on the sizee of the inductive argument.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-abella">IH : forall X, is_nat X * -&gt; plus X z X
+forall X, is_nat X @ -&gt; plus X z X
+</pre>
+</div>
+
+<ul class="org-ul">
+<li><code>is_nat X *</code> stands for an instance of <code>is_nat</code> that is strictly smaller than the initial <code>is_nat X</code> in the goal.</li>
+
+<li><code>is_nat X @</code> indicates that its size is such that every <code>*</code>-annotated instance is strictly smaller.</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div id="outline-container-org0990ec2" class="outline-3">
+<h3 id="org0990ec2"><span class="section-number-3">4.4.</span> <span class="todo TODO">TODO</span> Induction for metatheory</h3>
+<div class="outline-text-3" id="text-4-4">
+<ul class="org-ul">
+<li>See page 6 for an example on <code>ack</code>.</li>
+
+<li>Size annotations represent strong inductions on linearly ordered sizes.</li>
+
+<li>Meta-theoretic proofs however use inductions on more complex orderings such as lexicographic orderings.</li>
+
+<li>While <code>G</code>, the logic under Abella has a general induction rule that can represent any well-ordering, we need to generalize it further for lexicographic induction</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org2ee5519" class="outline-3">
+<h3 id="org2ee5519"><span class="section-number-3">4.5.</span> <span class="todo TODO">TODO</span> Typing predicates</h3>
+<div class="outline-text-3" id="text-4-5">
+<ul class="org-ul">
+<li><p>
+The rest of the paper follows a certain style of specifications (which?) where typing predicates like <code>is_nat</code> are not explicitly assumed but are produced by inversion on a different predicate.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-abella">Theorem plus_is : forall X Y Z, plus X Y Z -&gt;
+is_nat X /\ is_nat Y /\ is_nat Z.
+</pre>
+</div>
+
+<p>
+WE see here that we don&rsquo;t need to assume both <code>is_nat X</code> and <code>plus X Y Z</code> because <code>plus X Y Z</code> derives <code>is_nat X</code>.
+</p>
+
+<p>
+Now we have
+</p></li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-abella">Define plus : nat -&gt; nat -&gt; nat -&gt; prop
+; plus z X X := is_nat X
+; plus (s X) Y (s Z) := plus X Y Z
+</pre>
+</div>
+
+<p>
+<code>is_nat X</code> is added. This lets us prove <code>plus_is</code> (TODO) by straightforward induction on <code>plus X Y Z</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org397e7e3" class="outline-3">
+<h3 id="org397e7e3"><span class="section-number-3">4.6.</span> <span class="todo TODO">TODO</span> Two Level Logic Approach</h3>
+<div class="outline-text-3" id="text-4-6">
+<ul class="org-ul">
+<li>We can define a predicate in Abella that defines the derivability of the sequent calculus in LJ. As in, we can represent inference rules as a inductive predicate, like how in Coq we have LJ as a inductive proposition.</li>
+
+<li>Weakening and contraction are height-preserving admissible in LJ (?)</li>
+
+<li>Two level logic approach from Gacek, Miller, Nadathur (2011)</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-orgaa0a4b0" class="outline-2">
+<h2 id="orgaa0a4b0"><span class="section-number-2">5.</span> Context representation design:</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+<div id="outline-container-orgee12ab6" class="outline-3">
+<h3 id="orgee12ab6"><span class="section-number-3">5.1.</span> Problem with contexts</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+We quote the motivation for defining <code>adj</code> (and <code>merge</code> and <code>perm</code>).
+</p>
+
+<blockquote>
+<p>
+There is a wider than expected design space here. A first attempt might be
+to simply use olist as our representation of contexts, with addition of elements
+represented by list consing <code>(::)</code> and context joining with list append. This
+makes inductive reasoning on contexts rather straightforward, but, because
+linear contexts are structurally identical modulo exchange, it requires adding
+explicit exchange rules to the system, which complicates the meta-theory. An
+alternative that works is still to use olist as our representation, but to relax
+the notion of structural identity as follows: two lists are structurally identical if
+one is a permutation of the other. Thus, we need a predicate <code>perm : olist
+-&gt; olist -&gt; prop</code> to recognize list permutations.
+To define the addition operation with this modified notion, we could continue
+to use list cons, but this will still require an explicit exchange rule. Instead, we
+define a generalized cons operation, called <code>adj</code>
+</p>
+</blockquote>
+</div>
+</div>
+<div id="outline-container-orga3cd51d" class="outline-3">
+<h3 id="orga3cd51d"><span class="section-number-3">5.2.</span> Idea: <code>adj</code>, <code>merge</code>, <code>perm</code></h3>
+<div class="outline-text-3" id="text-5-2">
+<ul class="org-ul">
+<li>Multisets</li>
+
+<li>They have typing predicates <code>is_o</code> (<code>o</code> means formula) and <code>is_list</code> (<code>olist</code> typing predicate). They are straightforward.</li>
+
+<li><code>adj</code> is a generalized, non-deterministic cons operation. <code>adj J A K</code> says that the context <code>K</code> is the same as <code>J</code> but with <code>K</code> inserted somewhere.</li>
+
+<li><code>perm</code> is list equality modulo ordering. As in, <code>perm J K</code> means that <code>J</code> and <code>K</code> have the same elements. This is done by multiple <code>adj</code>; A list <code>J</code> is a permutation of <code>K</code> if for all elements <code>A</code> in (<code>adj KK A K</code>) in <code>K</code>, it is in <code>L</code> (<code>adj LL A L</code>).</li>
+
+<li><code>merge J K L</code> says that <code>L</code> is the union of <code>J</code> and <code>K</code>.
+<code>merge</code> is non-deterministic because it has overlapping heads.
+It says that <code>L</code> is the union of <code>J</code> and <code>K</code> (1) if for <code>A</code> in <code>J</code> (<code>adj JJ A J</code>), it is in <code>L</code> (<code>adj LL A L</code>) and (2) similarly for <code>A</code> in <code>K</code>.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgab72835" class="outline-3">
+<h3 id="orgab72835"><span class="section-number-3">5.3.</span> <span class="todo TODO">TODO</span> Code</h3>
+<div class="outline-text-3" id="text-5-3">
+<p>
+Here is the code.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-abella">Type is_o o - &gt; prop .
+Define is_list : olist - &gt; prop by
+; is_list nil
+; is_list ( A :: L ) := is_o A /\ is_list L .
+% adj J A K : K is J with A inserted somewhere
+Define adj : olist - &gt; o - &gt; olist - &gt; prop by
+; adj L A ( A :: L ) := is_o A /\ is_list L
+; adj ( B :: K ) A ( B :: L ) := is_o B /\ adj K A L .
+% merge J K L : J union K equals L .
+Define merge : olist - &gt; olist - &gt; olist - &gt; prop by
+; merge nil nil nil
+; merge J K L := exists A JJ LL , adj JJ A J /\ adj LL A L /\
+merge JJ K LL
+; merge J K L := exists A KK LL , adj KK A K /\ adj LL A L /\
+merge J KK LL .
+% perm J K : J and K have the same elements
+Define perm : olist - &gt; olist - &gt; prop by
+; perm nil nil
+; perm K L :=
+exists A KK LL , adj KK A K /\ adj LL A L /\ perm KK LL .
+</pre>
+</div>
+
+<ul class="org-ul">
+<li>Notice the overlapping heads for <code>merge</code>, which makes it nondeterministic.</li>
+<li>(?) Why is <code>adj</code> non-deterministic?</li>
+<li>Why do they have the existential quantifiers?</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org8847120" class="outline-3">
+<h3 id="org8847120"><span class="section-number-3">5.4.</span> Multiset Theorems</h3>
+<div class="outline-text-3" id="text-5-4">
+<p>
+The files <code>lib/merge.thm</code> and <code>lib/perm.thm</code> containts theorems about multisets.
+</p>
+
+<p>
+Examples:
+</p>
+<ul class="org-ul">
+<li><p>
+<code>merge</code> is stable under permutation. If <code>L</code> is the union of <code>J</code> and <code>K</code>, and <code>JJ</code> is the same as <code>J</code> modulo permutation, then <code>L</code> is also the union of <code>JJ</code> and <code>K</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-abella">  Theorem perm_merge_1 : forall J K L JJ,
+  merge J K L - &gt; perm J JJ - &gt; merge JJ K L .
+</pre>
+</div></li>
+
+<li><p>
+<code>merge</code> is associative. Apparently this requires establishing that <code>perm</code> is an equivalence (transitive, reflexive, symmetric).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-abella">  Theorem merge_assoc : forall J K L JK KL JKL1 JKL2 ,
+  merge J K JK - &gt; merge K L KL - &gt;
+  merge J KL JKL1 - &gt; merge JK L JKL2 - &gt;
+  perm JKL1 JKL2 .
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-orge40f269" class="outline-2">
+<h2 id="orge40f269"><span class="section-number-2">6.</span> MALL (Multiplicative additive linear logic)</h2>
+<div class="outline-text-2" id="text-6">
+</div>
+<div id="outline-container-org373c61f" class="outline-3">
+<h3 id="org373c61f"><span class="section-number-3">6.1.</span> Formulas</h3>
+<div class="outline-text-3" id="text-6-1">
+<p>
+We seem to define the connectives as their own types, then define a formula inductively (typing predicate). Constrast this to SML or Coq where you simply define formulas as an inductive datatype.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-abella">Type atom , natom atm - &gt; o .
+Type tens , par o - &gt; o - &gt; o .
+Type one , bot o .
+Type wth , plus o - &gt; o - &gt; o .
+Type top , zero o .
+
+Define is_fm : o - &gt; prop by
+; is_fm ( atom A )
+; is_fm ( natom A )
+; is_fm ( tens A B ) := is_fm A /\ is_fm B
+; is_fm one
+; is_fm ( par A B ) := is_fm A /\ is_fm B
+; is_fm bot
+; is_fm ( wth A B ) := is_fm A /\ is_fm B
+; is_fm top
+; is_fm ( plus A B ) := is_fm A /\ is_fm B
+; is_fm zero .
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org61a7e66" class="outline-3">
+<h3 id="org61a7e66"><span class="section-number-3">6.2.</span> <span class="todo TODO">TODO</span> Inference rules</h3>
+<div class="outline-text-3" id="text-6-2">
+<p>
+Here is the code for the inference rules of the fragment of MALL.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">Define mall : olist - &gt; prop by
+; mall L := exists A , adj ( natom A :: nil ) ( atom A ) L
+; mall L := exists A B LL JJ KK J K ,
+adj LL ( tens A B ) L /\ merge JJ KK LL /\
+adj JJ A J /\ mall J /\ adj KK B K /\ mall K
+; mall ( one :: nil )
+; mall L := exists A B LL J K ,
+adj LL ( par A B ) L /\ adj LL A J /\ adj J B K /\ mall K
+; mall L := exists LL , adj LL bot L /\ mall LL
+; mall L := exists A B LL J K ,
+adj LL ( wth A B ) L /\ adj LL A J /\ mall J /\ adj LL B K /\
+mall K
+; mall L := exists LL , adj LL top L
+; mall L := exists A B LL J , adj LL ( plus A B ) L /\ adj LL A J
+/\ mall J
+; mall L := exists A B LL J , adj LL ( plus A B ) L /\ adj LL B J
+/\ mall J .
+</pre>
+</div>
+
+<ul class="org-ul">
+<li>Why are all the heads <code>mall L</code>?</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org71be7db" class="outline-3">
+<h3 id="org71be7db"><span class="section-number-3">6.3.</span> Exchange rule (implicit)</h3>
+<div class="outline-text-3" id="text-6-3">
+<p>
+They do not have an explicit exchange rule (benefit of not using lists and also using <code>adj</code>). Instead they say that if <code>|- K</code>, and <code>K</code> is a permutation of <code>L</code>, then <code>|- L</code> as well.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-abella">Theorem mall_perm : forall K L , mall K - &gt; perm K L - &gt; mall L .
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgfb99796" class="outline-3">
+<h3 id="orgfb99796"><span class="section-number-3">6.4.</span> <span class="todo TODO">TODO</span> Duality and inversions</h3>
+<div class="outline-text-3" id="text-6-4">
+<ul class="org-ul">
+<li>They set up the one-sided formulation in a way that the only height of the derivation containing the positive variant (not invertible) is relevant. (?)</li>
+
+<li>This requires an asymmetric dual predicate.</li>
+
+<li>Here is the code.</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-abella">Define dual : o - &gt; o - &gt; prop by
+; dual ( atom A ) ( natom A )
+; dual ( tens A B ) ( par AA BB ) := dual A AA /\ dual B BB
+; dual one bot
+; dual ( plus A B ) ( wth AA BB ) := dual A AA /\ dual B BB
+; dual zero top .
+</pre>
+</div>
+
+<p>
+(?) Why is this asymmetric?
+</p>
+
+<ul class="org-ul">
+<li><p>
+Here are some inversion lemmas:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-abella">Theorem bot_inv : forall J L, mall L -&gt; adj J bot L -&gt; mall J.
+Theorem par_inv : forall L JJ A B, mall L -&gt; adj JJ (par A B) L -&gt; exists KK LL, adj JJ A KK /\ adj KK B LL /\ mall LL
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-orgac718a8" class="outline-2">
+<h2 id="orgac718a8"><span class="section-number-2">7.</span> Cut elim for MALL</h2>
+<div class="outline-text-2" id="text-7">
+</div>
+<div id="outline-container-org867cabe" class="outline-3">
+<h3 id="org867cabe"><span class="section-number-3">7.1.</span> <span class="todo TODO">TODO</span> Statement</h3>
+<div class="outline-text-3" id="text-7-1">
+<ul class="org-ul">
+<li>Here is how it is encoded.</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-abella">Theorem cut : forall A B JJ J KK K LL ,
+dual A B -&gt;
+adj JJ A J -&gt; mall J -&gt;
+adj KK B K -&gt; mall K -&gt;
+merge JJ KK LL -&gt;
+mall LL .
+</pre>
+</div>
+
+<ul class="org-ul">
+<li>Why is this how it&rsquo;s encoded?</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgffb249b" class="outline-3">
+<h3 id="orgffb249b"><span class="section-number-3">7.2.</span> <span class="todo TODO">TODO</span> Proof strategy</h3>
+<div class="outline-text-3" id="text-7-2">
+<ul class="org-ul">
+<li>The proof proceeds by nested induction on the first and third assumptions.</li>
+
+<li>This encodes the following measure for appealing to the IHs: either the rank decreases because of case analysis of <code>dual A B</code>, or the rank stays the same and the height of <code>mall J</code>, which is the derivation that contains the positive half of the cut formula pair, decreases.</li>
+
+<li>Is this what is known as a lexicographic induction?</li>
+
+<li>Whe have to show that cuts can be reduced to cuts of lower rank.</li>
+</ul>
+</div>
+<div id="outline-container-org2c4211f" class="outline-4">
+<h4 id="org2c4211f"><span class="todo TODO">TODO</span> Rest of the proof</h4>
+<div class="outline-text-4" id="text-org2c4211f">
+<ul class="org-ul">
+<li>(TODO) Read pages 13 and 14 while following the proof interactively in Abella.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb9d1acb" class="outline-3">
+<h3 id="orgb9d1acb"><span class="section-number-3">7.3.</span> <span class="todo TODO">TODO</span> Cut Admissiblity for Exponential Case</h3>
+<div class="outline-text-3" id="text-7-3">
+<ul class="org-ul">
+<li>Apparently, adding exponentials complicates the cut elimination proof by induction.</li>
+<li>The termination measures are more complex.</li>
+<li>The problem is that there is a case where a cut instance is not a lower measure.</li>
+<li>They try to solve it by incorporating multiset orderings, which is apparently not yet supported by Abella&rsquo;s size annotations.</li>
+<li>Instead, they move to a dyadic sequent calculus. Now they induct on another measure (weight).</li>
+
+<li>See page 16.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-org1fe9d83" class="outline-2">
+<h2 id="org1fe9d83"><span class="section-number-2">8.</span> <span class="todo TODO">TODO</span> First-order case</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+First order means we introduce the existential and universal quantifier.
+</p>
+</div>
+<div id="outline-container-org521cae4" class="outline-3">
+<h3 id="org521cae4"><span class="section-number-3">8.1.</span> <span class="todo TODO">TODO</span> Two Level logic approcach</h3>
+<div class="outline-text-3" id="text-8-1">
+<ul class="org-ul">
+<li>Recall the two-level logic approach in 2.2 that simplifies reasoning about quantifiers and instantiation.</li>
+
+<li>This means we move from the code so far (which is apparently in the reasoning level) to the specification logic of  <code>\lambda</code> Prolog (henceforth LProlog).</li>
+</ul>
+
+
+<p>
+I haven&rsquo;t read this carefully yet.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgfe1cb9b" class="outline-2">
+<h2 id="orgfe1cb9b"><span class="section-number-2">9.</span> <span class="todo TODO">TODO</span> Focused Calculi</h2>
+<div class="outline-text-2" id="text-9">
+<ul class="org-ul">
+<li>They also prove cut-admissibility for focused proof systems for linear logic.</li>
+<li>Focused systems group connectives by polarity. Polarity is either invertible (-) or non-invertible (+).</li>
+<li>Focused systems cut down on non-determinism.</li>
+<li>Main difficulty with focused proofs is that &ldquo;cuts are not permuted step by step above single connectives but must rather permute past entire phases&rdquo;.</li>
+<li>They completed the cut-elimination argument for focused first-order MALL.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org0385b22" class="outline-2">
+<h2 id="org0385b22"><span class="section-number-2">10.</span> <span class="todo TODO">TODO</span> Two Sided Calculi</h2>
+<div class="outline-text-2" id="text-10">
+<ul class="org-ul">
+<li>They implemented two sided calculus for MALL.</li>
+<li>The two sided formulation has left and right introduction rules.</li>
+<li>&ldquo;Cut rules apply to fomrulas on either side of the sequent rather than in terms of duality&rdquo;</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org0134233" class="outline-2">
+<h2 id="org0134233"><span class="section-number-2">11.</span> Related Work</h2>
+<div class="outline-text-2" id="text-11">
+<ul class="org-ul">
+<li>Generic method for formalizing sequent calculi in Isabelle/HOL by Dawson, Gore (2010).
+Proved cut-elimination for <code>GLS_v</code> provability logic.</li>
+<li>Pattinson and Schroder formalized cut-elimination for coalgebraic logics in Coq (2013). They implemented multisets as setoids with an underlying list type and permuation relation.</li>
+<li>To avoid dealing with explicit representations of contexts, some find different representations for sequent calculus rules that mention only the principal and auxiliary formula. (Pfenning, 1995) annotates sequents with proof terms, which reduces cut elimination to a type checking problem on the proof terms.</li>
+<li>Pfenning&rsquo;s method was used by Simmons (2014) to formalize completeness of focusing in intuitionistic logic. Apparently he avoids showing invertibility lemmas.</li>
+<li>Some other linear logic encodings focused on obtaining proof search engines (no proofs for metatheorems).</li>
+<li>In LL-coq, they implemented a multiset library and used PHOAS for quantifiers.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: selffins</p>
+<p class="date">Created: 2025-05-20 Tue 14:12</p>
+</div>
+</body>
+</html>
