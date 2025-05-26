@@ -178,6 +178,12 @@ Module LJ_lists.
         apply rules_impl_l; apply init.
     Qed.
 
+    (* huh *)
+    Theorem identity_reduction : forall A, [A] |- A.
+    Proof.
+      intros. apply rules_id.
+    Qed.
+
   End InferenceRules.
 
 End LJ_lists.

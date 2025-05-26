@@ -1,0 +1,10 @@
+#+title: Perm
+
+* Libraries
+#+BEGIN_SRC coq
+From Stdlib Require Export List.
+Export ListNotations.
+From Stdlib Require Export Permutation
+#+END_SRC
+
+* Case study: < on Nat

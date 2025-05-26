@@ -1,0 +1,35 @@
+I wonder if there is a metatheory way / more mathematical way to talk about context representations :).
+Not just in a CS way / interactive theorem prover way of talking about them.
+
+---
+* Algebras
+** Definition
+An "algebra" aka "algebraic structure" is a set equipped with a binary relation, satisfying some (algebraic) axioms.
+(Actually an n-tuple containing at least a set and a binary relation).
+** Example: Magma
+- A magma =M = (S, *)= is a set =S= with a closed binary relation =* : S x S -> S=.
+** Example: Monoid
+- A monoid =M = (S, *, 1)= is a set =S= equipped with an associative binary relation =*= and an identity element =1=.
+- Or, a monoid is a set =S= with:
+  - =* : S x S -> S=.
+  - For all =x, y, z : S=, =(x * y) * z = x * (y * z)=.
+  - Identity element =1 :S=.
+  - For all =x : S=, =x * 1 = x= and =1 * x = x=.
+** Example: Commutative monoid
+- A commutative monoid =M = (S, *, 1)= is a monoid with its relation also being commutative (For all =x, y : S=, =x * y = y * x=).
+* Proof systems
+* Context representations
+** Definition
+ A context representation is an algebra for contexts =G= used in some proof system =P=.
+ A context representation is a set =S=, with
+** Example: LJ
+- In proof system =LJ=, with judgement =G |- C=, =G= is a context.
+- A commutative monoid is a context representation for contexts =G=.
+
+* Context representation satisfies a proof system
+** Definition
+We say a context representation =C= satisfies a proof system =P= if
+
+*
+Definition: Two context representations are equivalent if they have the same algebraic properties in the proof system.
+Example: In LJ, with judgement G |- C, G is a context.

@@ -1,0 +1,178 @@
+#+title: May-25
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="custom.css">
+#+OPTIONS: num:2 toc:2
+
+------
+[[file:index.org][Homepage]]
+
+* Todo List
+
+Here are the todos for Wednesday. These are exploratory.
+
+** DONE LJ + multiset
+** TODO cut-elim review (paper)
+** TODO LJ cut-elim formalization (attempt)
+** TODO modal logic system rewrite
+** TODO pientka paper
+
+* LJ + coq-ll Multiset
+
+- We look at the file =coq-ll/FOLL/LL/Examples/LJLL.v=, where they define =LJ= and provide encodings into =LL= and prove adequacy of encoding.
+
+- Here are some relevant code snippets.
+
+** Fornulas
+- Inductive definition:
+#+BEGIN_SRC coq
+Inductive LForm :Set :=
+  | bot (* false *)
+  | atom : nat -> LForm (* atomic propositions are named with a natural number *)
+  | conj : LForm -> LForm -> LForm (* conjunction *)
+  | disj : LForm -> LForm -> LForm (* disjunction *)
+  | impl : LForm -> LForm -> LForm (* intuitionistic implication *)
+  .
+#+END_SRC
+
+- Two formulas are either equal to one another or not.
+
+  #+BEGIN_SRC coq
+Theorem LForm_dec_eq : forall F G : LForm, {F = G} + {F <> G}.
+  #+END_SRC
+
+** Inference rules
+
+#+BEGIN_SRC coq
+Reserved Notation " L ';' n '|-P-' F" (at level 80).
+  Inductive sq : list LForm -> nat -> LForm -> Prop :=
+  | init : forall (L L' :list LForm) a, L =mul= atom a :: L' -> L ; 0 |-P- atom a
+  | botL : forall (L L' :list LForm) G , L =mul= bot :: L' -> L ; 0 |-P- G
+  | cR : forall L F G n m , L ; n |-P- F -> L ; m |-P- G -> L ; S (max n m) |-P- conj F G
+  | cL : forall L G G' F L' n, L =mul= (conj G G') :: L' -> G :: G' :: L' ; n |-P- F -> L ; S n |-P- F
+  | dR1 : forall L F G n, L ;  n |-P- F -> L ; S n |-P- disj F G
+  | dR2 : forall L F G n, L ;  n |-P- G -> L ; S n |-P- disj F G
+  | dL : forall L L' F G H n m, L =mul= disj F G :: L' ->  F :: L' ;  n |-P- H -> G :: L' ;  m |-P- H  -> L ;  S (max n m) |-P- H
+  | impR : forall L F G n , F :: L ; n |-P- G ->  L ; S n |-P- impl F G
+  | impL : forall L L' F G H n m,  L =mul= impl F G :: L' -> L ; n |-P- F -> G :: L' ; m |-P- H -> L ; S (max n m)|-P- H
+  where "L ; n |-P- F" := (sq L n F).
+#+END_SRC
+
+- There is a lot to say. Notice how they include =n= as as part of the nation, which is the height of the tree. This is for an inductive measure in some metatheorem proof.
+
+#+BEGIN_SRC coq
+Reserved Notation " L ';' n '|-P-' F" (at level 80). L =mul= (atom a :: L').
+#+END_SRC
+We will remove this.
+
+- Why isn't =impR= something like = L eq_mul F :: L' |-P- G= instead?
+  #+BEGIN_SRC coq
+  | impR : forall L F G n , F :: L ; n |-P- G ->  L ; S n |-P- impl F G
+#+END_SRC
+
+** My Version
+
+- I'm not too sure about the formatting here. It helps you read it better, because having to use =G mul_eq A :: G'= makes it hard to read (compare my other LJ, which uses =G ++ [A] |- C= directly..). It doesn't matter anywhere else in the code.
+
+#+BEGIN_SRC coq
+Reserved Notation " G '|-' C " (at level 80).
+Inductive rules : list LForm -> LForm -> Prop :=
+  | rules_init     : forall G_atom_A G A,
+                            (G_atom_A =mul= atom A :: G)
+                          -> G_atom_A |- atom A             (* G, atom a |- atom a *)
+  | rules_bot_l    : forall G_bot G C,
+                            (G_bot =mul= bot :: G)
+                          -> G_bot |- C                      (* G, bot |- C *)
+  | rules_conj_r   : forall G A B, G |- A -> G |- B -> G |- conj A B
+  | rules_conj_l   : forall G_conj_A_B A B C G,
+                            (G_conj_A_B =mul= (conj A B) :: G)
+                         -> A :: B :: G |- C
+                         -> G_conj_A_B |- C                 (* G, A, B |- C -> G, conj A B |- C *)
+  | rules_disj_r_1 : forall G A B, G |- A -> G |- disj A B
+  | rules_disj_r_2 : forall G A B, G |- B -> G |- disj A B
+  | rules_disj_l   : forall G_disj_A_B G A B C,
+                            (G_disj_A_B =mul= disj A B :: G)
+                         -> A :: G |- C
+                         -> B :: G |- C
+                         -> G_disj_A_B |- C                 (* G, A |- C -> G, B |-  C -> G, disj A B |- C *)
+  | rules_impl_r   : forall G A B, A :: G |- B -> G |- impl A B
+  | rules_impl_l   : forall G_impl_l G A B C,
+                            (G_impl_l =mul= impl A B :: G)
+                         -> G_impl_l |- A
+                         -> B :: G |- C
+                         -> G_impl_l |- C
+where " G '|-' C " := (rules G C).
+#+END_SRC
+
+** Proof of a small derivation in my LJ
+
+#+BEGIN_SRC coq
+Example Ex1_my_ver: [(atom 3)] |- impl (conj (atom 1) (atom 2)) (conj (atom 2) (conj (atom 3) (atom 1))).
+  remember (atom 1) as A.
+  remember (atom 2) as B.
+  remember (atom 3) as C.
+  eapply rules_impl_r;eauto.                   (* [C] |- impl (conj A B) (conj B (conj C A)) *)
+  eapply rules_conj_l;eauto.                   (* [conj A B; C] |- conj B (conj C A) *)
+  eapply rules_conj_r;eauto.                   (* [A; B; C] |- conj B (conj C A) *)
+  rewrite HeqB;eapply rules_init;eauto.        (* [A; B; C] |- B *)
+  eapply rules_conj_r;eauto.                   (* [A; B; C] |- conj C A *)
+  rewrite HeqC;eapply rules_init;eauto.        (* [A; B; C] |- C *)
+  rewrite HeqA;eapply rules_init;eauto.        (* [A; B; C] |- A *)
+  Qed.
+#+END_SRC
+
+** Proof of exchange in my LJ
+
+- Here is a slightly more involved proof. It is my first try at proving a metatheorem by induction on the proof tree. It wasn't too bad (but then again I had the coq-ll version for reference).
+- I learned the usefulness of tacticals like =;= and solvers like =auto=, and a new tactic =eapply=.
+- The original proof for the coq-ll LJ proceeds by strong induction on the size of the proof tree. Here, we induct on the proof tree instead.
+- Some cases were identical, and other cases were similar but not immediate.
+
+#+BEGIN_SRC coq
+(* two contexts equivalent modulo exchange are *)
+Theorem Exch_my_ver : forall G D C, G =mul= D -> G |- C -> D |- C.
+    intros.
+    generalize dependent D.
+
+    induction H0;intros;subst.
+
+    (* base case 1: init *)
+    -
+    rewrite H in H0.
+    eapply rules_init;auto.
+
+    (* base case 2: bot left *)
+    -  rewrite H in H0.
+    eapply rules_bot_l;auto.
+
+    (* conjunction right *)
+    (* two IH: for D |- A and D |- B *)
+    -  apply rules_conj_r.
+    -- apply IHrules1. apply H. (* IH: G =mul D+ -> D |- A*)
+    -- apply IHrules2. apply H.
+
+    (* conjunction left *)
+    - eapply rules_conj_l.
+      -- rewrite <- H1. apply H.
+      -- apply H0.
+
+    (* disjunction right 1 *)
+    - apply rules_disj_r_1;auto.
+
+    (* disjunction right 2 *)
+    - apply rules_disj_r_2;auto.
+
+    (* disjunction left *)
+    - eapply rules_disj_l.
+      -- rewrite <- H0. apply H.
+      -- apply H0_.
+      -- apply H0_0.
+
+    (* implication right *)
+    - apply rules_impl_r. apply IHrules;auto.
+    (* implication left *)
+    - eapply rules_impl_l.
+      -- rewrite <- H0. apply H.
+      -- apply IHrules1. apply H0.
+      -- apply H0_0.
+  Qed.
+  #+END_SRC

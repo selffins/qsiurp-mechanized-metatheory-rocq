@@ -1,11 +1,13 @@
 From Stdlib Require Export Permutation.
 From Stdlib Require Export List.
+From OLlibs Require Import Permutation_solve. (* Olivier Laurent on Github *)
 Export List.ListNotations.
 Set Implicit Arguments.
 Set Printing Parentheses.
 
-(* LJ lists *)
-Module LJ_lists.
+
+(* LL lists. Girard one-sided system *)
+Module LL_lists.
 
   (** Atomic propositions *)
   Section Formula.
@@ -65,7 +67,7 @@ Module LJ_lists.
     Inductive rules : ctx -> Prop :=
     | rules_id : forall A, |- [negation A] ++ [A]
     | rules_cut : forall G D A, |- G ++ [A] -> |- D ++ [negation A] -> |- G ++ D
-    | rules_e : forall G D, Permutation G D -> |- G -> |- D
+    | rules_exchange : forall G D, Permutation G D -> |- G -> |- D
     | rules_tensor : forall G D A B, |- G ++ [A] -> |- D ++ [B] -> |- G ++ D ++ [Tensor A B]
     | rules_par : forall G A B, |- G ++ [A] ++ [B] -> |- G ++ [Par A B]
     | rules_one : |- [One]
@@ -98,7 +100,7 @@ Module LJ_lists.
     Example exchange_123_312: |- [PosA 1; PosA 2; PosA 3] -> |- [PosA 3 ; PosA 1 ; PosA 2].
     Proof.
       intros.
-      apply rules_e with [PosA 1 ; PosA 2 ; PosA 3].
+      apply rules_exchange with [PosA 1 ; PosA 2 ; PosA 3].
       - apply Permutation_sym.
         apply perm_trans with [PosA 1 ; PosA 3 ; PosA 2].
         -- apply perm_swap.
@@ -107,15 +109,31 @@ Module LJ_lists.
       - apply H.
     Qed.
 
-    Example exchange_ABC_CAB: forall A B C : formula, |- [A ; B ; C] -> |- [C ; A ; B].
+    Example exchange_123_213: |- (PosA 1) :: ([PosA 2] ++ [PosA 3]) -> |- [PosA 3] ++ ((PosA 1) :: [PosA 2]).
     Proof.
       intros.
-      apply rules_e with [A ; B ; C].
+      apply rules_exchange with [PosA 1 ; PosA 2 ; PosA 3].
       - apply Permutation_sym.
-        apply perm_trans with [A ; C ; B].
+        apply perm_trans with [PosA 1 ; PosA 3 ; PosA 2].
         -- apply perm_swap.
         -- apply perm_skip.
            apply perm_swap.
+      - apply H.
+    Qed.
+
+    Example exchange_123_213_solver: |- (PosA 1) :: ([PosA 2] ++ [PosA 3]) -> |- [PosA 3] ++ ((PosA 1) :: [PosA 2]).
+    Proof.
+      intros.
+      apply rules_exchange with [PosA 1 ; PosA 2 ; PosA 3].
+      - Permutation_solve.
+      - apply H.
+    Qed.
+
+    Example exchange_ABC_BAC_solver: forall A B C, |- A ++ B ++ C -> |- B ++ A ++ C.
+    Proof.
+      intros.
+      apply rules_exchange with (A ++ B ++ C).
+      - Permutation_solve.
       - apply H.
     Qed.
 
@@ -128,7 +146,7 @@ Module LJ_lists.
         rewrite cons_app_singleton.
         apply rules_cut with A.
         -- apply rules_id.
-        -- apply rules_e with [negation A ; B]. apply perm_swap.
+        -- apply rules_exchange with [negation A ; B]. apply perm_swap.
            apply H.
     Qed.
 
@@ -151,7 +169,38 @@ Module LJ_lists.
       apply rules_id.
     Qed.
 
-  End InferenceRules.
+    (* | rules_ofc : forall G A, Questions G -> |- G ++ [A] -> |- G ++ [Ofc A] *)
+    Example ofc_example : forall A, Questions [YNot A] -> |- [YNot A] ++ [A] -> |- [YNot A] ++ [Ofc A].
+    Proof.
+      intros.
+      apply rules_ofc.
+      apply H.
+      apply H0.
+    Qed.
 
+   Example negation_tensor : negation (negation (Tensor (PosA 0) (PosA 1))) = Tensor (PosA 0) (PosA 1).
+   Proof.
+     reflexivity.
+   Qed.
+
+   Theorem negation_involutive : forall A, negation (negation A) = A.
+   Proof.
+     intros.
+     induction A.
+     - reflexivity.
+     - reflexivity.
+     - reflexivity.
+     - reflexivity.
+     - reflexivity.
+     - reflexivity.
+     - simpl. rewrite IHA1. rewrite IHA2. reflexivity.
+     - simpl. rewrite IHA1. rewrite IHA2. reflexivity.
+     - simpl. rewrite IHA1. rewrite IHA2. reflexivity.
+     - simpl. rewrite IHA1. rewrite IHA2. reflexivity.
+     - simpl. rewrite IHA. reflexivity.
+     - simpl. rewrite IHA. reflexivity.
+   Qed.
+
+  End InferenceRules.
 
 End LL_lists.
