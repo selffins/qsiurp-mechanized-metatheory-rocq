@@ -44,7 +44,6 @@ Module PL.
     contradiction.
   Qed.
 
-
   Module F_dec <: Eqset_dec_pol.
     Definition A := LForm.
     Definition eqA_dec := LForm_dec_eq.
