@@ -1,5 +1,5 @@
 (* NOTE:  This file was taken from the Linear Logic formalization in Coq:
-https://github.com/brunofx86/LL. This file will not work unless you use it inside the repo within their coq project. *)
+https://github.com/brunofx86/LL. *)
 
 (* Add LoadPath "../" . *)
 From Stdlib Require Import Relations.Relations.
@@ -58,82 +58,6 @@ Module PL.
   Declare Module MSFormulas : MultisetList F_dec.
   Export MSFormulas.
 
-  Reserved Notation " L ';' n '|-P-' F" (at level 80).
-  Inductive sq : list LForm -> nat -> LForm -> Prop :=
-  | init : forall (L L' :list LForm) a, L =mul= atom a :: L' -> L ; 0 |-P- atom a
-  | botL : forall (L L' :list LForm) G , L =mul= bot :: L' -> L ; 0 |-P- G
-  | cR : forall L F G n m , L ; n |-P- F -> L ; m |-P- G -> L ; S (max n m) |-P- conj F G
-  | cL : forall L G G' F L' n, L =mul= (conj G G') :: L' -> G :: G' :: L' ; n |-P- F -> L ; S n |-P- F
-  | dR1 : forall L F G n, L ;  n |-P- F -> L ; S n |-P- disj F G
-  | dR2 : forall L F G n, L ;  n |-P- G -> L ; S n |-P- disj F G
-  | dL : forall L L' F G H n m, L =mul= disj F G :: L' ->  F :: L' ;  n |-P- H -> G :: L' ;  m |-P- H  -> L ;  S (max n m) |-P- H 
-  | impR : forall L F G n , F :: L ; n |-P- G ->  L ; S n |-P- impl F G
-  | impL : forall L L' F G H n m,  L =mul= impl F G :: L' -> L ; n |-P- F -> G :: L' ; m |-P- H -> L ; S (max n m)|-P- H
-  where "L ; n |-P- F" := (sq L n F).
-
-  Example Ex1: exists n, [ (atom 3)] ;n|-P- impl (conj (atom 1) (atom 2)) (conj (atom 2) (conj (atom 3) (atom 1))).
-  eexists.
-  eapply impR;eauto.
-  eapply cL;eauto.
-  eapply cR;eauto.
-  eapply init;eauto.
-  eapply cR;eauto.
-  eapply init;eauto.
-  eapply init;eauto.
-  Qed.
-
-  (* Exchange *)
-  Theorem Exch : forall L L' F n, L =mul= L' -> L ; n |-P-F -> L' ;n  |-P-F.
-    intros.
-    generalize dependent L.
-    generalize dependent L'.
-    generalize dependent F.
-    induction n using strongind;intros;subst.
-    + (* base *)
-      inversion H0;subst.
-      rewrite H in H1.
-      eapply init;auto.
-
-      rewrite H in H1.
-      eapply botL;auto.
-    + (* inductive *)
-      inversion H1;subst.
-
-      (* cR *) 
-      - apply cR.
-      eapply H with (L:=L);auto.
-      eapply H with (L:=L);auto.
-
-      (* cL *)
-      - rewrite H0 in H3.
-      eapply cL.
-      -- apply H3.
-      -- apply H5.
-
-      (* dR1 *)
-      - apply H with (L' := L') in H4;auto.
-      apply dR1;auto.
-
-      (* dR2 *)
-      - apply H with (L' := L') in H4;auto.
-      apply dR2;auto.
-
-      (* dL *)
-      - rewrite H0 in H4.
-      eapply dL;eauto.
-
-
-      (* impl R *)  
-      - eapply H with (L' := F0 :: L') in H4;auto.
-      eapply impR;auto.
-
-      (* impl L *)
-      - eapply H with (L' := L') in H5;auto.
-      eapply impL;eauto.
-  Qed.
-
-(* MY VERSION *)
-
 Reserved Notation " G '|-' C " (at level 80).
 Inductive rules : list LForm -> LForm -> Prop :=
   | rules_init     : forall G_atom_A G A,
@@ -162,7 +86,7 @@ Inductive rules : list LForm -> LForm -> Prop :=
                             -> G_impl_l |- C
 where " G '|-' C " := (rules G C).
 
-Example Ex1_my_ver: [(atom 3)] |- impl (conj (atom 1) (atom 2)) (conj (atom 2) (conj (atom 3) (atom 1))).
+Example Ex1: [(atom 3)] |- impl (conj (atom 1) (atom 2)) (conj (atom 2) (conj (atom 3) (atom 1))).
   remember (atom 1) as A.
   remember (atom 2) as B.
   remember (atom 3) as C.
@@ -175,8 +99,7 @@ Example Ex1_my_ver: [(atom 3)] |- impl (conj (atom 1) (atom 2)) (conj (atom 2) (
   rewrite HeqA;eapply rules_init;eauto.        (* [A; B; C] |- A *)
   Qed.
 
-(* two contexts equivalent modulo exchange are *)
-Theorem Exch_my_ver : forall G D C, G =mul= D -> G |- C -> D |- C.
+Theorem Exchange : forall G D C, G =mul= D -> G |- C -> D |- C.
     intros.
     generalize dependent D.
 
