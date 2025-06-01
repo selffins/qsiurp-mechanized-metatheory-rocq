@@ -5,8 +5,8 @@ Export List.ListNotations.
 Set Implicit Arguments.
 Set Printing Parentheses.
 
-(* LJ lists *)
-Module LJ_lists.
+(* LJ lists with permutation from coq library *)
+Module LJ_lists_permlib.
 
   (** Atomic propositions *)
   Section Var.
@@ -19,7 +19,7 @@ Module LJ_lists.
   Section Formula.
 
     Inductive formula :=
-    | Bot  : formula
+    | Bot : formula
     | Atom : var -> formula
     | Not  : formula -> formula
     | Conj  : formula -> formula -> formula
@@ -61,6 +61,7 @@ Module LJ_lists.
                          Permutation G_A (A :: G) ->
                          G_A |- Bot ->
                          G |- Not A
+    | rules_bot_l : forall G_Bot G C, Permutation G_Bot (Bot :: G) -> G_Bot |- C
     | rules_conj_l  : forall G_A_B G_conj_A_B G A B C,
                          Permutation G_A_B (A :: B :: G) -> Permutation G_conj_A_B ((Conj A B) :: G) ->
                          G_A_B |- C ->
@@ -91,22 +92,6 @@ Module LJ_lists.
                          G |- Impl A B
     where " A '|-' B " := (rules A B).
 
-    Theorem init : forall G A, (Atom A) :: G |- Atom A.
-      intros.
-      induction G as [| X G'].
-      - apply rules_id. auto.
-      - eapply rules_w_l with (A := X) (G := (Atom A) :: G').
-        -- Permutation_solve.
-        -- apply IHG'.
-    Qed.
-
-    Lemma w_ctx : forall G G_copy C, Permutation G G_copy -> G |- C -> G ++ G_copy |- C.
-    Proof.
-      intros. generalize dependent G_copy.
-      induction G as [| X G'];intros;subst.
-      - apply Permutation_nil in H. subst. auto.
-      - Admitted.
-
     (* Example proofs *)
     Example double_negation : forall A, [Atom A] |- Not (Not (Atom A)).
       intros.
@@ -126,18 +111,55 @@ Module LJ_lists.
       Permutation_solve. apply rules_id. Permutation_solve.
     Qed.
 
-    Example cut_base_1 : forall A D G, [A] |- A -> G ++ [A] |- D -> G ++ [A] |- D.
-      intros.
-      apply H0.
+    (* Some metatheorems *)
+    Theorem Init : forall G_Atom_A G A, Permutation G_Atom_A ((Atom A) :: G) -> G_Atom_A |- Atom A.
+      intros. generalize dependent G_Atom_A.
+      induction G as [| X G'];intros;subst.
+      - apply rules_id. auto.
+      - eapply rules_w_l with (A := X) (G := (Atom A) :: G'). Permutation_solve.
+        eapply IHG'. auto.
     Qed.
 
-    Example cut_base_2 : forall A G, G |- A -> [A] |- A -> G |- A.
-      intros.
-      apply H.
+    Theorem Identity : forall GG G A, Permutation GG (A :: G) -> GG |- A.
+    Proof.
+      intros. generalize dependent GG. generalize G.
+      induction A;intros;subst.
+      (* Bot *)
+      - apply rules_bot_l with (G := G0). apply H.
+      (* Atom *)
+      - eapply Init. apply H.
+      (* Not / Neg *)
+      - apply rules_neg_r with (G_A := A :: GG). auto.
+        apply rules_neg_l with (G := A :: G0) (G_not_A := A :: GG) (A := A). Permutation_solve. (* wow :D *)
+        apply IHA with (G := G0). auto.
+      (* Conj *)
+      - apply rules_conj_l with (G_A_B := A1 :: A2 :: G0) (G := G0) (A := A1) (B := A2). auto. apply H.
+        apply rules_conj_r.
+        -- apply IHA1 with (G := A2 :: G0) (GG := A1 :: A2 :: G0). Permutation_solve.
+        -- apply IHA2 with (G := A1 :: G0) (GG := A1 :: A2 :: G0). Permutation_solve.
+      (* Disj *)
+      - apply rules_disj_l with (G_A := A1 :: G0) (G_B := A2 :: G0) (G := G0) (A := A1) (B := A2). auto. auto. auto.
+        -- apply rules_disj_r_1. apply IHA1 with (G := G0). auto.
+        -- apply rules_disj_r_2. apply IHA2 with (G := G0). auto.
+      (* Impl *)
+      - apply rules_impl_r with (G_A := A1 ::GG). auto.
+        apply rules_impl_l with (D := nil) (D_B := A2 :: nil) (G_D_impl_A_B := A1 :: GG) (G := A1 :: G0) (A := A1) (B := A2) (C := A2).
+        auto. Permutation_solve.
+        -- apply IHA1 with (G := G0). auto.
+        -- apply IHA2 with (G := []). auto.
     Qed.
 
-    Example cut_and : forall G G' G'' A1 A2 C, G |- A1 -> G' |- A2 -> G'' ++ [A1] |- C -> G ++ G' ++ G'' |- C.
-      intros. Admitted.
+    Theorem Exchange : forall G D C, Permutation G D -> G |- C -> D |- C.
+    Proof.
+      intros. generalize dependent D.
+      induction H0;intros;subst.
+      (* rules_id / Atom*)
+      - apply Permutation_sym in H. apply Permutation_length_1_inv in H.
+        rewrite H in H0. apply Permutation_length_1_inv in H0.
+        rewrite H0. apply rules_id. auto.
+      (* rules_cut *)
+      Admitted.
+
 
   End InferenceRules.
 

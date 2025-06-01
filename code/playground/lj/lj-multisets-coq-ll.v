@@ -58,6 +58,8 @@ Module PL.
   Declare Module MSFormulas : MultisetList F_dec.
   Export MSFormulas.
 
+
+
 Reserved Notation " G '|-' C " (at level 80).
 Inductive rules : list LForm -> LForm -> Prop :=
   | rules_init     : forall G_atom_A G A,
@@ -79,14 +81,24 @@ Inductive rules : list LForm -> LForm -> Prop :=
                             -> B :: G |- C
                             -> G_disj_A_B |- C                 (* G, A |- C -> G, B |-  C -> G, disj A B |- C *)
   | rules_impl_r   : forall G A B, A :: G |- B -> G |- impl A B
-  | rules_impl_l   : forall G_impl_l G A B C,
-                            (G_impl_l =mul= impl A B :: G)
-                            -> G_impl_l |- A
+  | rules_impl_l   : forall G_impl_A_B G A B C,
+                            (G_impl_A_B =mul= impl A B :: G)
+                            -> G_impl_A_B |- A
                             -> B :: G |- C
-                            -> G_impl_l |- C
+                            -> G_impl_A_B |- C
+  | rules_weak     : forall G A G_A C,
+                            (G_A =mul= A :: G)
+                            -> G |- C
+                            -> G_A |- C
+  | rules_contract : forall G A G_A G_A_A C,
+                            (G_A =mul= A :: G) -> (G_A_A =mul= A :: G_A)
+                            -> G_A_A |- C
+                            -> G_A |- C
+
 where " G '|-' C " := (rules G C).
 
 Example Ex1: [(atom 3)] |- impl (conj (atom 1) (atom 2)) (conj (atom 2) (conj (atom 3) (atom 1))).
+Proof.
   remember (atom 1) as A.
   remember (atom 2) as B.
   remember (atom 3) as C.
@@ -97,29 +109,27 @@ Example Ex1: [(atom 3)] |- impl (conj (atom 1) (atom 2)) (conj (atom 2) (conj (a
   eapply rules_conj_r;eauto.                   (* [A; B; C] |- conj C A *)
   rewrite HeqC;eapply rules_init;eauto.        (* [A; B; C] |- C *)
   rewrite HeqA;eapply rules_init;eauto.        (* [A; B; C] |- A *)
-  Qed.
+Qed.
 
 Theorem Exchange : forall G D C, G =mul= D -> G |- C -> D |- C.
-    intros.
-    generalize dependent D.
-
+Proof.
+    intros. generalize dependent D.
 
     induction H0;intros;subst.
 
     (* base case 1: init *)
-    -
-    rewrite H in H0.
-    eapply rules_init;auto.
+    - rewrite H in H0.
+      eapply rules_init;auto.
 
     (* base case 2: bot left *)
     -  rewrite H in H0.
-    eapply rules_bot_l;auto.
+       eapply rules_bot_l;auto.
 
     (* conjunction right *)
     (* two IH: for D |- A and D |- B *)
     -  apply rules_conj_r.
-    -- apply IHrules1. apply H. (* IH: G =mul D+ -> D |- A*)
-    -- apply IHrules2. apply H.
+       -- apply IHrules1. apply H. (* IH: G =mul D+ -> D |- A*)
+       -- apply IHrules2. apply H.
 
     (* conjunction left *)
     - eapply rules_conj_l.
@@ -145,6 +155,54 @@ Theorem Exchange : forall G D C, G =mul= D -> G |- C -> D |- C.
       -- rewrite <- H0. apply H.
       -- apply IHrules1. apply H0.
       -- apply H0_0.
-  Qed.
+    (* weakening *)
+    -  eapply rules_weak.
+       -- apply meq_sym in H. apply meq_sym. eapply meq_trans.
+          --- apply H.
+          --- apply H1.
+       -- apply H0.
+    - eapply rules_contract.
+      --  apply meq_sym in H. apply meq_sym. eapply meq_trans.
+          --- apply H.
+          --- apply H2.
+      -- rewrite <- H2. apply H0.
+      -- apply H1.
+Qed.
+
+Theorem Identity : forall GG G A, GG =mul= A :: G  -> GG |- A.
+Proof.
+  intros. generalize dependent GG. generalize dependent G.
+  induction A;intros;subst.
+  - eapply rules_bot_l. auto.
+  - eapply rules_init. auto.
+  - eapply rules_conj_r.
+    -- eapply rules_conj_l.
+       --- apply H.
+       --- eapply rules_weak with (G_A := A1 :: A2 :: G) (G := A1 :: G) (A := A2).
+           ---- auto.
+           ---- apply IHA1 with (G := G) (GG := A1 :: G).
+                ----- reflexivity.
+    -- eapply rules_conj_l.
+       --- apply H.
+       --- eapply rules_weak with (G_A := A1 :: A2 :: G) (G := A2 :: G) (A := A1).
+           ---- auto.
+           ---- apply IHA2 with (G := G) (GG := A2 :: G).
+                ----- reflexivity.
+  - eapply rules_disj_l.
+     -- apply H.
+     -- apply rules_disj_r_1. apply IHA1 with (G := G). reflexivity.
+     -- apply rules_disj_r_2. apply IHA2 with (G := G). reflexivity.
+  - eapply rules_impl_r.
+    eapply rules_impl_l with (G_impl_A_B := A1 :: GG) (G := A1 :: G) (A := A1) (B := A2) (C := A2).
+    -- rewrite H. auto.
+    -- apply IHA1 with (G := GG). auto.
+    -- apply IHA2 with (G := A1 :: G). auto.
+Qed.
+
+Theorem Cut : forall GG G A C, GG =mul= A :: G -> G |- A -> GG |- C -> G |- C.
+Proof.
+  intros. generalize dependent GG. generalize dependent G.
+  (* :) *)
+  Admitted.
 
 End PL.
