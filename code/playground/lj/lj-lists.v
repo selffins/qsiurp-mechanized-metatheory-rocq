@@ -33,8 +33,9 @@ Module LJ_lists.
 
     Reserved Notation " A '|-' B " (at level 80).
     Inductive rules : ctx -> formula -> Prop :=
-    | rules_id     : forall A, [A] |- A
+    | rules_id     : forall G A, G ++ [Atom A] |- Atom A (* Modified from [A] |- A to this *)
     | rules_cut    : forall G D A B, G |- A -> D ++ [A] |- B -> G ++ D |- B
+    | rules_bot_l  : forall G C, G ++ [Bot] |- C
     | rules_w_l    : forall G D B, G |- B -> G ++ D |- B      (* Weakening : contexts level *)
     | rules_w_r    : forall G A, G |- Bot -> G |- A
     | rules_e_l    : forall G D C, G ++ D |- C -> D ++ G |- C (* Exchange : contexts level *)
@@ -67,15 +68,6 @@ Module LJ_lists.
       split;intro;apply H.
     Qed.
 
-
-    Theorem init : forall G A, G ++ [A] |- A.
-      intros.
-      induction G as [| X G'].
-      - simpl. apply rules_id.
-      - rewrite cons_app_singleton. rewrite <- app_assoc.
-        apply rules_e_l. apply rules_w_l. apply IHG'.
-    Qed.
-
     Theorem shift : forall X Y Z C, X ++ Y ++ Z |- C -> Z ++ X ++ Y |- C.
     Proof.
       intros.
@@ -85,6 +77,59 @@ Module LJ_lists.
       apply rules_e_l.
       apply H.
     Qed.
+
+
+    Theorem Identity : forall G A, G ++ [A] |- A.
+    Proof.
+      intros. generalize dependent G.
+      induction A;intros;subst.
+      - apply rules_bot_l.
+      - apply rules_id.
+      - apply rules_neg_r.
+        rewrite <- app_assoc.
+        apply shift with (Z := G) (X := [Not A]) (Y := [A]).
+        apply rules_e_l.
+        apply rules_neg_l.
+        apply rules_e_l.
+        apply IHA.
+      - apply rules_and_l. apply rules_and_r.
+        -- rewrite app_assoc. apply rules_e_l. rewrite app_assoc. apply IHA1.
+        -- rewrite app_assoc. apply IHA2.
+      - apply rules_or_l.
+        -- apply rules_or_r_1. apply IHA1.
+        -- apply rules_or_r_2. apply IHA2.
+      - apply rules_impl_r.
+        rewrite <- app_assoc.
+        apply shift.
+        apply rules_e_l.
+        rewrite <- app_assoc.
+        apply rules_impl_l.
+        -- apply IHA1 with (G := []).
+        -- apply IHA2.
+    Qed.
+
+    Theorem Exchange : forall G D C, Permutation G D -> G |- C -> D |- C.
+    Proof.
+      intros.
+      generalize dependent D.
+      induction H0;intros;subst.
+      - Admitted.
+      (* -
+      -
+      -
+      -
+      -
+      -
+      -
+      -
+      -
+      -
+      -
+      -
+      -
+      -
+      -
+    Qed. *)
 
     Lemma w_ctx : forall G C, G |- C -> G ++ G |- C.
     Proof.
@@ -98,7 +143,7 @@ Module LJ_lists.
       intros.
       apply rules_neg_r.
       apply rules_neg_l.
-      apply rules_id.
+      apply Identity with (G := []).
     Qed.
 
     Example non_contradiction : forall A, [] |- Not (And A (Not A)).
@@ -106,7 +151,7 @@ Module LJ_lists.
       apply rules_neg_r.
       apply rules_and_l.
       apply rules_neg_l.
-      apply rules_id.
+      apply Identity with (G := []).
     Qed.
 
     Example cut_base_1 : forall A D G, [A] |- A -> G ++ [A] |- D -> G ++ [A] |- D.
@@ -134,8 +179,8 @@ Module LJ_lists.
       forall G A B,  G |- And A B -> ((G ++ [A] ++ [B] |- A) /\ (G ++ [A] ++ [B] |- B)).
       intros.
       split.
-      - rewrite app_assoc. apply rules_w_l. apply init.
-      - rewrite app_assoc. apply init.
+      - rewrite app_assoc. apply rules_w_l. apply Identity.
+      - rewrite app_assoc. apply Identity.
     Qed.
 
     Example invertibility_or_l :
@@ -146,14 +191,14 @@ Module LJ_lists.
         apply rules_c_l.
         simpl.
         apply rules_cut with (A := Or A B).
-        -- apply rules_or_r_1. apply init.
+        -- apply rules_or_r_1. apply Identity.
         -- rewrite <- app_assoc. apply shift. apply shift. rewrite app_assoc.
            apply rules_w_l. apply rules_e_l. apply H. }
       { apply ctx_nil_l.
         apply rules_c_l.
         simpl.
         apply rules_cut with (A := Or A B).
-        -- apply rules_or_r_2. apply init.
+        -- apply rules_or_r_2. apply Identity.
         -- rewrite <- app_assoc. apply shift. apply shift. rewrite app_assoc.
            apply rules_w_l. apply rules_e_l. apply H. }
     Qed.
@@ -175,13 +220,7 @@ Module LJ_lists.
           reflexivity.
         }
         rewrite H0.
-        apply rules_impl_l; apply init.
-    Qed.
-
-    (* huh *)
-    Theorem identity_reduction : forall A, [A] |- A.
-    Proof.
-      intros. apply rules_id.
+        apply rules_impl_l; apply Identity.
     Qed.
 
   End InferenceRules.
