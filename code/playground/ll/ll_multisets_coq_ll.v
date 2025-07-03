@@ -17,12 +17,11 @@ Require Export LL.FLLMetaTheory.
 #[local] Hint Resolve Nat.le_max_l : core .
 
 (** * Linear logic (LL)
-
-  - Following Girard's presentation (as laid out in the Encyclopedia of Proof Systems)
-  - Exchange behaves implicitly (no low-level shifting of elements), but is an explicit rule in the system.
-  - Contexts are multisets - we use the multiset library from the paper "coq-ll".
-  - This file was modified from the Linear Logic formalization in Coq: https://github.com/brunofx86/LL.
-
+      - Girard's original linear logic system.
+      - Following the presentation laid out in the Encyclopedia of Proof Systems)
+      - Exchange behaves implicitly (no low-level shifting of elements), but is an explicit rule in the system.
+      - Contexts are multisets - we use the multiset library from the paper "coq-ll".
+      - This file was is a modification taken from the Linear Logic formalization in Coq: https://github.com/brunofx86/LL.
  *)
 
 Module PL.
@@ -97,6 +96,7 @@ Module PL.
     (** *** Questions
 
         Some rules require that the context contains only [YNot] formulas.
+        TBD: equivalence proof between the proposition form and the fixpoint form.
 
      *)
 
@@ -107,6 +107,20 @@ Module PL.
       end.
 
   Definition Questions (G : list LForm) := forall A, In A G -> is_YNot A.
+
+  Fixpoint questions (G : list LForm) : bool :=
+    match G with
+    | nil => true
+    | cons A G' => match A with
+                   | YNot _ => questions G'
+                   | _ => false
+                   end
+    end.
+
+  Lemma questions_Questions :
+    forall G, questions G = true <-> Questions G.
+  Proof.
+    Admitted.
 
   (**  *** Inductive Definition for rules *)
 
@@ -198,5 +212,60 @@ Module PL.
   - TBD: derivation examples + metatheorems
 
    *)
+
+  (** ** Metatheorems
+      - TBD: cut admissibility, identity expansion, exchange, etc.
+
+   *)
+
+  (** *** Exchange
+      - TBD: proof
+   *)
+
+  Theorem exchange_admissibility :
+    forall G D,
+      G =mul= D ->
+      |- G ->
+      |- D.
+  Proof.
+    Admitted.
+
+  (** ** Derivation examples *)
+
+  (** *** Derivation 1:
+
+      The written proof is from [https://www.cs.uoregon.edu/research/summerschool/summer25/_lectures/Kesner_Lesson1.pdf, slide 30].
+
+      There are some mildly interesting things to note:
+
+      - We need to [apply] the rules with explicit arguments - to know which formula and context(s) are being manipulated.
+      - We use [eapply] because there are multiset conditions / preludes for the rules, which [auto] can handle. Often, [eapply] can figure out the formula being manipulated.
+      - The order of the context can sometimes be rearranged just by applying these tactics.
+      - [Questions A] is a proposition stating that all formulas in [A] are of the form [YNot _]. We switch to the fixpoint version [questions] via [questions_Questions], which can be simplified/evaluated.
+      - The theorem is stated this way (without using any multiset condiitions). This means we will have [ax : |- A :: [negation A]], and we wouldn't be able to apply [ax] directly on [|- [negation A] :: A]. So this requires exchange admissibility.
+      - Or you can use a statement with multiset conditions.
+      - Negation is meta in that it is not part of the syntax. It is a fixpoint.  So when we use a rule like [rules_cut], which requires that the cut formulas on both subtrees are negations of each other, the negation does not come automatically evaluated. Hence we called [simpl] and [apply negation_involutive].
+
+   *)
+
+  Example A__not_Ynot_A__not_Ynot_C :
+    forall A C,
+      |- A :: [negation A] ->
+      |- A :: (YNot (negation A)) :: [YNot (negation C)].
+  Proof.
+    intros A C ax.
+    eapply rules_ynot_weak with (A := negation C). auto.
+    eapply rules_ynot_contract with (G := [A]) (A := negation A);auto.
+    eapply rules_cut with (A := Tensor (negation A) (Ofc A));auto.
+    - eapply rules_tensor with (G := [A]) (D := [YNot (negation A)]) (A := negation A) (B := Ofc A);auto.
+      eapply rules_ofc;auto.
+      -- apply questions_Questions. reflexivity.
+      -- eapply rules_ynot_conv;auto.
+    - simpl. rewrite negation_involutive.
+      eapply rules_par;auto.
+      -- eapply rules_ynot_conv;auto. eapply rules_ynot_weak;auto.
+         eapply exchange_admissibility. auto.
+         apply ax.
+  Qed.
 
 End PL.
