@@ -1,7 +1,3 @@
-(* NOTE:  This file was taken from the Linear Logic formalization in Coq:
-https://github.com/brunofx86/LL. *)
-
-(* Add LoadPath "../" . *)
 From Stdlib Require Import Relations.Relations.
 From Stdlib Require Import Arith.EqNat.
 From Stdlib Require Import Classes.Morphisms.
@@ -20,7 +16,17 @@ Require Export LL.FLLMetaTheory.
 #[local] Hint Resolve Nat.le_max_r : core .
 #[local] Hint Resolve Nat.le_max_l : core .
 
+(** * Linear logic (LL)
+
+  - Following Girard's presentation (as laid out in the Encyclopedia of Proof Systems)
+  - Exchange behaves implicitly (no low-level shifting of elements), but is an explicit rule in the system.
+  - Contexts are multisets - we use the multiset library from the paper "coq-ll".
+  - This file was modified from the Linear Logic formalization in Coq: https://github.com/brunofx86/LL.
+
+ *)
+
 Module PL.
+
   Inductive LForm :=
   | PosA   : nat -> LForm
   | NegA   : nat -> LForm
@@ -35,10 +41,18 @@ Module PL.
   | Ofc    : LForm -> LForm
   | YNot   : LForm -> LForm.
 
+  (** * Some infrastructure for multisets
+
+  - Refer to the documentation for coq-ll. In short, we need that formulas have decidable equality.
+  - These are defined in a module [F_dec], which is passed to the multiset module.
+
+   *)
+
   Theorem LForm_dec_eq : forall F G : LForm, {F = G} + {F <> G}.
     Admitted.
 
   Module F_dec <: Eqset_dec_pol.
+
     Definition A := LForm.
     Definition eqA_dec := LForm_dec_eq.
     Fixpoint isPositive (n:nat) :=
@@ -47,10 +61,14 @@ Module PL.
       | 1%nat => true
       | S (S n) => isPositive n
       end.
+
   End F_dec.
 
   Declare Module MSFormulas : MultisetList F_dec.
+
   Export MSFormulas.
+
+  (** *** Negation *)
 
   Fixpoint negation (A : LForm) : LForm :=
     match A with
@@ -68,6 +86,20 @@ Module PL.
     | Top => Zero
     end.
 
+  Theorem negation_involutive : forall A, negation (negation A) = A.
+  Proof.
+    intros.
+    induction A;auto;
+      (repeat(simpl; rewrite IHA1; rewrite IHA2; auto));
+      (repeat simpl; rewrite IHA;auto).
+  Qed.
+
+    (** *** Questions
+
+        Some rules require that the context contains only [YNot] formulas.
+
+     *)
+
   Definition is_YNot (A : LForm) : Prop :=
       match A with
       | YNot _ => True
@@ -75,6 +107,8 @@ Module PL.
       end.
 
   Definition Questions (G : list LForm) := forall A, In A G -> is_YNot A.
+
+  (**  *** Inductive Definition for rules *)
 
   Reserved Notation " '|-' G " (at level 80).
   Inductive rules : list LForm -> Prop :=
@@ -151,14 +185,18 @@ Module PL.
       |- G_YNot_A
   where " '|-' G " := (rules G).
 
+  (** *** Linear implication
+
+    Also known as lollipop.
+
+   *)
+
   Definition Impl (A B : LForm) : LForm := Par (negation A) B.
 
-  Theorem negation_involutive : forall A, negation (negation A) = A.
-  Proof.
-    intros.
-    induction A;auto;
-      (repeat(simpl; rewrite IHA1; rewrite IHA2; auto));
-      (repeat simpl; rewrite IHA;auto).
-  Qed.
+  (** * Examples
+
+  - TBD: derivation examples + metatheorems
+
+   *)
 
 End PL.

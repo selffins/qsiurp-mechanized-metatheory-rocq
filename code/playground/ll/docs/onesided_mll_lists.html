@@ -1,0 +1,242 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>onesided_mll_lists</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library onesided_mll_lists</h1>
+
+<div class="code">
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Export</span> <span class="id" title="library">Permutation</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Export</span> <span class="id" title="library">List</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">OLlibs</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="library">Permutation_solve</span>. <span class="id" title="keyword">Export</span> <span class="id" title="module">List.ListNotations</span>.<br/>
+<span class="id" title="keyword">Set Implicit Arguments</span>.<br/>
+<span class="id" title="keyword">Set</span> <span class="id" title="keyword">Printing</span> <span class="id" title="var">Parentheses</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab1"></a><h1 class="section">Onesided MLL</h1>
+
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> Multiplicative linear logic, unilateral sequent presentation
+
+</li>
+<li> Explicit exchange
+
+</li>
+<li> Contexts are lists
+
+</li>
+<li> From Kesner OPLSS '25
+
+</li>
+<li> The duality between par and tens makes it clear that a unilateral sequent presentation is simpler: we simply take anything from the left hand side of the and move it to the right hand side and negate it. See: <span class="inlinecode"><span class="id" title="var">twosided</span>-<span class="id" title="var">mll</span>-<span class="id" title="var">lists.v</span></span>
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Module</span> <a id="Onesided_MLL_lists" class="idref" href="#Onesided_MLL_lists"><span class="id" title="module">Onesided_MLL_lists</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab2"></a><h1 class="section">Syntax</h1>
+
+      Formulas and negation
+   
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Section</span> <a id="Onesided_MLL_lists.Formula" class="idref" href="#Onesided_MLL_lists.Formula"><span class="id" title="section">Formula</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a id="Onesided_MLL_lists.var" class="idref" href="#Onesided_MLL_lists.var"><span class="id" title="definition">var</span></a> := <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Inductive</span> <a id="Onesided_MLL_lists.formula" class="idref" href="#Onesided_MLL_lists.formula"><span class="id" title="definition, inductive"><span id="Onesided_MLL_lists.formula_rect" class="id"><span id="Onesided_MLL_lists.formula_ind" class="id"><span id="Onesided_MLL_lists.formula_rec" class="id"><span id="Onesided_MLL_lists.formula_sind" class="id">formula</span></span></span></span></span></a> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a id="Onesided_MLL_lists.PosA" class="idref" href="#Onesided_MLL_lists.PosA"><span class="id" title="constructor">PosA</span></a>   : <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.var"><span class="id" title="definition">var</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a> <a class="idref" href="onesided_mll_lists.html#formula:1"><span class="id" title="inductive">formula</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a id="Onesided_MLL_lists.NegA" class="idref" href="#Onesided_MLL_lists.NegA"><span class="id" title="constructor">NegA</span></a>   : <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.var"><span class="id" title="definition">var</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a> <a class="idref" href="onesided_mll_lists.html#formula:1"><span class="id" title="inductive">formula</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a id="Onesided_MLL_lists.Tensor" class="idref" href="#Onesided_MLL_lists.Tensor"><span class="id" title="constructor">Tensor</span></a> : <a class="idref" href="onesided_mll_lists.html#formula:1"><span class="id" title="inductive">formula</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a> <a class="idref" href="onesided_mll_lists.html#formula:1"><span class="id" title="inductive">formula</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a> <a class="idref" href="onesided_mll_lists.html#formula:1"><span class="id" title="inductive">formula</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a id="Onesided_MLL_lists.Par" class="idref" href="#Onesided_MLL_lists.Par"><span class="id" title="constructor">Par</span></a>    : <a class="idref" href="onesided_mll_lists.html#formula:1"><span class="id" title="inductive">formula</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a> <a class="idref" href="onesided_mll_lists.html#formula:1"><span class="id" title="inductive">formula</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a> <a class="idref" href="onesided_mll_lists.html#formula:1"><span class="id" title="inductive">formula</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Fixpoint</span> <a id="Onesided_MLL_lists.negation" class="idref" href="#Onesided_MLL_lists.negation"><span class="id" title="definition">negation</span></a> (<a id="A:3" class="idref" href="#A:3"><span class="id" title="binder">A</span></a> : <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.formula"><span class="id" title="inductive">formula</span></a>) : <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.formula"><span class="id" title="inductive">formula</span></a> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="onesided_mll_lists.html#A:3"><span class="id" title="variable">A</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.PosA"><span class="id" title="constructor">PosA</span></a> <span class="id" title="var">v</span> =&gt; <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.NegA"><span class="id" title="constructor">NegA</span></a> <span class="id" title="var">v</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.NegA"><span class="id" title="constructor">NegA</span></a> <span class="id" title="var">v</span> =&gt; <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.PosA"><span class="id" title="constructor">PosA</span></a> <span class="id" title="var">v</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.Tensor"><span class="id" title="constructor">Tensor</span></a> <span class="id" title="var">A</span> <span class="id" title="var">B</span> =&gt; <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.Par"><span class="id" title="constructor">Par</span></a> (<a class="idref" href="onesided_mll_lists.html#negation:4"><span class="id" title="definition">negation</span></a> <a class="idref" href="onesided_mll_lists.html#A:3"><span class="id" title="variable">A</span></a>) (<a class="idref" href="onesided_mll_lists.html#negation:4"><span class="id" title="definition">negation</span></a> <span class="id" title="var">B</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.Par"><span class="id" title="constructor">Par</span></a> <span class="id" title="var">A</span> <span class="id" title="var">B</span> =&gt; <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.Tensor"><span class="id" title="constructor">Tensor</span></a> (<a class="idref" href="onesided_mll_lists.html#negation:4"><span class="id" title="definition">negation</span></a> <a class="idref" href="onesided_mll_lists.html#A:3"><span class="id" title="variable">A</span></a>) (<a class="idref" href="onesided_mll_lists.html#negation:4"><span class="id" title="definition">negation</span></a> <span class="id" title="var">B</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Theorem</span> <a id="Onesided_MLL_lists.negation_involutive" class="idref" href="#Onesided_MLL_lists.negation_involutive"><span class="id" title="lemma">negation_involutive</span></a> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">forall</span> <a id="A:6" class="idref" href="#A:6"><span class="id" title="binder">A</span></a>, <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.negation"><span class="id" title="definition">negation</span></a> (<a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.negation"><span class="id" title="definition">negation</span></a> <a class="idref" href="onesided_mll_lists.html#A:6"><span class="id" title="variable">A</span></a>) <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#6cd0f7b28b6092304087c7049437bb1a"><span class="id" title="notation">=</span></a> <a class="idref" href="onesided_mll_lists.html#A:6"><span class="id" title="variable">A</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">A</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-  <span class="id" title="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id" title="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id" title="tactic">simpl</span>. <span class="id" title="tactic">rewrite</span> <span class="id" title="var">IHA1</span>. <span class="id" title="tactic">rewrite</span> <span class="id" title="var">IHA2</span>. <span class="id" title="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id" title="tactic">simpl</span>. <span class="id" title="tactic">rewrite</span> <span class="id" title="var">IHA1</span>. <span class="id" title="tactic">rewrite</span> <span class="id" title="var">IHA2</span>. <span class="id" title="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a id="Onesided_MLL_lists.ctx" class="idref" href="#Onesided_MLL_lists.ctx"><span class="id" title="definition">ctx</span></a> := <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.formula"><span class="id" title="inductive">formula</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">End</span> <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.Formula"><span class="id" title="section">Formula</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab3"></a><h1 class="section">Inference rules</h1>
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Section</span> <a id="Onesided_MLL_lists.Rules" class="idref" href="#Onesided_MLL_lists.Rules"><span class="id" title="section">Rules</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Reserved Notation</span> &quot; '|-' D " (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 80).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Inductive</span> <a id="Onesided_MLL_lists.onesided_mll" class="idref" href="#Onesided_MLL_lists.onesided_mll"><span class="id" title="definition, inductive"><span id="Onesided_MLL_lists.onesided_mll_ind" class="id"><span id="Onesided_MLL_lists.onesided_mll_sind" class="id">onesided_mll</span></span></span></a> : <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.ctx"><span class="id" title="definition">ctx</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a id="Onesided_MLL_lists.rules_ax" class="idref" href="#Onesided_MLL_lists.rules_ax"><span class="id" title="constructor">rules_ax</span></a> : <span class="id" title="keyword">forall</span> <a id="A:9" class="idref" href="#A:9"><span class="id" title="binder">A</span></a>, <a class="idref" href="onesided_mll_lists.html#c3124c4b3cca160874087da8108bf320"><span class="id" title="notation">|-</span></a> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.negation"><span class="id" title="definition">negation</span></a> <a class="idref" href="onesided_mll_lists.html#A:9"><span class="id" title="variable">A</span></a><span class="id" title="notation">]</span> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#A:9"><span class="id" title="variable">A</span></a><span class="id" title="notation">]</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a id="Onesided_MLL_lists.rules_cut" class="idref" href="#Onesided_MLL_lists.rules_cut"><span class="id" title="constructor">rules_cut</span></a> : <span class="id" title="keyword">forall</span> <a id="G:10" class="idref" href="#G:10"><span class="id" title="binder">G</span></a> <a id="D:11" class="idref" href="#D:11"><span class="id" title="binder">D</span></a> <a id="A:12" class="idref" href="#A:12"><span class="id" title="binder">A</span></a>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="onesided_mll_lists.html#c3124c4b3cca160874087da8108bf320"><span class="id" title="notation">|-</span></a> <a class="idref" href="onesided_mll_lists.html#G:10"><span class="id" title="variable">G</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#A:12"><span class="id" title="variable">A</span></a><span class="id" title="notation">]</span> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="onesided_mll_lists.html#c3124c4b3cca160874087da8108bf320"><span class="id" title="notation">|-</span></a> <a class="idref" href="onesided_mll_lists.html#D:11"><span class="id" title="variable">D</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.negation"><span class="id" title="definition">negation</span></a> <a class="idref" href="onesided_mll_lists.html#A:12"><span class="id" title="variable">A</span></a><span class="id" title="notation">]</span> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="onesided_mll_lists.html#c3124c4b3cca160874087da8108bf320"><span class="id" title="notation">|-</span></a> <a class="idref" href="onesided_mll_lists.html#G:10"><span class="id" title="variable">G</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <a class="idref" href="onesided_mll_lists.html#D:11"><span class="id" title="variable">D</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a id="Onesided_MLL_lists.rules_perm" class="idref" href="#Onesided_MLL_lists.rules_perm"><span class="id" title="constructor">rules_perm</span></a> : <span class="id" title="keyword">forall</span> <a id="G:13" class="idref" href="#G:13"><span class="id" title="binder">G</span></a> <a id="D:14" class="idref" href="#D:14"><span class="id" title="binder">D</span></a> <a id="A:15" class="idref" href="#A:15"><span class="id" title="binder">A</span></a> <a id="B:16" class="idref" href="#B:16"><span class="id" title="binder">B</span></a>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="onesided_mll_lists.html#c3124c4b3cca160874087da8108bf320"><span class="id" title="notation">|-</span></a> <a class="idref" href="onesided_mll_lists.html#G:13"><span class="id" title="variable">G</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#A:15"><span class="id" title="variable">A</span></a><span class="id" title="notation">]</span> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#B:16"><span class="id" title="variable">B</span></a><span class="id" title="notation">]</span> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <a class="idref" href="onesided_mll_lists.html#D:14"><span class="id" title="variable">D</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="onesided_mll_lists.html#c3124c4b3cca160874087da8108bf320"><span class="id" title="notation">|-</span></a> <a class="idref" href="onesided_mll_lists.html#G:13"><span class="id" title="variable">G</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#B:16"><span class="id" title="variable">B</span></a><span class="id" title="notation">]</span> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#A:15"><span class="id" title="variable">A</span></a><span class="id" title="notation">]</span> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <a class="idref" href="onesided_mll_lists.html#D:14"><span class="id" title="variable">D</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a id="Onesided_MLL_lists.rules_par" class="idref" href="#Onesided_MLL_lists.rules_par"><span class="id" title="constructor">rules_par</span></a> : <span class="id" title="keyword">forall</span> <a id="G:17" class="idref" href="#G:17"><span class="id" title="binder">G</span></a> <a id="A:18" class="idref" href="#A:18"><span class="id" title="binder">A</span></a> <a id="B:19" class="idref" href="#B:19"><span class="id" title="binder">B</span></a>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="onesided_mll_lists.html#c3124c4b3cca160874087da8108bf320"><span class="id" title="notation">|-</span></a> <a class="idref" href="onesided_mll_lists.html#G:17"><span class="id" title="variable">G</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#A:18"><span class="id" title="variable">A</span></a><span class="id" title="notation">]</span> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#B:19"><span class="id" title="variable">B</span></a><span class="id" title="notation">]</span> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="onesided_mll_lists.html#c3124c4b3cca160874087da8108bf320"><span class="id" title="notation">|-</span></a> <a class="idref" href="onesided_mll_lists.html#G:17"><span class="id" title="variable">G</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.Par"><span class="id" title="constructor">Par</span></a> <a class="idref" href="onesided_mll_lists.html#A:18"><span class="id" title="variable">A</span></a> <a class="idref" href="onesided_mll_lists.html#B:19"><span class="id" title="variable">B</span></a><span class="id" title="notation">]</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a id="Onesided_MLL_lists.rules_tensor" class="idref" href="#Onesided_MLL_lists.rules_tensor"><span class="id" title="constructor">rules_tensor</span></a> : <span class="id" title="keyword">forall</span> <a id="G:20" class="idref" href="#G:20"><span class="id" title="binder">G</span></a> <a id="D:21" class="idref" href="#D:21"><span class="id" title="binder">D</span></a> <a id="A:22" class="idref" href="#A:22"><span class="id" title="binder">A</span></a> <a id="B:23" class="idref" href="#B:23"><span class="id" title="binder">B</span></a>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="onesided_mll_lists.html#c3124c4b3cca160874087da8108bf320"><span class="id" title="notation">|-</span></a> <a class="idref" href="onesided_mll_lists.html#G:20"><span class="id" title="variable">G</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#A:22"><span class="id" title="variable">A</span></a><span class="id" title="notation">]</span> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="onesided_mll_lists.html#c3124c4b3cca160874087da8108bf320"><span class="id" title="notation">|-</span></a> <a class="idref" href="onesided_mll_lists.html#D:21"><span class="id" title="variable">D</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#B:23"><span class="id" title="variable">B</span></a><span class="id" title="notation">]</span> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="onesided_mll_lists.html#c3124c4b3cca160874087da8108bf320"><span class="id" title="notation">|-</span></a> <a class="idref" href="onesided_mll_lists.html#G:20"><span class="id" title="variable">G</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <a class="idref" href="onesided_mll_lists.html#D:21"><span class="id" title="variable">D</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.Tensor"><span class="id" title="constructor">Tensor</span></a> <a class="idref" href="onesided_mll_lists.html#A:22"><span class="id" title="variable">A</span></a> <a class="idref" href="onesided_mll_lists.html#B:23"><span class="id" title="variable">B</span></a><span class="id" title="notation">]</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">where</span> <a id="c3124c4b3cca160874087da8108bf320" class="idref" href="#c3124c4b3cca160874087da8108bf320"><span class="id" title="notation">&quot;</span></a> '|-' D " := (<a class="idref" href="onesided_mll_lists.html#onesided_mll:8"><span class="id" title="inductive">onesided_mll</span></a> <span class="id" title="var">D</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">End</span> <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.Rules"><span class="id" title="section">Rules</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Section</span> <a id="Onesided_MLL_lists.Examples" class="idref" href="#Onesided_MLL_lists.Examples"><span class="id" title="section">Examples</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab4"></a><h1 class="section">Examples</h1>
+
+<div class="paragraph"> </div>
+
+<a id="lab5"></a><h3 class="section">Derivation 1</h3>
+
+
+<div class="paragraph"> </div>
+
+      Here we use explicit exchange and properties of append in order to manipulate the contexts
+      into fitting the proper shape needed by the inference rules.
+
+<div class="paragraph"> </div>
+
+     
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Example</span> <a id="Onesided_MLL_lists.a1_par_a2_a3_par_a4_1" class="idref" href="#Onesided_MLL_lists.a1_par_a2_a3_par_a4_1"><span class="id" title="definition">a1_par_a2_a3_par_a4_1</span></a> : <span class="id" title="keyword">forall</span> <a id="A1:24" class="idref" href="#A1:24"><span class="id" title="binder">A1</span></a> <a id="A2:25" class="idref" href="#A2:25"><span class="id" title="binder">A2</span></a> <a id="A3:26" class="idref" href="#A3:26"><span class="id" title="binder">A3</span></a> <a id="A4:27" class="idref" href="#A4:27"><span class="id" title="binder">A4</span></a>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.onesided_mll"><span class="id" title="inductive">onesided_mll</span></a> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#A1:24"><span class="id" title="variable">A1</span></a> <span class="id" title="notation">;</span> <a class="idref" href="onesided_mll_lists.html#A2:25"><span class="id" title="variable">A2</span></a> <span class="id" title="notation">;</span> <a class="idref" href="onesided_mll_lists.html#A3:26"><span class="id" title="variable">A3</span></a> <span class="id" title="notation">;</span> <a class="idref" href="onesided_mll_lists.html#A4:27"><span class="id" title="variable">A4</span></a><span class="id" title="notation">]</span> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">-&gt;</span></a> <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.onesided_mll"><span class="id" title="inductive">onesided_mll</span></a> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.Par"><span class="id" title="constructor">Par</span></a> <a class="idref" href="onesided_mll_lists.html#A1:24"><span class="id" title="variable">A1</span></a> <a class="idref" href="onesided_mll_lists.html#A2:25"><span class="id" title="variable">A2</span></a><span class="id" title="notation">;</span> <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.Par"><span class="id" title="constructor">Par</span></a> <a class="idref" href="onesided_mll_lists.html#A3:26"><span class="id" title="variable">A3</span></a> <a class="idref" href="onesided_mll_lists.html#A4:27"><span class="id" title="variable">A4</span></a><span class="id" title="notation">]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">A1</span> <span class="id" title="var">A2</span> <span class="id" title="var">A3</span> <span class="id" title="var">A4</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intros</span>.<br/>
+</div>
+
+<div class="doc">
+rewriting in order to apply rules_par the first time
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">replace</span> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.Par"><span class="id" title="constructor">Par</span></a> <span class="id" title="var">A1</span> <span class="id" title="var">A2</span><span class="id" title="notation">;</span> <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.Par"><span class="id" title="constructor">Par</span></a> <span class="id" title="var">A3</span> <span class="id" title="var">A4</span><span class="id" title="notation">]</span> <span class="id" title="keyword">with</span> (<span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.Par"><span class="id" title="constructor">Par</span></a> <span class="id" title="var">A1</span> <span class="id" title="var">A2</span><span class="id" title="notation">]</span> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#bc347c51eaf667706ae54503b26d52c6"><span class="id" title="notation">++</span></a> <span class="id" title="notation">[</span><a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.Par"><span class="id" title="constructor">Par</span></a> <span class="id" title="var">A3</span> <span class="id" title="var">A4</span><span class="id" title="notation">]</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 : <span class="id" title="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.rules_par"><span class="id" title="constructor">rules_par</span></a>.<br/>
+</div>
+
+<div class="doc">
+rewriting in order to apply rules_par the second time
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> &lt;- <span class="id" title="lemma">app_nil_l</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.rules_perm"><span class="id" title="constructor">rules_perm</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> <span class="id" title="lemma">app_nil_l</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> &lt;- <span class="id" title="lemma">app_nil_r</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> &lt;- <span class="id" title="lemma">app_assoc</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.rules_perm"><span class="id" title="constructor">rules_perm</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> <span class="id" title="lemma">app_nil_r</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> <span class="id" title="lemma">app_assoc</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.rules_par"><span class="id" title="constructor">rules_par</span></a>.<br/>
+</div>
+
+<div class="doc">
+rewriting in order to get |- <span class="inlinecode"><span class="id" title="var">A3</span>;</span> <span class="inlinecode"><span class="id" title="var">A4</span>;</span> <span class="inlinecode"><span class="id" title="var">A1</span>;</span> <span class="inlinecode"><span class="id" title="var">A2</span></span> into |- <span class="inlinecode"><span class="id" title="var">A1</span>;</span> <span class="inlinecode"><span class="id" title="var">A2</span>;</span> <span class="inlinecode"><span class="id" title="var">A3</span>;</span> <span class="inlinecode"><span class="id" title="var">A4</span></span> 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> &lt;- <span class="id" title="lemma">app_assoc</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.rules_perm"><span class="id" title="constructor">rules_perm</span></a> <span class="id" title="keyword">with</span> (<span class="id" title="var">A</span> := <span class="id" title="var">A1</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> &lt;- <span class="id" title="lemma">app_nil_l</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.rules_perm"><span class="id" title="constructor">rules_perm</span></a> <span class="id" title="keyword">with</span> (<span class="id" title="var">A</span> := <span class="id" title="var">A1</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> <span class="id" title="lemma">app_nil_l</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> <span class="id" title="lemma">app_assoc</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> &lt;- <span class="id" title="lemma">app_nil_r</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> &lt;- <span class="id" title="lemma">app_assoc</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.rules_perm"><span class="id" title="constructor">rules_perm</span></a> <span class="id" title="keyword">with</span> (<span class="id" title="var">A</span> := <span class="id" title="var">A2</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> <span class="id" title="lemma">app_nil_r</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> &lt;- <span class="id" title="lemma">app_assoc</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.rules_perm"><span class="id" title="constructor">rules_perm</span></a> <span class="id" title="keyword">with</span> (<span class="id" title="var">A</span> := <span class="id" title="var">A2</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <span class="id" title="var">H</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">End</span> <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists.Examples"><span class="id" title="section">Examples</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="onesided_mll_lists.html#Onesided_MLL_lists"><span class="id" title="module">Onesided_MLL_lists</span></a>.<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>

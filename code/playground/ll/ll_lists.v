@@ -6,14 +6,20 @@ Set Implicit Arguments.
 Set Printing Parentheses.
 
 
-(* LL lists. Girard one-sided system *)
+(** * Linear logic (LL)
+
+  - Following Girard's presentation (as laid out in the Encyclopedia of Proof Systems)
+  - Exchange behaves implicitly (no low-level shifting of elements), but is an explicit rule in the system.
+  - Contexts are lists
+
+ *)
+
 Module LL_lists.
 
-  (** Atomic propositions *)
+  (** * Syntax *)
+
   Section Formula.
   Definition var := nat.
-
-  (** Formulas *)
 
     Inductive formula :=
     | PosA   : var -> formula
@@ -28,6 +34,8 @@ Module LL_lists.
     | Par    : formula -> formula -> formula
     | Ofc    : formula -> formula
     | YNot   : formula -> formula.
+
+    (** *** Negation *)
 
     Fixpoint negation (A : formula) : formula :=
       match A with
@@ -45,10 +53,31 @@ Module LL_lists.
       | Top => Zero
       end.
 
+    Theorem negation_involutive : forall A, negation (negation A) = A.
+    Proof.
+      intros.
+      induction A.
+      - reflexivity.
+      - reflexivity.
+      - reflexivity.
+      - reflexivity.
+      - reflexivity.
+      - reflexivity.
+      - simpl. rewrite IHA1. rewrite IHA2. reflexivity.
+      - simpl. rewrite IHA1. rewrite IHA2. reflexivity.
+      - simpl. rewrite IHA1. rewrite IHA2. reflexivity.
+      - simpl. rewrite IHA1. rewrite IHA2. reflexivity.
+      - simpl. rewrite IHA. reflexivity.
+      - simpl. rewrite IHA. reflexivity.
+    Qed.
+
+
   End Formula.
 
-  (** Inference rules *)
+  (** * Inference rules *)
+
   Section InferenceRules.
+
     Definition ctx := list formula.
 
     Lemma cons_app_singleton : forall T (G : list T) a, a :: G = [a] ++ G.
@@ -61,41 +90,82 @@ Module LL_lists.
       | _ => False
       end.
 
+    (** *** Questions
+
+        Some rules require that the context contains only [YNot] formulas.
+
+     *)
+
     Definition Questions (G : ctx) := forall A, In A G -> is_YNot A.
+
+    (**  *** Inductive Definition for rules *)
 
     Reserved Notation " '|-' A " (at level 80).
     Inductive rules : ctx -> Prop :=
-    | rules_id : forall A, |- [negation A] ++ [A]
-    | rules_cut : forall G D A, |- G ++ [A] -> |- D ++ [negation A] -> |- G ++ D
-    | rules_exchange : forall G D, Permutation G D -> |- G -> |- D
-    | rules_tensor : forall G D A B, |- G ++ [A] -> |- D ++ [B] -> |- G ++ D ++ [Tensor A B]
-    | rules_par : forall G A B, |- G ++ [A] ++ [B] -> |- G ++ [Par A B]
+    | rules_id : forall A,
+        |- [negation A] ++ [A]
+    | rules_cut : forall G D A,
+        |- G ++ [A] ->
+        |- D ++ [negation A] ->
+        |- G ++ D
+    | rules_exchange : forall G D,
+        Permutation G D ->
+        |- G ->
+        |- D
+    | rules_tensor : forall G D A B,
+        |- G ++ [A] ->
+        |- D ++ [B] ->
+        |- G ++ D ++ [Tensor A B]
+    | rules_par : forall G A B,
+        |- G ++ [A] ++ [B] ->
+        |- G ++ [Par A B]
     | rules_one : |- [One]
-    | rules_bot : forall G, |- G -> |- G ++ [Bot]
-    | rules_top : forall G, |- G ++ [Top]
-    | rules_oplus_1 : forall G A B, |- G ++ [A] -> |- G ++ [OPlus A B]
-    | rules_oplus_2 : forall G A B, |- G ++ [B] -> |- G ++ [OPlus A B]
-    | rules_with : forall G A B, |- G ++ [A] -> |- G ++ [B] -> |- G ++ [With A B]
-    | rules_ynot_conv : forall G A, |- G ++ [A] -> |- G ++ [YNot A]
-    | rules_ofc : forall G A, Questions G -> |- G ++ [A] -> |- G ++ [Ofc A]
-    | rules_ynot_contract : forall G A, |- G ++ [YNot A] ++ [YNot A] -> |- G ++ [YNot A]
-    | rules_ynot_weak : forall G A, |- G -> |- G ++ [YNot A]
+    | rules_bot : forall G,
+        |- G ->
+        |- G ++ [Bot]
+    | rules_top : forall G,
+        |- G ++ [Top]
+    | rules_oplus_1 : forall G A B,
+        |- G ++ [A] ->
+        |- G ++ [OPlus A B]
+    | rules_oplus_2 : forall G A B,
+        |- G ++ [B] ->
+        |- G ++ [OPlus A B]
+    | rules_with : forall G A B,
+        |- G ++ [A] ->
+        |- G ++ [B] ->
+        |- G ++ [With A B]
+    | rules_ynot_conv : forall G A,
+        |- G ++ [A] ->
+        |- G ++ [YNot A]
+    | rules_ofc : forall G A,
+        Questions G ->
+        |- G ++ [A] ->
+        |- G ++ [Ofc A]
+    | rules_ynot_contract : forall G A,
+        |- G ++ [YNot A] ++ [YNot A] ->
+        |- G ++ [YNot A]
+    | rules_ynot_weak : forall G A,
+        |- G ->
+        |- G ++ [YNot A]
     where " '|-' A " := (rules A).
+
+    (** *** Linear implication
+
+    Also known as lollipop.
+
+     *)
 
     Definition Impl (A B : formula) : formula := Par (negation A) (B).
 
-    Lemma ctx_nil_r : forall G, |- G <-> |- G ++ [].
-    Proof.
-      intros. split;intro.
-      - rewrite app_nil_r. apply H.
-      - rewrite app_nil_r in H. apply H.
-    Qed.
+    (** * Examples  *)
 
-    Lemma ctx_nil_l : forall G, |- G <-> |- [] ++ G.
-    Proof.
-      intros.
-      split;intro;apply H.
-    Qed.
+    (** ** Exchange examples
+
+        - Here we do some simple exchange proofs on a finite list in order to test out the permutation library.
+        - To avoid using [perm_swap] and the like, we use [Permutation_solve] from [OLlibs], which does the context manipulation for us.
+
+     *)
 
     Example exchange_123_312: |- [PosA 1; PosA 2; PosA 3] -> |- [PosA 3 ; PosA 1 ; PosA 2].
     Proof.
@@ -137,10 +207,16 @@ Module LL_lists.
       - apply H.
     Qed.
 
+    (** ** Simple example derivations
+
+        - TODO: more substantial examples
+
+     *)
+
     Example impl_example : forall A B, |- [negation A ; B] -> |- [Impl A B].
     Proof.
       - unfold Impl. intros.
-        apply ctx_nil_l.
+        rewrite <- app_nil_l.
         apply rules_par.
         simpl.
         rewrite cons_app_singleton.
@@ -159,7 +235,6 @@ Module LL_lists.
       apply rules_id.
     Qed.
 
-    (* | rules_par : forall G A B, |- G ++ [A] ++ [B] -> |- G ++ [Par A B] *)
     Example par_example :
       forall A B, |- [negation A; OPlus A B].
     Proof.
@@ -169,7 +244,6 @@ Module LL_lists.
       apply rules_id.
     Qed.
 
-    (* | rules_ofc : forall G A, Questions G -> |- G ++ [A] -> |- G ++ [Ofc A] *)
     Example ofc_example : forall A, Questions [YNot A] -> |- [YNot A] ++ [A] -> |- [YNot A] ++ [Ofc A].
     Proof.
       intros.
@@ -183,23 +257,11 @@ Module LL_lists.
      reflexivity.
    Qed.
 
-   Theorem negation_involutive : forall A, negation (negation A) = A.
-   Proof.
-     intros.
-     induction A.
-     - reflexivity.
-     - reflexivity.
-     - reflexivity.
-     - reflexivity.
-     - reflexivity.
-     - reflexivity.
-     - simpl. rewrite IHA1. rewrite IHA2. reflexivity.
-     - simpl. rewrite IHA1. rewrite IHA2. reflexivity.
-     - simpl. rewrite IHA1. rewrite IHA2. reflexivity.
-     - simpl. rewrite IHA1. rewrite IHA2. reflexivity.
-     - simpl. rewrite IHA. reflexivity.
-     - simpl. rewrite IHA. reflexivity.
-   Qed.
+   (** * Metatheorems
+
+   - TBD
+
+    *)
 
   End InferenceRules.
 
