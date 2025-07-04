@@ -1,0 +1,662 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>ll_fragment</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library ll_fragment</h1>
+
+<div class="code">
+</div>
+
+<div class="doc">
+<a id="lab1"></a><h1 class="section">CaRVe implementation in Rocq</h1>
+
+
+<div class="paragraph"> </div>
+
+    We follow the first sections of the Beluga context as resource vectors library,
+    and define a small fragment of intuitionistic logic.
+
+<div class="paragraph"> </div>
+
+    Some simplifications:
+
+<div class="paragraph"> </div>
+
+<ul class="doclist">
+<li> We don't work with named assumptions.
+
+</li>
+<li> We don't have contexts length-indexed.
+
+</li>
+<li> It seems that Beluga has everything as propositions / relations. We follow that but we make some fixpoint equivalents if convenient.
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+ 
+<div class="paragraph"> </div>
+
+<a id="lab2"></a><h1 class="section">ILL fragment</h1>
+
+
+<div class="paragraph"> </div>
+
+The intuitionistic linear logic fragment the paper is concerned with is:
+
+<div class="paragraph"> </div>
+
+<pre>
+---------------- hyp
+    A |- A
+
+    D_1 |- A    D_2, A |- B
+------------------------------ cut
+        D_1, D_2 |- B
+
+     D, A |- B
+------------------- -o R
+    D |- A -o B
+
+   D_1 |- A   D_2, B |- C
+---------------------------- -o L
+   D_1, D_2, A -o B |- C
+</pre>
+
+<div class="paragraph"> </div>
+
+ 
+<div class="paragraph"> </div>
+
+<a id="lab3"></a><h1 class="section">Infrastructure of CaRVE</h1>
+
+
+<div class="paragraph"> </div>
+
+The carve infrastructure includes:
+<ul class="doclist">
+<li> variables of type A annotated by multiplicities (We do not use variables for now for simplicity)
+
+</li>
+<li> multiplicites come from a resource monoid \M = (M, op, e)
+
+</li>
+<li> contexts: D = (x_i :^a_i A_i, ..., x_n :^a_n A_n) (list)
+
+</li>
+<li> context merge : merge op, parametrized by op
+
+</li>
+<li> context merge monoid : D{M}
+
+</li>
+<li> context update
+
+</li>
+<li> context look-up in terms of update
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+    Which we then use to define ILL.
+
+<div class="paragraph"> </div>
+
+From the artifact read-me, we are concerned with:
+
+</div>
+<div class="code">
+
+<br/>
+<span class="comment">(*<br/>
+<br/>
+Definitions<br/>
+<br/>
+|&nbsp;Definition&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;Paper&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;File&nbsp;/&nbsp;folder&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;Definition&nbsp;name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|----------------------------------------------|-----------------|-------------------------------------&nbsp;|---------------------------------------------------|<br/>
+|&nbsp;Typing&nbsp;contexts&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;§2,&nbsp;§4.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;common/defs/ctx.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;lctx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;Linear&nbsp;multiplicities&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;§2.1,&nbsp;§4.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;common/defs/mult/lin_aff.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;mult,&nbsp;•,&nbsp;hal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;Context&nbsp;merge&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;§2.1,&nbsp;§4.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;common/defs/ctx.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;merge&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;Exhaustedness&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;§2.2,&nbsp;§4.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;common/defs/ctx.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;exh&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;Context&nbsp;update&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;§2.3,&nbsp;§4.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;common/defs/ctx.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;upd&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;Context&nbsp;element&nbsp;permutation&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;§2.3,&nbsp;§4.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;common/defs/ctx.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;exch&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;Context&nbsp;look-up&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;§2.3,&nbsp;§4.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;common/defs/ctx.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;lookup_intm,&nbsp;lookup_n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;Context&nbsp;well-formedness&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;§4.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;common/defs/ctx.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;Wf&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;Linear&nbsp;natural&nbsp;deduction&nbsp;terms&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;§3.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;case_studies/seq-nd/tm.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;obj&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;Lin.&nbsp;seq.&nbsp;/&nbsp;nat.&nbsp;deduction&nbsp;types&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;§4.2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;case_studies/seq-nd/tp.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;tp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;Linear&nbsp;sequent&nbsp;calculus&nbsp;typing&nbsp;judgment&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;§3.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;case_studies/seq-nd/seq.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;seq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+<br/>
+*)</span><br/>
+
+<br/>
+<span class="comment">(*<br/>
+<br/>
+Theorems<br/>
+<br/>
+|&nbsp;Theorem&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;Paper&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;File&nbsp;/&nbsp;folder&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;Definition&nbsp;name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|----------------------------------------------|-----------------|--------------------------------&nbsp;---&nbsp;&nbsp;|---------------------------------------------------|<br/>
+|&nbsp;Algebraic&nbsp;properties&nbsp;of&nbsp;lin.&nbsp;multiplicities&nbsp;&nbsp;|&nbsp;§2.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;common/lemmas/mult/lin_aff.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;mult_func,&nbsp;mult_canc,&nbsp;mult_assoc,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;mult_comm,&nbsp;mult_zsfree&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;Algebraic&nbsp;properties&nbsp;of&nbsp;context&nbsp;merge&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;§2.1,&nbsp;Prop&nbsp;2.1&nbsp;&nbsp;|&nbsp;common/lemmas/merge/halid.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;merge_id&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;common/lemmas/merge/main.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;merge_assoc,&nbsp;merge_comm&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;common/lemmas/merge/cancl.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;mult_canc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;Well-formedness&nbsp;properties&nbsp;of&nbsp;context&nbsp;merge&nbsp;&nbsp;|&nbsp;§2.1,&nbsp;Prop&nbsp;2.2&nbsp;&nbsp;|&nbsp;common/lemmas/mult/merge/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;wf_merge,&nbsp;wf_merge_l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;Algebraic&nbsp;properties&nbsp;of&nbsp;context&nbsp;update&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;§2.3,&nbsp;Prop&nbsp;2.3&nbsp;&nbsp;|&nbsp;common/lemmas/upd/main.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;upd_func,&nbsp;upd_refl,&nbsp;upd_symm,&nbsp;upd_trans,&nbsp;upd_conf&nbsp;|<br/>
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;common/lemmas/merge/main.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;merge_upd&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;Properties&nbsp;of&nbsp;context&nbsp;look-up&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;§2.3,&nbsp;Prop&nbsp;2.4&nbsp;&nbsp;|&nbsp;common/lemmas/upd/main.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;lookup_unq,&nbsp;lookup_upd&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;common/lemmas/merge/main.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;merge_lookup,&nbsp;merge_lookup2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;Well-formedness&nbsp;properties&nbsp;of&nbsp;context&nbsp;update&nbsp;|&nbsp;§2.1,&nbsp;Prop&nbsp;2.5&nbsp;&nbsp;|&nbsp;common/lemmas/upd/main.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;lookup_neq_nat2var,&nbsp;lookup_neq_var2nat,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;common/lemmas/wf.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;wf_upd,&nbsp;wf_upd_neq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;Properties&nbsp;of&nbsp;substitution&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;§3.2,&nbsp;Lemma&nbsp;3.1&nbsp;|&nbsp;case_studies/seq-nd/lemmas/subst.bel&nbsp;|&nbsp;subst_exh,&nbsp;subst_merge,&nbsp;subst_upd&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+|&nbsp;Equivalence&nbsp;theorem&nbsp;(seq.&nbsp;/&nbsp;nat.&nbsp;deduction)&nbsp;&nbsp;|&nbsp;§3.2,&nbsp;Thm.&nbsp;3.2&nbsp;&nbsp;|&nbsp;case_studies/seq-nd/thms.bel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;seq2nd,&nbsp;chk2seq,&nbsp;syn2seq&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br/>
+<br/>
+&nbsp;*)</span><br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Let's try doing most of the definitions from section 2.1, i.e. the file ctx.bel. Then we try 3.1 
+<div class="paragraph"> </div>
+
+ Relational: WE try yet again to do most of this relationally, but IF it makes more sense not to,
+    we define both relational and functional versions and prove that they are equivalent. 
+<div class="paragraph"> </div>
+
+<a id="lab4"></a><h1 class="section">Linear multiplicities</h1>
+
+<ul class="doclist">
+<li> file: <span class="inlinecode"><span class="id" title="var">lin_aff.bel</span></span>
+
+</li>
+<li> Here we are implementing the resource monoid.
+
+</li>
+<li> <span class="inlinecode"><span class="id" title="var">m_0</span></span> : available once
+
+</li>
+<li> <span class="inlinecode"><span class="id" title="var">m_1</span></span> : used
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Module</span> <a id="lmult" class="idref" href="#lmult"><span class="id" title="module">lmult</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="lmult.mult" class="idref" href="#lmult.mult"><span class="id" title="definition, inductive"><span id="lmult.mult_rect" class="id"><span id="lmult.mult_ind" class="id"><span id="lmult.mult_rec" class="id"><span id="lmult.mult_sind" class="id">mult</span></span></span></span></span></a> : <span class="id" title="keyword">Type</span> :=<br/>
+| <a id="lmult.m_0" class="idref" href="#lmult.m_0"><span class="id" title="constructor">m_0</span></a><br/>
+| <a id="lmult.m_1" class="idref" href="#lmult.m_1"><span class="id" title="constructor">m_1</span></a>.<br/>
+
+<br/>
+<span class="comment">(**Monoid&nbsp;operator&nbsp;*)</span><br/>
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="lmult.op" class="idref" href="#lmult.op"><span class="id" title="definition, inductive"><span id="lmult.op_rect" class="id"><span id="lmult.op_ind" class="id"><span id="lmult.op_rec" class="id"><span id="lmult.op_sind" class="id">op</span></span></span></span></span></a> : <a class="idref" href="ll_fragment.html#lmult.mult"><span class="id" title="inductive">mult</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lmult.mult"><span class="id" title="inductive">mult</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lmult.mult"><span class="id" title="inductive">mult</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Type</span> :=<br/>
+| <a id="lmult.op_00" class="idref" href="#lmult.op_00"><span class="id" title="constructor">op_00</span></a> : <a class="idref" href="ll_fragment.html#op:3"><span class="id" title="inductive">op</span></a> <a class="idref" href="ll_fragment.html#lmult.m_0"><span class="id" title="constructor">m_0</span></a> <a class="idref" href="ll_fragment.html#lmult.m_0"><span class="id" title="constructor">m_0</span></a> <a class="idref" href="ll_fragment.html#lmult.m_0"><span class="id" title="constructor">m_0</span></a><br/>
+| <a id="lmult.op_10" class="idref" href="#lmult.op_10"><span class="id" title="constructor">op_10</span></a> : <a class="idref" href="ll_fragment.html#op:3"><span class="id" title="inductive">op</span></a> <a class="idref" href="ll_fragment.html#lmult.m_1"><span class="id" title="constructor">m_1</span></a> <a class="idref" href="ll_fragment.html#lmult.m_0"><span class="id" title="constructor">m_0</span></a> <a class="idref" href="ll_fragment.html#lmult.m_1"><span class="id" title="constructor">m_1</span></a><br/>
+| <a id="lmult.op_01" class="idref" href="#lmult.op_01"><span class="id" title="constructor">op_01</span></a> : <a class="idref" href="ll_fragment.html#op:3"><span class="id" title="inductive">op</span></a> <a class="idref" href="ll_fragment.html#lmult.m_0"><span class="id" title="constructor">m_0</span></a> <a class="idref" href="ll_fragment.html#lmult.m_1"><span class="id" title="constructor">m_1</span></a> <a class="idref" href="ll_fragment.html#lmult.m_1"><span class="id" title="constructor">m_1</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Note on functional <span class="inlinecode"><span class="id" title="var">op</span></span>
+
+<div class="paragraph"> </div>
+
+We could have written <span class="inlinecode"><span class="id" title="var">op_fn</span></span>, because this is quite awkward.
+But, recall <span class="inlinecode"><span class="id" title="var">op_m</span></span> <span class="inlinecode">1</span> <span class="inlinecode">1</span> is undefined.
+
+<div class="paragraph"> </div>
+
+<pre>
+Fixpoint op_fn (m_a m_b : mult) : mult :=
+  match m_a, m_b with
+  | m_0, m_0 =&gt; m_0
+  | m_1, m_0 =&gt; m_1
+  | m_0, m_1 =&gt; m_1
+  | m_1, m_1 =&gt; ??
+  end.
+</pre>
+
+<div class="paragraph"> </div>
+
+<a id="lab5"></a><h3 class="section">Harmlessness</h3>
+
+<ul class="doclist">
+<li> <span class="inlinecode"><span class="id" title="var">hal</span></span> <span class="inlinecode"><span class="id" title="var">a</span></span>: multiplicity a is harmless
+
+</li>
+<li> In this ILL fragment, this means that the multiplicity is zero or that the resource is unavailable.
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="lmult.hal" class="idref" href="#lmult.hal"><span class="id" title="definition, inductive"><span id="lmult.hal_rect" class="id"><span id="lmult.hal_ind" class="id"><span id="lmult.hal_rec" class="id"><span id="lmult.hal_sind" class="id">hal</span></span></span></span></span></a> : <a class="idref" href="ll_fragment.html#lmult.mult"><span class="id" title="inductive">mult</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+| <a id="lmult.hal_0" class="idref" href="#lmult.hal_0"><span class="id" title="constructor">hal_0</span></a> : <a class="idref" href="ll_fragment.html#hal:5"><span class="id" title="inductive">hal</span></a> <a class="idref" href="ll_fragment.html#lmult.m_0"><span class="id" title="constructor">m_0</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab6"></a><h3 class="section">Identity element</h3>
+
+<ul class="doclist">
+<li> <span class="inlinecode"><span class="id" title="var">ident_rel</span></span> : identity element w.r.t to op
+
+</li>
+<li> <span class="inlinecode"><span class="id" title="var">ident_e</span></span> : alias
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="lmult.ident_rel" class="idref" href="#lmult.ident_rel"><span class="id" title="definition, inductive"><span id="lmult.ident_rel_rect" class="id"><span id="lmult.ident_rel_ind" class="id"><span id="lmult.ident_rel_rec" class="id"><span id="lmult.ident_rel_sind" class="id">ident_rel</span></span></span></span></span></a> : <a class="idref" href="ll_fragment.html#lmult.mult"><span class="id" title="inductive">mult</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+| <a id="lmult.ident_0" class="idref" href="#lmult.ident_0"><span class="id" title="constructor">ident_0</span></a> : <a class="idref" href="ll_fragment.html#ident_rel:7"><span class="id" title="inductive">ident_rel</span></a> <a class="idref" href="ll_fragment.html#lmult.m_0"><span class="id" title="constructor">m_0</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a id="lmult.ident_e" class="idref" href="#lmult.ident_e"><span class="id" title="definition">ident_e</span></a> : <a class="idref" href="ll_fragment.html#lmult.mult"><span class="id" title="inductive">mult</span></a> := <a class="idref" href="ll_fragment.html#lmult.m_0"><span class="id" title="constructor">m_0</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab7"></a><h3 class="section">Multiplicity equality</h3>
+
+<ul class="doclist">
+<li> <span class="inlinecode"><span class="id" title="var">mult_eq</span></span>: two mults are equal if they are reflexively equal in terms of a relation
+
+</li>
+<li> <span class="inlinecode"><span class="id" title="var">mult_eq</span></span>: two mults are equal if they are "equal" equal (Coq-level?).
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="lmult.mult_eq" class="idref" href="#lmult.mult_eq"><span class="id" title="definition, inductive"><span id="lmult.mult_eq_ind" class="id"><span id="lmult.mult_eq_sind" class="id">mult_eq</span></span></span></a> : <a class="idref" href="ll_fragment.html#lmult.mult"><span class="id" title="inductive">mult</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lmult.mult"><span class="id" title="inductive">mult</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;| <a id="lmult.mult_refl" class="idref" href="#lmult.mult_refl"><span class="id" title="constructor">mult_refl</span></a> <a id="a:11" class="idref" href="#a:11"><span class="id" title="binder">a</span></a> : <a class="idref" href="ll_fragment.html#mult_eq:9"><span class="id" title="inductive">mult_eq</span></a> <a class="idref" href="ll_fragment.html#a:11"><span class="id" title="variable">a</span></a> <a class="idref" href="ll_fragment.html#a:11"><span class="id" title="variable">a</span></a>.<br/>
+
+<br/>
+<span class="comment">(*&nbsp;<span class="inlinecode"><span class="id" title="var">added</span></span>&nbsp;*)</span><br/>
+<span class="id" title="keyword">Lemma</span> <a id="lmult.mult_eq_eq" class="idref" href="#lmult.mult_eq_eq"><span class="id" title="lemma">mult_eq_eq</span></a> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <a id="a:12" class="idref" href="#a:12"><span class="id" title="binder">a</span></a> <a id="b:13" class="idref" href="#b:13"><span class="id" title="binder">b</span></a>, <a class="idref" href="ll_fragment.html#lmult.mult_eq"><span class="id" title="inductive">mult_eq</span></a> <a class="idref" href="ll_fragment.html#a:12"><span class="id" title="variable">a</span></a> <a class="idref" href="ll_fragment.html#b:13"><span class="id" title="variable">b</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#a:12"><span class="id" title="variable">a</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#6cd0f7b28b6092304087c7049437bb1a"><span class="id" title="notation">=</span></a> <a class="idref" href="ll_fragment.html#b:13"><span class="id" title="variable">b</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">inversion</span> <span class="id" title="var">H</span>;<span class="id" title="tactic">subst</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">reflexivity</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a id="lmult.eq_mult_eq" class="idref" href="#lmult.eq_mult_eq"><span class="id" title="lemma">eq_mult_eq</span></a> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <a id="a:14" class="idref" href="#a:14"><span class="id" title="binder">a</span></a> <a id="b:15" class="idref" href="#b:15"><span class="id" title="binder">b</span></a>, <a class="idref" href="ll_fragment.html#a:14"><span class="id" title="variable">a</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#6cd0f7b28b6092304087c7049437bb1a"><span class="id" title="notation">=</span></a> <a class="idref" href="ll_fragment.html#b:15"><span class="id" title="variable">b</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lmult.mult_eq"><span class="id" title="inductive">mult_eq</span></a> <a class="idref" href="ll_fragment.html#a:14"><span class="id" title="variable">a</span></a> <a class="idref" href="ll_fragment.html#b:15"><span class="id" title="variable">b</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">inversion</span> <span class="id" title="var">H</span>;<span class="id" title="tactic">subst</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="ll_fragment.html#lmult.mult_refl"><span class="id" title="constructor">mult_refl</span></a>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Since we've shown <span class="inlinecode"><span class="id" title="var">mult_eq</span></span> is equivalent to <span class="inlinecode">=</span>, moving forward we stick with <span class="inlinecode"><span class="id" title="var">mult_eq</span></span> for
+    correspondence with the Beluga code.
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a id="lmult.m_zero_sum_free" class="idref" href="#lmult.m_zero_sum_free"><span class="id" title="lemma">m_zero_sum_free</span></a> :  <span class="id" title="keyword">∀</span> (<a id="a:16" class="idref" href="#a:16"><span class="id" title="binder">a</span></a> <a id="b:17" class="idref" href="#b:17"><span class="id" title="binder">b</span></a> <a id="c:18" class="idref" href="#c:18"><span class="id" title="binder">c</span></a> : <a class="idref" href="ll_fragment.html#lmult.mult"><span class="id" title="inductive">mult</span></a>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="ll_fragment.html#lmult.op"><span class="id" title="inductive">op</span></a> <a class="idref" href="ll_fragment.html#a:16"><span class="id" title="variable">a</span></a> <a class="idref" href="ll_fragment.html#b:17"><span class="id" title="variable">b</span></a> <a class="idref" href="ll_fragment.html#c:18"><span class="id" title="variable">c</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="ll_fragment.html#lmult.mult_eq"><span class="id" title="inductive">mult_eq</span></a> <a class="idref" href="ll_fragment.html#c:18"><span class="id" title="variable">c</span></a> <a class="idref" href="ll_fragment.html#lmult.m_0"><span class="id" title="constructor">m_0</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="ll_fragment.html#lmult.mult_eq"><span class="id" title="inductive">mult_eq</span></a> <a class="idref" href="ll_fragment.html#a:16"><span class="id" title="variable">a</span></a> <a class="idref" href="ll_fragment.html#lmult.m_0"><span class="id" title="constructor">m_0</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#ba2b0e492d2b4675a0acf3ea92aabadd"><span class="id" title="notation">∧</span></a> <a class="idref" href="ll_fragment.html#lmult.mult_eq"><span class="id" title="inductive">mult_eq</span></a> <a class="idref" href="ll_fragment.html#b:17"><span class="id" title="variable">b</span></a> <a class="idref" href="ll_fragment.html#lmult.m_0"><span class="id" title="constructor">m_0</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;case&nbsp;on&nbsp;<span class="inlinecode"><span class="id" title="var">op</span></span> <span class="inlinecode"><span class="id" title="var">a</span></span> <span class="inlinecode"><span class="id" title="var">b</span></span> <span class="inlinecode"><span class="id" title="var">c</span></span>&nbsp;--&nbsp;follows&nbsp;immediately&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="id" title="tactic">split</span>;<span class="id" title="tactic">inversion</span> <span class="id" title="var">H</span>;<span class="id" title="tactic">subst</span>;<span class="id" title="tactic">auto</span>;<span class="id" title="tactic">apply</span> <a class="idref" href="ll_fragment.html#lmult.mult_refl"><span class="id" title="constructor">mult_refl</span></a>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="ll_fragment.html#lmult"><span class="id" title="module">lmult</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab8"></a><h1 class="section">Explicit contexts</h1>
+
+<ul class="doclist">
+<li> file: <span class="inlinecode"><span class="id" title="var">ctx.bel</span></span> 
+
+</li>
+</ul>
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Module</span> <a id="lctx" class="idref" href="#lctx"><span class="id" title="module">lctx</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Import</span> <a class="idref" href="ll_fragment.html#lmult"><span class="id" title="module">lmult</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a id="lctx.var" class="idref" href="#lctx.var"><span class="id" title="definition">var</span></a> := <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a>.<br/>
+<span class="id" title="keyword">Definition</span> <a id="lctx.var_type" class="idref" href="#lctx.var_type"><span class="id" title="definition">var_type</span></a> := <span class="id" title="keyword">Set</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab9"></a><h2 class="section">Length indexed typing contexts</h2>
+
+<div class="paragraph"> </div>
+
+ Note: The beluga lctx is length indexed, which makes lctx a dependent type and also somewhat complicates merge and everything else that works on lctx. Binders are also implicitly quantified.
+
+<div class="paragraph"> </div>
+
+<pre>
+
+    Inductive lctx : nat -&gt; Prop :=
+    | nil : lctx 0
+    | cons : forall n, lctx n -&gt; var -&gt; var_type -&gt; mult -&gt; lctx (S n).
+
+</pre>
+
+<div class="paragraph"> </div>
+
+    The above was a first attempt, highlighting how the dependent type makes it a bit harder to write.
+    Coq should work with dependent types ANYWAY, so this is my unfamiliarity with it speaking.
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="lctx.lctx" class="idref" href="#lctx.lctx"><span class="id" title="definition, inductive"><span id="lctx.lctx_rect" class="id"><span id="lctx.lctx_ind" class="id"><span id="lctx.lctx_rec" class="id"><span id="lctx.lctx_sind" class="id">lctx</span></span></span></span></span></a> : <span class="id" title="keyword">Type</span> :=<br/>
+| <a id="lctx.lnil" class="idref" href="#lctx.lnil"><span class="id" title="constructor">lnil</span></a> : <a class="idref" href="ll_fragment.html#lctx:19"><span class="id" title="inductive">lctx</span></a><br/>
+| <a id="lctx.lcons" class="idref" href="#lctx.lcons"><span class="id" title="constructor">lcons</span></a> : <a class="idref" href="ll_fragment.html#lctx:19"><span class="id" title="inductive">lctx</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.var"><span class="id" title="definition">var</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.var_type"><span class="id" title="definition">var_type</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lmult.mult"><span class="id" title="inductive">mult</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx:19"><span class="id" title="inductive">lctx</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab10"></a><h2 class="section">Typing context equality</h2>
+
+
+<div class="paragraph"> </div>
+
+    In the original beluga implementation, this is written:
+
+<div class="paragraph"> </div>
+
+<pre>
+    LF cx_eq : lctx N → lctx N → type =
+    | cx/refl : cx_eq Δ Δ;
+</pre>
+
+<div class="paragraph"> </div>
+
+  It's a relation.
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="lctx.lctx_eq" class="idref" href="#lctx.lctx_eq"><span class="id" title="definition, inductive"><span id="lctx.lctx_eq_ind" class="id"><span id="lctx.lctx_eq_sind" class="id">lctx_eq</span></span></span></a> : <a class="idref" href="ll_fragment.html#lctx.lctx"><span class="id" title="inductive">lctx</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.lctx"><span class="id" title="inductive">lctx</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+| <a id="lctx.lctx_refl" class="idref" href="#lctx.lctx_refl"><span class="id" title="constructor">lctx_refl</span></a> : <span class="id" title="keyword">∀</span> <a id="D:23" class="idref" href="#D:23"><span class="id" title="binder">D</span></a>, <a class="idref" href="ll_fragment.html#lctx_eq:21"><span class="id" title="inductive">lctx_eq</span></a> <a class="idref" href="ll_fragment.html#D:23"><span class="id" title="variable">D</span></a> <a class="idref" href="ll_fragment.html#D:23"><span class="id" title="variable">D</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab11"></a><h1 class="section">Merge</h1>
+
+
+<div class="paragraph"> </div>
+
+In beluga, it is written :
+
+<div class="paragraph"> </div>
+
+<pre>
+LF merge : lctx N → lctx N → lctx N → type =
+| mg/n : merge nil nil nil
+| mg/c : merge Δ₁ Δ₂ Δ → • α₁ α₂ α → merge (cons Δ₁ X A α₁) (cons Δ₂ X A α₂) (cons Δ X A α);
+</pre>
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="comment">(*<br/>
+<br/>
+Old&nbsp;attempt,&nbsp;with&nbsp;dependent&nbsp;types:<br/>
+<br/>
+Inductive&nbsp;merge&nbsp;n&nbsp;:&nbsp;lctx&nbsp;n&nbsp;-&gt;&nbsp;lctx&nbsp;n&nbsp;-&gt;&nbsp;lctx&nbsp;n&nbsp;-&gt;&nbsp;Prop&nbsp;:=<br/>
+|&nbsp;merge_nil&nbsp;:&nbsp;merge&nbsp;0&nbsp;nil&nbsp;nil&nbsp;nil<br/>
+|&nbsp;merge_cons&nbsp;n&nbsp;:&nbsp;forall&nbsp;D1&nbsp;D2&nbsp;a1&nbsp;a2&nbsp;X&nbsp;A,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;exists&nbsp;D,&nbsp;merge&nbsp;n&nbsp;D1&nbsp;D2&nbsp;D&nbsp;-&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exists&nbsp;a,&nbsp;op&nbsp;a1&nbsp;a2&nbsp;a&nbsp;-&gt;&nbsp;merge&nbsp;(cons&nbsp;D1&nbsp;X&nbsp;A&nbsp;a1)&nbsp;(cons&nbsp;D2&nbsp;X&nbsp;A&nbsp;a2)&nbsp;(cons&nbsp;D&nbsp;X&nbsp;A&nbsp;a).<br/>
+*)</span><br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab12"></a><h1 class="section">Splitting / merging typing contexts</h1>
+
+<ul class="doclist">
+<li> <span class="inlinecode"><span class="id" title="var">Δ₁</span></span> <span class="inlinecode">⋈</span> <span class="inlinecode"><span class="id" title="var">Δ₂</span></span> <span class="inlinecode">=</span> <span class="inlinecode"><span class="id" title="var">Δ</span></span>
+
+</li>
+<li> Deterministic merge, or viewed bottom-up, non-deterministic split.
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="lctx.merge" class="idref" href="#lctx.merge"><span class="id" title="definition, inductive"><span id="lctx.merge_ind" class="id"><span id="lctx.merge_sind" class="id">merge</span></span></span></a> : <a class="idref" href="ll_fragment.html#lctx.lctx"><span class="id" title="inductive">lctx</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.lctx"><span class="id" title="inductive">lctx</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.lctx"><span class="id" title="inductive">lctx</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+| <a id="lctx.merge_lnil" class="idref" href="#lctx.merge_lnil"><span class="id" title="constructor">merge_lnil</span></a> : <a class="idref" href="ll_fragment.html#merge:24"><span class="id" title="inductive">merge</span></a> <a class="idref" href="ll_fragment.html#lctx.lnil"><span class="id" title="constructor">lnil</span></a> <a class="idref" href="ll_fragment.html#lctx.lnil"><span class="id" title="constructor">lnil</span></a> <a class="idref" href="ll_fragment.html#lctx.lnil"><span class="id" title="constructor">lnil</span></a><br/>
+| <a id="lctx.merge_lcons" class="idref" href="#lctx.merge_lcons"><span class="id" title="constructor">merge_lcons</span></a> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <a id="D1:26" class="idref" href="#D1:26"><span class="id" title="binder">D1</span></a> <a id="D2:27" class="idref" href="#D2:27"><span class="id" title="binder">D2</span></a> <a id="D:28" class="idref" href="#D:28"><span class="id" title="binder">D</span></a> <a id="a1:29" class="idref" href="#a1:29"><span class="id" title="binder">a1</span></a> <a id="a2:30" class="idref" href="#a2:30"><span class="id" title="binder">a2</span></a> <a id="a:31" class="idref" href="#a:31"><span class="id" title="binder">a</span></a> <a id="X:32" class="idref" href="#X:32"><span class="id" title="binder">X</span></a> <a id="A:33" class="idref" href="#A:33"><span class="id" title="binder">A</span></a>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="ll_fragment.html#merge:24"><span class="id" title="inductive">merge</span></a> <a class="idref" href="ll_fragment.html#D1:26"><span class="id" title="variable">D1</span></a> <a class="idref" href="ll_fragment.html#D2:27"><span class="id" title="variable">D2</span></a> <a class="idref" href="ll_fragment.html#D:28"><span class="id" title="variable">D</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lmult.op"><span class="id" title="inductive">op</span></a> <a class="idref" href="ll_fragment.html#a1:29"><span class="id" title="variable">a1</span></a> <a class="idref" href="ll_fragment.html#a2:30"><span class="id" title="variable">a2</span></a> <a class="idref" href="ll_fragment.html#a:31"><span class="id" title="variable">a</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="ll_fragment.html#merge:24"><span class="id" title="inductive">merge</span></a> (<a class="idref" href="ll_fragment.html#lctx.lcons"><span class="id" title="constructor">lcons</span></a> <a class="idref" href="ll_fragment.html#D1:26"><span class="id" title="variable">D1</span></a> <a class="idref" href="ll_fragment.html#X:32"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#A:33"><span class="id" title="variable">A</span></a> <a class="idref" href="ll_fragment.html#a1:29"><span class="id" title="variable">a1</span></a>) (<a class="idref" href="ll_fragment.html#lctx.lcons"><span class="id" title="constructor">lcons</span></a> <a class="idref" href="ll_fragment.html#D1:26"><span class="id" title="variable">D1</span></a> <a class="idref" href="ll_fragment.html#X:32"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#A:33"><span class="id" title="variable">A</span></a> <a class="idref" href="ll_fragment.html#a2:30"><span class="id" title="variable">a2</span></a>) (<a class="idref" href="ll_fragment.html#lctx.lcons"><span class="id" title="constructor">lcons</span></a> <a class="idref" href="ll_fragment.html#D:28"><span class="id" title="variable">D</span></a> <a class="idref" href="ll_fragment.html#X:32"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#A:33"><span class="id" title="variable">A</span></a> <a class="idref" href="ll_fragment.html#a:31"><span class="id" title="variable">a</span></a>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab13"></a><h1 class="section">Update</h1>
+
+<ul class="doclist">
+<li> <span class="inlinecode"><span class="id" title="var">Δ</span>[<span class="id" title="var">x</span></span> <span class="inlinecode">:<span class="id" title="var">α</span></span> <span class="inlinecode"><span class="id" title="var">A</span></span> <span class="inlinecode">↦ₙ</span> <span class="inlinecode"><span class="id" title="var">y</span></span> <span class="inlinecode">:<span class="id" title="var">β</span></span> <span class="inlinecode"><span class="id" title="var">B</span>]</span> <span class="inlinecode">=</span> <span class="inlinecode"><span class="id" title="var">Δ'</span></span>
+
+</li>
+<li> 9 arguments:
+
+</li>
+<li> New context <span class="inlinecode"><span class="id" title="var">D'</span></span> is <span class="inlinecode"><span class="id" title="var">D</span></span> with assumption <span class="inlinecode"><span class="id" title="var">x</span></span> <span class="inlinecode">:<span class="id" title="var">a</span></span> <span class="inlinecode"><span class="id" title="var">A</span></span> in position <span class="inlinecode"><span class="id" title="var">n</span></span> replaced with <span class="inlinecode"><span class="id" title="var">y</span></span> <span class="inlinecode">:<span class="id" title="var">b</span></span> <span class="inlinecode"><span class="id" title="var">B</span></span>.
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="lctx.upd" class="idref" href="#lctx.upd"><span class="id" title="definition, inductive"><span id="lctx.upd_ind" class="id"><span id="lctx.upd_sind" class="id">upd</span></span></span></a> :<br/>
+&nbsp;&nbsp;<a class="idref" href="ll_fragment.html#lctx.lctx"><span class="id" title="inductive">lctx</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.var"><span class="id" title="definition">var</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.var"><span class="id" title="definition">var</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.var_type"><span class="id" title="definition">var_type</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.var_type"><span class="id" title="definition">var_type</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lmult.mult"><span class="id" title="inductive">mult</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lmult.mult"><span class="id" title="inductive">mult</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.lctx"><span class="id" title="inductive">lctx</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+| <a id="lctx.upd_hd" class="idref" href="#lctx.upd_hd"><span class="id" title="constructor">upd_hd</span></a> : <span class="id" title="keyword">∀</span> <a id="D:36" class="idref" href="#D:36"><span class="id" title="binder">D</span></a> <a id="n:37" class="idref" href="#n:37"><span class="id" title="binder">n</span></a> <a id="X:38" class="idref" href="#X:38"><span class="id" title="binder">X</span></a> <a id="X':39" class="idref" href="#X':39"><span class="id" title="binder">X'</span></a> <a id="A:40" class="idref" href="#A:40"><span class="id" title="binder">A</span></a> <a id="A':41" class="idref" href="#A':41"><span class="id" title="binder">A'</span></a> <a id="a:42" class="idref" href="#a:42"><span class="id" title="binder">a</span></a> <a id="a':43" class="idref" href="#a':43"><span class="id" title="binder">a'</span></a>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="ll_fragment.html#upd:34"><span class="id" title="inductive">upd</span></a> (<a class="idref" href="ll_fragment.html#lctx.lcons"><span class="id" title="constructor">lcons</span></a> <a class="idref" href="ll_fragment.html#D:36"><span class="id" title="variable">D</span></a> <a class="idref" href="ll_fragment.html#X:38"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#A:40"><span class="id" title="variable">A</span></a> <a class="idref" href="ll_fragment.html#a:42"><span class="id" title="variable">a</span></a>) (<a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#S"><span class="id" title="constructor">S</span></a> <a class="idref" href="ll_fragment.html#n:37"><span class="id" title="variable">n</span></a>) <a class="idref" href="ll_fragment.html#X:38"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#X':39"><span class="id" title="variable">X'</span></a> <a class="idref" href="ll_fragment.html#A:40"><span class="id" title="variable">A</span></a> <a class="idref" href="ll_fragment.html#A':41"><span class="id" title="variable">A'</span></a> <a class="idref" href="ll_fragment.html#a:42"><span class="id" title="variable">a</span></a> <a class="idref" href="ll_fragment.html#a':43"><span class="id" title="variable">a'</span></a> (<a class="idref" href="ll_fragment.html#lctx.lcons"><span class="id" title="constructor">lcons</span></a> <a class="idref" href="ll_fragment.html#D:36"><span class="id" title="variable">D</span></a> <a class="idref" href="ll_fragment.html#X':39"><span class="id" title="variable">X'</span></a> <a class="idref" href="ll_fragment.html#A:40"><span class="id" title="variable">A</span></a> <a class="idref" href="ll_fragment.html#a':43"><span class="id" title="variable">a'</span></a>)<br/>
+| <a id="lctx.upd_tl" class="idref" href="#lctx.upd_tl"><span class="id" title="constructor">upd_tl</span></a> : <span class="id" title="keyword">∀</span> <a id="D:44" class="idref" href="#D:44"><span class="id" title="binder">D</span></a> <a id="n:45" class="idref" href="#n:45"><span class="id" title="binder">n</span></a> <a id="X:46" class="idref" href="#X:46"><span class="id" title="binder">X</span></a> <a id="X':47" class="idref" href="#X':47"><span class="id" title="binder">X'</span></a> <a id="A:48" class="idref" href="#A:48"><span class="id" title="binder">A</span></a> <a id="A':49" class="idref" href="#A':49"><span class="id" title="binder">A'</span></a> <a id="a:50" class="idref" href="#a:50"><span class="id" title="binder">a</span></a> <a id="a':51" class="idref" href="#a':51"><span class="id" title="binder">a'</span></a> <a id="B:52" class="idref" href="#B:52"><span class="id" title="binder">B</span></a> <a id="b:53" class="idref" href="#b:53"><span class="id" title="binder">b</span></a> <a id="D':54" class="idref" href="#D':54"><span class="id" title="binder">D'</span></a> <a id="Y:55" class="idref" href="#Y:55"><span class="id" title="binder">Y</span></a>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="ll_fragment.html#upd:34"><span class="id" title="inductive">upd</span></a> <a class="idref" href="ll_fragment.html#D:44"><span class="id" title="variable">D</span></a> <a class="idref" href="ll_fragment.html#n:45"><span class="id" title="variable">n</span></a> <a class="idref" href="ll_fragment.html#X:46"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#X':47"><span class="id" title="variable">X'</span></a> <a class="idref" href="ll_fragment.html#A:48"><span class="id" title="variable">A</span></a> <a class="idref" href="ll_fragment.html#A':49"><span class="id" title="variable">A'</span></a> <a class="idref" href="ll_fragment.html#a:50"><span class="id" title="variable">a</span></a> <a class="idref" href="ll_fragment.html#a':51"><span class="id" title="variable">a'</span></a> <a class="idref" href="ll_fragment.html#D':54"><span class="id" title="variable">D'</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#upd:34"><span class="id" title="inductive">upd</span></a> (<a class="idref" href="ll_fragment.html#lctx.lcons"><span class="id" title="constructor">lcons</span></a> <a class="idref" href="ll_fragment.html#D:44"><span class="id" title="variable">D</span></a> <a class="idref" href="ll_fragment.html#Y:55"><span class="id" title="variable">Y</span></a> <a class="idref" href="ll_fragment.html#B:52"><span class="id" title="variable">B</span></a> <a class="idref" href="ll_fragment.html#b:53"><span class="id" title="variable">b</span></a>) <a class="idref" href="ll_fragment.html#n:45"><span class="id" title="variable">n</span></a> <a class="idref" href="ll_fragment.html#X:46"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#X':47"><span class="id" title="variable">X'</span></a> <a class="idref" href="ll_fragment.html#A:48"><span class="id" title="variable">A</span></a> <a class="idref" href="ll_fragment.html#A':49"><span class="id" title="variable">A'</span></a> <a class="idref" href="ll_fragment.html#a:50"><span class="id" title="variable">a</span></a> <a class="idref" href="ll_fragment.html#a':51"><span class="id" title="variable">a'</span></a> (<a class="idref" href="ll_fragment.html#lctx.lcons"><span class="id" title="constructor">lcons</span></a> <a class="idref" href="ll_fragment.html#D':54"><span class="id" title="variable">D'</span></a> <a class="idref" href="ll_fragment.html#Y:55"><span class="id" title="variable">Y</span></a> <a class="idref" href="ll_fragment.html#B:52"><span class="id" title="variable">B</span></a> <a class="idref" href="ll_fragment.html#b:53"><span class="id" title="variable">b</span></a>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab14"></a><h1 class="section">Exhausted context</h1>
+
+<ul class="doclist">
+<li> Only harmless assumptions appear in D.
+
+</li>
+<li> For this particular type system (linear), recall an assumption is harmless if it is unavailable. Hence an exhausted context for this linear system is a context with all multiplicities set to 0 ('practically an empty context').
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="lctx.exh" class="idref" href="#lctx.exh"><span class="id" title="definition, inductive"><span id="lctx.exh_ind" class="id"><span id="lctx.exh_sind" class="id">exh</span></span></span></a> : <a class="idref" href="ll_fragment.html#lctx.lctx"><span class="id" title="inductive">lctx</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+| <a id="lctx.exh_lnil" class="idref" href="#lctx.exh_lnil"><span class="id" title="constructor">exh_lnil</span></a> : <a class="idref" href="ll_fragment.html#exh:56"><span class="id" title="inductive">exh</span></a> <a class="idref" href="ll_fragment.html#lctx.lnil"><span class="id" title="constructor">lnil</span></a><br/>
+| <a id="lctx.exh_lcons" class="idref" href="#lctx.exh_lcons"><span class="id" title="constructor">exh_lcons</span></a> : <span class="id" title="keyword">∀</span> <a id="D:58" class="idref" href="#D:58"><span class="id" title="binder">D</span></a> <a id="m:59" class="idref" href="#m:59"><span class="id" title="binder">m</span></a> <a id="v:60" class="idref" href="#v:60"><span class="id" title="binder">v</span></a> <a id="v_typ:61" class="idref" href="#v_typ:61"><span class="id" title="binder">v_typ</span></a>, <a class="idref" href="ll_fragment.html#exh:56"><span class="id" title="inductive">exh</span></a> <a class="idref" href="ll_fragment.html#D:58"><span class="id" title="variable">D</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lmult.hal"><span class="id" title="inductive">hal</span></a> <a class="idref" href="ll_fragment.html#m:59"><span class="id" title="variable">m</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#exh:56"><span class="id" title="inductive">exh</span></a> (<a class="idref" href="ll_fragment.html#lctx.lcons"><span class="id" title="constructor">lcons</span></a> <a class="idref" href="ll_fragment.html#D:58"><span class="id" title="variable">D</span></a> <a class="idref" href="ll_fragment.html#v:60"><span class="id" title="variable">v</span></a> <a class="idref" href="ll_fragment.html#v_typ:61"><span class="id" title="variable">v_typ</span></a> <a class="idref" href="ll_fragment.html#m:59"><span class="id" title="variable">m</span></a>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab15"></a><h1 class="section">same_elts :</h1>
+
+<ul class="doclist">
+<li> <span class="inlinecode"><span class="id" title="var">Δ</span></span> <span class="inlinecode">≈</span> <span class="inlinecode"><span class="id" title="var">Δ'</span>,</span> <span class="inlinecode"><span class="id" title="var">Δ</span></span> <span class="inlinecode">=</span> <span class="inlinecode"><span class="id" title="var">Δ'</span></span> up to varying multiplicities
+
+</li>
+<li> Comment: last case in beluga is written: <span class="inlinecode"><span class="id" title="var">same_elts</span></span> <span class="inlinecode">(<span class="id" title="var">cons</span></span> <span class="inlinecode"><span class="id" title="var">Δ</span></span> <span class="inlinecode"><span class="id" title="var">X</span></span> <span class="inlinecode"><span class="id" title="var">A</span></span> <span class="inlinecode"><span class="id" title="var">_</span>)</span> <span class="inlinecode">(<span class="id" title="var">cons</span></span> <span class="inlinecode"><span class="id" title="var">Δ'</span></span> <span class="inlinecode"><span class="id" title="var">X</span></span> <span class="inlinecode"><span class="id" title="var">A</span></span> <span class="inlinecode"><span class="id" title="var">_</span>)</span>. What does that placeholder "_" imply -- can they be different? Yes. Because we don't care about multiplicities.  Could we use _ in Coq? Only in matches (pattern matching), as far as I am aware.
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="lctx.same_elts" class="idref" href="#lctx.same_elts"><span class="id" title="definition, inductive"><span id="lctx.same_elts_ind" class="id"><span id="lctx.same_elts_sind" class="id">same_elts</span></span></span></a> : <a class="idref" href="ll_fragment.html#lctx.lctx"><span class="id" title="inductive">lctx</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.lctx"><span class="id" title="inductive">lctx</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+| <a id="lctx.same_elts_lnil" class="idref" href="#lctx.same_elts_lnil"><span class="id" title="constructor">same_elts_lnil</span></a> : <a class="idref" href="ll_fragment.html#same_elts:62"><span class="id" title="inductive">same_elts</span></a> <a class="idref" href="ll_fragment.html#lctx.lnil"><span class="id" title="constructor">lnil</span></a> <a class="idref" href="ll_fragment.html#lctx.lnil"><span class="id" title="constructor">lnil</span></a><br/>
+| <a id="lctx.same_elts_lcons" class="idref" href="#lctx.same_elts_lcons"><span class="id" title="constructor">same_elts_lcons</span></a> : <span class="id" title="keyword">∀</span> <a id="D:64" class="idref" href="#D:64"><span class="id" title="binder">D</span></a> <a id="D':65" class="idref" href="#D':65"><span class="id" title="binder">D'</span></a> <a id="X:66" class="idref" href="#X:66"><span class="id" title="binder">X</span></a> <a id="A:67" class="idref" href="#A:67"><span class="id" title="binder">A</span></a> <a id="a:68" class="idref" href="#a:68"><span class="id" title="binder">a</span></a> <a id="b:69" class="idref" href="#b:69"><span class="id" title="binder">b</span></a>, <a class="idref" href="ll_fragment.html#same_elts:62"><span class="id" title="inductive">same_elts</span></a> (<a class="idref" href="ll_fragment.html#lctx.lcons"><span class="id" title="constructor">lcons</span></a> <a class="idref" href="ll_fragment.html#D:64"><span class="id" title="variable">D</span></a> <a class="idref" href="ll_fragment.html#X:66"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#A:67"><span class="id" title="variable">A</span></a> <a class="idref" href="ll_fragment.html#a:68"><span class="id" title="variable">a</span></a>) (<a class="idref" href="ll_fragment.html#lctx.lcons"><span class="id" title="constructor">lcons</span></a> <a class="idref" href="ll_fragment.html#D':65"><span class="id" title="variable">D'</span></a> <a class="idref" href="ll_fragment.html#X:66"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#A:67"><span class="id" title="variable">A</span></a> <a class="idref" href="ll_fragment.html#b:69"><span class="id" title="variable">b</span></a>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab16"></a><h1 class="section">Shorthands</h1>
+
+<ul class="doclist">
+<li> file: <span class="inlinecode"><span class="id" title="var">ctx.bel</span></span>
+
+</li>
+<li> TBD
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="lctx.exch" class="idref" href="#lctx.exch"><span class="id" title="definition, inductive"><span id="lctx.exch_ind" class="id"><span id="lctx.exch_sind" class="id">exch</span></span></span></a> : <a class="idref" href="ll_fragment.html#lctx.lctx"><span class="id" title="inductive">lctx</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.var"><span class="id" title="definition">var</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.var"><span class="id" title="definition">var</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.lctx"><span class="id" title="inductive">lctx</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+| <a id="lctx.exch_u" class="idref" href="#lctx.exch_u"><span class="id" title="constructor">exch_u</span></a> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<a id="n:72" class="idref" href="#n:72"><span class="id" title="binder">n</span></a> <a id="m:73" class="idref" href="#m:73"><span class="id" title="binder">m</span></a> : <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a>)  <a id="D:74" class="idref" href="#D:74"><span class="id" title="binder">D</span></a> <a id="n:75" class="idref" href="#n:75"><span class="id" title="binder">n</span></a> <a id="X:76" class="idref" href="#X:76"><span class="id" title="binder">X</span></a> <a id="Y:77" class="idref" href="#Y:77"><span class="id" title="binder">Y</span></a> <a id="A:78" class="idref" href="#A:78"><span class="id" title="binder">A</span></a> <a id="B:79" class="idref" href="#B:79"><span class="id" title="binder">B</span></a> <a id="a:80" class="idref" href="#a:80"><span class="id" title="binder">a</span></a> <a id="b:81" class="idref" href="#b:81"><span class="id" title="binder">b</span></a> <a id="D'':82" class="idref" href="#D'':82"><span class="id" title="binder">D''</span></a> <a id="m:83" class="idref" href="#m:83"><span class="id" title="binder">m</span></a> <a id="D':84" class="idref" href="#D':84"><span class="id" title="binder">D'</span></a>,<br/>
+&nbsp;&nbsp;<a class="idref" href="ll_fragment.html#n:75"><span class="id" title="variable">n</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'&lt;&gt;'_x"><span class="id" title="notation">≠</span></a> <a class="idref" href="ll_fragment.html#m:83"><span class="id" title="variable">m</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.upd"><span class="id" title="inductive">upd</span></a> <a class="idref" href="ll_fragment.html#D:74"><span class="id" title="variable">D</span></a> <a class="idref" href="ll_fragment.html#n:75"><span class="id" title="variable">n</span></a> <a class="idref" href="ll_fragment.html#X:76"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#Y:77"><span class="id" title="variable">Y</span></a> <a class="idref" href="ll_fragment.html#A:78"><span class="id" title="variable">A</span></a> <a class="idref" href="ll_fragment.html#B:79"><span class="id" title="variable">B</span></a> <a class="idref" href="ll_fragment.html#a:80"><span class="id" title="variable">a</span></a> <a class="idref" href="ll_fragment.html#b:81"><span class="id" title="variable">b</span></a> <a class="idref" href="ll_fragment.html#D'':82"><span class="id" title="variable">D''</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.upd"><span class="id" title="inductive">upd</span></a> <a class="idref" href="ll_fragment.html#D'':82"><span class="id" title="variable">D''</span></a> <a class="idref" href="ll_fragment.html#m:83"><span class="id" title="variable">m</span></a> <a class="idref" href="ll_fragment.html#Y:77"><span class="id" title="variable">Y</span></a> <a class="idref" href="ll_fragment.html#X:76"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#B:79"><span class="id" title="variable">B</span></a> <a class="idref" href="ll_fragment.html#A:78"><span class="id" title="variable">A</span></a> <a class="idref" href="ll_fragment.html#b:81"><span class="id" title="variable">b</span></a> <a class="idref" href="ll_fragment.html#a:80"><span class="id" title="variable">a</span></a> <a class="idref" href="ll_fragment.html#D':84"><span class="id" title="variable">D'</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="ll_fragment.html#exch:70"><span class="id" title="inductive">exch</span></a> <a class="idref" href="ll_fragment.html#D:74"><span class="id" title="variable">D</span></a> <a class="idref" href="ll_fragment.html#n:75"><span class="id" title="variable">n</span></a> <a class="idref" href="ll_fragment.html#X:76"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#m:83"><span class="id" title="variable">m</span></a> <a class="idref" href="ll_fragment.html#Y:77"><span class="id" title="variable">Y</span></a> <a class="idref" href="ll_fragment.html#D':84"><span class="id" title="variable">D'</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="lctx.lookup" class="idref" href="#lctx.lookup"><span class="id" title="definition, inductive"><span id="lctx.lookup_ind" class="id"><span id="lctx.lookup_sind" class="id">lookup</span></span></span></a> : <a class="idref" href="ll_fragment.html#lctx.var"><span class="id" title="definition">var</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.var_type"><span class="id" title="definition">var_type</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lmult.mult"><span class="id" title="inductive">mult</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.lctx"><span class="id" title="inductive">lctx</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+| <a id="lctx.look" class="idref" href="#lctx.look"><span class="id" title="constructor">look</span></a> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <a id="D:87" class="idref" href="#D:87"><span class="id" title="binder">D</span></a> <a id="n:88" class="idref" href="#n:88"><span class="id" title="binder">n</span></a> <a id="X:89" class="idref" href="#X:89"><span class="id" title="binder">X</span></a> <a id="A:90" class="idref" href="#A:90"><span class="id" title="binder">A</span></a> <a id="a:91" class="idref" href="#a:91"><span class="id" title="binder">a</span></a>,<br/>
+&nbsp;&nbsp;<a class="idref" href="ll_fragment.html#lctx.upd"><span class="id" title="inductive">upd</span></a> <a class="idref" href="ll_fragment.html#D:87"><span class="id" title="variable">D</span></a> <a class="idref" href="ll_fragment.html#n:88"><span class="id" title="variable">n</span></a> <a class="idref" href="ll_fragment.html#X:89"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#X:89"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#A:90"><span class="id" title="variable">A</span></a> <a class="idref" href="ll_fragment.html#A:90"><span class="id" title="variable">A</span></a> <a class="idref" href="ll_fragment.html#a:91"><span class="id" title="variable">a</span></a> <a class="idref" href="ll_fragment.html#a:91"><span class="id" title="variable">a</span></a> <a class="idref" href="ll_fragment.html#D:87"><span class="id" title="variable">D</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lookup:85"><span class="id" title="inductive">lookup</span></a> <a class="idref" href="ll_fragment.html#X:89"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#A:90"><span class="id" title="variable">A</span></a> <a class="idref" href="ll_fragment.html#a:91"><span class="id" title="variable">a</span></a> <a class="idref" href="ll_fragment.html#D:87"><span class="id" title="variable">D</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a id="lctx.lookup_" class="idref" href="#lctx.lookup_"><span class="id" title="definition">lookup_</span></a> <a id="D:92" class="idref" href="#D:92"><span class="id" title="binder">D</span></a> <a id="n:93" class="idref" href="#n:93"><span class="id" title="binder">n</span></a> <a id="X:94" class="idref" href="#X:94"><span class="id" title="binder">X</span></a> <a id="A:95" class="idref" href="#A:95"><span class="id" title="binder">A</span></a> <a id="a:96" class="idref" href="#a:96"><span class="id" title="binder">a</span></a> := <a class="idref" href="ll_fragment.html#lctx.upd"><span class="id" title="inductive">upd</span></a> <a class="idref" href="ll_fragment.html#D:92"><span class="id" title="variable">D</span></a> <a class="idref" href="ll_fragment.html#n:93"><span class="id" title="variable">n</span></a> <a class="idref" href="ll_fragment.html#X:94"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#X:94"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#A:95"><span class="id" title="variable">A</span></a> <a class="idref" href="ll_fragment.html#A:95"><span class="id" title="variable">A</span></a> <a class="idref" href="ll_fragment.html#a:96"><span class="id" title="variable">a</span></a> <a class="idref" href="ll_fragment.html#a:96"><span class="id" title="variable">a</span></a> <a class="idref" href="ll_fragment.html#D:92"><span class="id" title="variable">D</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="lctx.lookup_n" class="idref" href="#lctx.lookup_n"><span class="id" title="definition, inductive"><span id="lctx.lookup_n_ind" class="id"><span id="lctx.lookup_n_sind" class="id">lookup_n</span></span></span></a> : <a class="idref" href="ll_fragment.html#lctx.var"><span class="id" title="definition">var</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lctx.lctx"><span class="id" title="inductive">lctx</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+| <a id="lctx.lookn" class="idref" href="#lctx.lookn"><span class="id" title="constructor">lookn</span></a> : <span class="id" title="keyword">∀</span> <a id="D:99" class="idref" href="#D:99"><span class="id" title="binder">D</span></a> <a id="X:100" class="idref" href="#X:100"><span class="id" title="binder">X</span></a> <a id="a:101" class="idref" href="#a:101"><span class="id" title="binder">a</span></a> <a id="b:102" class="idref" href="#b:102"><span class="id" title="binder">b</span></a> <a id="c:103" class="idref" href="#c:103"><span class="id" title="binder">c</span></a> <a id="d:104" class="idref" href="#d:104"><span class="id" title="binder">d</span></a> <a id="e:105" class="idref" href="#e:105"><span class="id" title="binder">e</span></a> <a id="f:106" class="idref" href="#f:106"><span class="id" title="binder">f</span></a> <a id="g:107" class="idref" href="#g:107"><span class="id" title="binder">g</span></a>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="ll_fragment.html#lctx.upd"><span class="id" title="inductive">upd</span></a> <a class="idref" href="ll_fragment.html#D:99"><span class="id" title="variable">D</span></a> <a class="idref" href="ll_fragment.html#a:101"><span class="id" title="variable">a</span></a> <a class="idref" href="ll_fragment.html#X:100"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#b:102"><span class="id" title="variable">b</span></a> <a class="idref" href="ll_fragment.html#c:103"><span class="id" title="variable">c</span></a> <a class="idref" href="ll_fragment.html#d:104"><span class="id" title="variable">d</span></a> <a class="idref" href="ll_fragment.html#e:105"><span class="id" title="variable">e</span></a> <a class="idref" href="ll_fragment.html#f:106"><span class="id" title="variable">f</span></a> <a class="idref" href="ll_fragment.html#g:107"><span class="id" title="variable">g</span></a> <a class="idref" href="http://coq.inria.fr/doc/V9.0.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="ll_fragment.html#lookup_n:97"><span class="id" title="inductive">lookup_n</span></a> <a class="idref" href="ll_fragment.html#X:100"><span class="id" title="variable">X</span></a> <a class="idref" href="ll_fragment.html#D:99"><span class="id" title="variable">D</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="ll_fragment.html#lctx"><span class="id" title="module">lctx</span></a>.<br/>
+</div>
+<hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>
