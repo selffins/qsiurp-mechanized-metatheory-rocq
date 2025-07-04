@@ -1,3 +1,4 @@
+
 (** For now, 1 file contains all the modules. *)
 
 (** ##########################################
@@ -121,18 +122,60 @@ Module lists_abella.
       apply H.
   Qed.
 
+  (** In the abella version, they define "is_list". I think this is similar to providing an inductive definition of list.
+      For the abella proof of this one, they actually state can_rev as forall J, is_list J -> exists K, rev J K.
+      So, then they induct (and case) on is_list J, which is doing the same thing as inducting on J in coq
+      and having cases based on the shape of J.
+
+      This is the first proof which I've compared abella with coq. I will annotate it by the corresponding
+      Abella code.
+   *)
+
   Theorem can_rev_rel : forall J, exists K, rev_rel J K.
   Proof.
-    intros.
-    induction J as [ | j ].
-    - exists []. apply rev_nil.
-    - destruct IHJ as [L].
-      exists (L ++ [j]).
+    intros.                     (** induction on 1. intros. case H1. (Inducts on the list) *)
+    induction J as [ | A L ].
+    - exists []. apply rev_nil. (** Base case: J is nil. Goal: exists K, rev nil K.
+                                    Reversing nil obviously gives us nil.
+                                    In Abella this is handled easily by using "search", which
+                                    presumably finds evidence for you.
+                                 *)
+    - destruct IHL as [K].      (** Inductive case.
+                                    We have the IH "forall J, is_list J * -> (exists K, rev J K)" in Abella.
+                                    The asterisks mean that we can use this IH for is_list J hypothesis that is
+                                    smaller than the original is_list J in the theorem statement.
+
+                                    The abella proof proceeds with:
+
+                                    apply IH to H3.
+                                    ;; H3 here is "is_list L", L comes from J being (A :: L) in this case
+
+                                    apply can_append to _ _ with J = K, K = A :: nil.
+                                    ;;
+                                    apply rev_2_is_list to H4. search.
+                                    search.
+                                 *)
+
+      (**  The abella proof invokes "can_append" on K and [A].
+           They get that K ++ [A] = L1.
+           can_append here seems to be the way to show K == [A] is the append of K and [A]. Which they use for the
+           evidence for rev_rel.
+
+           We can of course provide K ++ [A] instead to rev_rel.
+       *)
+
+      assert (H1 : exists L1, append_rel K [A] L1).
+      {
+        exists (K ++ [A]). apply append_append_rel.
+      }
+      destruct H1 as [L1].
+      exists L1.
       apply rev_cons.
-      exists L.
+      exists K.
       split.
       -- apply H.
-      -- apply append_append_rel.
+      -- apply H0.
+
   Qed.
 
   Theorem rev_singleton: forall a,
@@ -258,10 +301,10 @@ Check adj_ind.
       eI wonder if it cause  something cyclical. I need to try proving them. *)
 
   Theorem adj_cons_comm_1 : forall A B K C L, adj (A :: B :: K) C L -> adj (B :: A :: K) C L.
-  Admitted.
+  Admitted. (** Not part of the lib *)
 
   Theorem adj_cons_comm_2 : forall A B K C L, adj K C (A :: B :: L) -> adj K C (B :: A :: L).
-  Admitted.
+  Admitted. 
 
   Example adj_1_23_123 : adj ([2 ; 3]) 1 ([1 ; 2 ; 3]).
   Proof.
@@ -289,7 +332,7 @@ Check adj_ind.
     apply adj_hd.
   Qed.
 
-  (** Note:
+          (** Note:
       Here is the Abella proof of adj_swap (annotations e.g. bullet points + comments mine):
 
       Theorem adj_swap : forall A J K B L, adj J A K -> adj K B L -> exists U, adj J B U /\ adj U A L.
@@ -301,7 +344,7 @@ Check adj_ind.
               -- search.                            (* Provide B :: J *)
               -- apply adj_1_is_list to H6.
               search.                               (* Provide B :: B1 :: K1 *)
-          - case H1.                                (* Case on adj J A (B1 :: K1) *)
+           - case H1.                                (* Case on adj J A (B1 :: K1) *)
                -- apply adj_3_is_list to H4.
                   search.                           (* Provide L1 *)
                -- apply IH to H6 H4.                (* IH on [K2 A ~ K1], [K1 B ~ L1] gives [K2 B ~ U'] [U' A ~ L1]. *)
@@ -459,54 +502,33 @@ Check adj_ind.
 
   (** ====================== Perm ======================== *)
 
-  (**  perm J K : J and K have the same elements *)
+  (**  perm J K : J and K have the same elements
+       Define perm : olist -> olist -> prop by
+       ; perm nil nil
+       ; perm K L :=
+       exists A KK LL, adj KK A K /\ adj LL A L /\ perm KK LL.
+   *)
+
+  (** perm seems more wellbehaved regarding induction *)
   Inductive perm  : list o -> list o -> Prop :=
   | perm_nil : perm nil nil
-  | perm_split : forall K L (H: exists A K' L', adj K' A K /\ adj L' A L /\ perm K' L'), perm K L.
+  | perm_split : forall K L A KK LL, adj KK A K -> adj LL A L -> perm KK LL -> perm K L.
 
-  (** perm_ind
-     : forall P : list o -> list o -> Prop,
-       P [] [] ->
-       (forall K L : list o,
-        (exists (A : o) (K' L' : list o), adj K' A K /\ adj L' A L /\ perm K' L') ->
-        P K L) ->
-       forall l l0 : list o, perm l l0 -> P l l0
-
-    Here we notice that K' and L' are smaller versions of K and L respectively.
-    But we need to prove it for K and L... which are not the bigger ones.
-   *)
+  Check nat_ind.
   Check perm_ind.
-  Print perm_ind.
 
   Example perm_123_321 : perm [1 ; 2 ; 3] [3 ; 2 ; 1].
   Proof.
-    apply perm_split.
-    exists 3. exists [1; 2]. exists [2; 1].
-    split;try split.
+    eapply perm_split.
     - apply adj_tl. apply adj_tl. apply adj_hd.
     - apply adj_hd.
-    - apply perm_split.
-      exists 1. exists [2]. exists [2].
-      split;try split.
+    - eapply perm_split.
       -- apply adj_hd.
       -- apply adj_tl. apply adj_hd.
-      -- apply perm_split. exists 2. exists nil. exists nil.
-         split;try split.
+      -- eapply perm_split.
          --- apply adj_hd.
          --- apply adj_hd.
          --- apply perm_nil.
-  Qed.
-
-  Theorem perm_refl : forall L, perm L L.
-  Proof.
-    intros.
-    induction L.
-    - apply perm_nil.
-    - apply perm_split. exists a. exists L. exists L.
-      repeat split.
-      -- apply adj_hd.
-      -- apply adj_hd.
-      -- apply IHL.
   Qed.
 
   Theorem perm_sym : forall K L, perm K L -> perm L K.
@@ -514,19 +536,34 @@ Check adj_ind.
     intros.
     induction H.
     - apply perm_nil.
-    - destruct H as [A [K' [L' [H1 [H2 H3]]]]].
-      apply perm_split.
-      exists A. exists L'. exists K'.
-      repeat split.
-      -- apply H2.
-      -- apply H1.
-      -- Admitted. (** I'm missing the IH! *)
+    - eapply perm_split.
+      -- apply H0.
+      -- apply H.
+      -- apply IHperm.
+  Qed.
 
+  Theorem perm_refl : forall L, perm L L.
+  Proof.
+    intros.
+    induction L.
+    - apply perm_nil.
+    - inversion IHL;subst.
+      -- eapply perm_split.
+         --- assert (H : adj [] a [a]). {apply adj_hd.} apply H.
+         --- assert (H : adj [] a [a]). {apply adj_hd.} apply H.
+         --- apply perm_nil.
+      -- eapply perm_split.
+         --- apply adj_hd.
+         --- apply adj_hd.
+         --- apply IHL.
+  Qed.
 
-  Theorem perm_cons_1 : forall A K L,
-      perm (A :: K) L ->
-      exists J, adj J A L /\ perm K J.
+  Theorem perm_cons_1 : forall A K K' L,
+      A :: K' = K -> perm K L ->
+      exists J, adj J A L /\ perm K' J.
+  Proof.
   Admitted.
+
 
   Theorem perm_cons_2 : forall A K L,
       perm K (A :: L) ->
@@ -534,12 +571,13 @@ Check adj_ind.
   Proof.
     intros.
     apply perm_sym in H.
-    apply perm_cons_1 in H.
+    eapply perm_cons_1 in H.
     destruct H as [J' [H1 H2]].
     exists J'.
     split.
     - apply H1.
     - apply perm_sym. apply H2.
+    - reflexivity.
   Qed.
 
   Theorem adj_preserves_perm : forall A JJ J KK K,
@@ -549,14 +587,18 @@ Check adj_ind.
       perm J K.
   Proof.
     intros.
-    apply perm_split.
-    exists A. exists JJ. exists KK.
-    auto.
+    eapply perm_split.
+    apply H. apply H0. apply H1.
   Qed.
 
   Theorem perm_trans_lem : forall J K L, perm J K -> perm K L -> perm J L.
   Proof.
-  Admitted. (** Long proof *)
+    intros. generalize dependent L.
+    induction H;intros.
+    - apply H0.
+    - (* Long proof, follow on paper *)
+      Admitted.
+
 
 Theorem perm_trans : forall J K L, perm J K -> perm K L -> perm J L.
 Proof.
@@ -566,45 +608,31 @@ Proof.
   apply H0.
 Qed.
 
+(** Interesting how the abella proof is 4 tactics *)
 Theorem adj_same_source : forall J A K L,
     adj J A K -> adj J A L ->
     perm K L.
 Proof.
-
-  (** Notes:
-      (1) Abella proof is shorter and is quite different from this one. Need to check
-      (2) A *lot* of repetition regarding witnesses. Compare to Abella's "search".
-      (3) We got stuck at the end. It might be an induction on H instead, which we have not fixed yet,
-      or we are missing something. I am using inversion because induction does not work :)
-   *)
-
   intros.
   inversion H;inversion H0;subst.
   - apply perm_refl.
-  - apply perm_split.
-    exists A. exists (B :: K0). exists (B :: K0).
-    repeat split.
+  - eapply perm_split.
     -- apply H.
     -- apply H0.
     -- apply perm_refl.
-  - apply perm_split.
-    exists B. exists L0. exists (A :: K0).
-    repeat split.
+  - eapply perm_split.
     -- apply adj_hd.
     -- apply adj_tl. apply adj_hd.
-    -- apply perm_split.
-       exists A. exists K0. exists K0.
-       repeat split.
+    -- eapply perm_split.
        --- apply H1.
        --- apply adj_hd.
        --- apply perm_refl.
   - inversion H6;subst.
-    apply perm_split.
-    exists B. exists L0. exists L0.
-    repeat split.
-    3 : {  apply perm_refl. }
-    1: { apply adj_hd. }
-    Admitted.
+    eapply perm_split.
+    apply H.
+    apply H0.
+    apply perm_refl.
+Qed.
 
 Theorem adj_same_result : forall J K A L,
       adj J A L ->
@@ -616,23 +644,16 @@ Proof.
   induction H;intros.
   - inversion H0;subst.
     -- apply perm_refl.
-    -- apply perm_split.
-       exists A. exists K0. exists K0.
-       repeat split.
+    -- eapply perm_split.
        --- apply H3.
        --- apply adj_hd.
        --- apply perm_refl.
   - inversion H0;subst.
-    -- apply perm_split. exists B. exists K. exists K.
-       repeat split.
+    -- eapply perm_split.
        --- apply adj_hd.
        --- apply H.
        --- apply perm_refl.
-    -- apply perm_split.
-       exists B.
-       exists K.
-       exists K1.
-       repeat split.
+    -- eapply perm_split.
        --- apply adj_hd.
        --- apply adj_hd.
        --- apply IHadj in H4. apply H4.
@@ -655,9 +676,7 @@ Proof.
     -- right. exists K. apply H.
     -- apply IHadj in H4. destruct H4 as [[H4a1 H4a2] | H4b1];subst.
        --- left. split.  reflexivity.
-           apply perm_split.
-           exists B. exists K. exists K1.
-           repeat split.
+           eapply perm_split.
            ---- apply adj_hd.
            ---- apply adj_hd.
            ---- apply H4a2.
@@ -691,9 +710,7 @@ Proof.
     -- apply IHadj in H4 as [[IHa1 IHa2] | IHb].
        --- inversion IHa2;subst.
            ---- left. split. reflexivity. apply perm_refl.
-           ---- left. split. reflexivity. apply perm_split.
-                exists B0. exists K. exists K1.
-                repeat split.
+           ---- left. split. reflexivity. eapply perm_split.
                 ----- apply adj_hd.
                 ----- apply adj_hd.
                 ----- apply IHa2.
@@ -702,9 +719,7 @@ Proof.
            repeat split.
            ---- apply adj_tl. apply IHb1.
            ---- apply adj_tl. apply IHb2.
-           ---- apply perm_split.
-                exists B0. exists X. exists Y.
-                repeat split.
+           ---- eapply perm_split.
                 ----- apply adj_hd.
                 ----- apply adj_hd.
                 ----- apply IHb3.
@@ -717,8 +732,8 @@ Theorem perm_invert : forall A J K JJ KK,
     perm JJ KK.
 Proof.
   (** Induction on perm J K, one casing on adj JJ A J, applying many previous theorems *)
-  intros. generalize dependent JJ. generalize dependent A. generalize dependent KK.
-  induction H;intros.
+  intros. Admitted.
+
   (** Proof in abella:
 
 induction on 1. intros. case H1.
@@ -738,26 +753,23 @@ induction on 1. intros. case H1.
 
 There are many usages of adj theorems. It might be more productive to look at the Abella interactive proof
 - see the hypotheses, and then figure out how they are manipulated. *)
-  - inversion H1.
-  - destruct H as [B [K' [L' [Ha [Hb Hc]]]]].
-    Admitted.
 
 Theorem adj_perm_result : forall J K A JJ,
       perm J K ->
       adj JJ A J ->
       exists KK, adj KK A K /\ perm JJ KK.
 Proof.
-  intros. generalize dependent JJ.
+  (** Revisit, was broken when switched perm.
+  intros. generalize dependent JJ. generalize dependent A.
   induction H;intros.
   - inversion H0.
   - inversion H0;subst.
-    -- destruct H as [B [K' [L' [Ha [Hb Hc]]]]].
-      apply adj_same_result_diff with (J := JJ) (A := A) in Ha.
-      destruct Ha.
+    -- eapply adj_same_result_diff with (J := JJ) (A := A) in H2.
+      destruct H2. destruct H2;subst.
       --- destruct H. subst.
           exists L'.
           split.
-          ---- apply Hb.
+          ---- apply H0.
           ---- apply perm_trans with (J := JJ) in Hc;auto.
       --- destruct H as [X].
           apply adj_same_result_diff with (J := L') (A := B) in H.
@@ -765,6 +777,7 @@ Proof.
           exists X. split.
           ---- Admitted.
   (** Induction on perm J K and casing on adj JJ A J *)
+  *) Admitted.
 
   Theorem adj_perm_source : forall J K A L,
       perm J K ->
@@ -775,9 +788,7 @@ Proof.
     exists (A :: K).
     split.
     - apply adj_hd.
-    - apply perm_split.
-      exists A. exists J. exists K.
-      repeat split.
+    - eapply perm_split.
       -- apply H0.
       -- apply adj_hd.
       -- apply H.
@@ -795,8 +806,7 @@ Proof.
     intros.
     inversion H;subst.
     - reflexivity.
-    - destruct H0 as [A [K [L' [H1 [H2 H3]]]]].
-      inversion H1.
+    - inversion H0.
   Qed.
 
   Theorem adj_det : forall A B L,
@@ -815,11 +825,10 @@ Proof.
   Proof.
     intros.
     inversion H;subst.
-    destruct H0 as [B [K [L' [H1 [H2 H3]]]]].
-    apply adj_det in H1 as [H1a H1b]. subst.
-    apply perm_nil_1 in H3. subst.
-    apply adj_nil_1 in H2.
-    apply H2.
+    apply adj_det in H0 as [H0a H0b]. subst.
+    apply perm_nil_1 in H2. subst.
+    apply adj_nil_1 in H1.
+    apply H1.
   Qed.
 
   (** ================== append and perm ==================== *)
@@ -830,6 +839,7 @@ Proof.
       perm K KK ->
       exists LL, append_rel JJ KK LL /\ perm L LL.
   Proof.
+    (* Revisit
     intros. generalize dependent JJ. generalize dependent KK.
     induction H;intros.
     - inversion H0;subst.
@@ -841,6 +851,8 @@ Proof.
     - apply perm_cons_1 in H0 as [J' [foo1 foo2]].
       apply IHappend_rel with (JJ := J') in H1.
       Admitted. (** Try again, almost done, needs proper application of IH *)
+      *)
+Admitted.
 
   Theorem adj_perm : forall J K JJ A,
       perm J K ->
@@ -848,13 +860,15 @@ Proof.
       exists KK, adj KK A K.
   Proof.
     intros. generalize dependent K.
-    induction H0;intros;apply perm_cons_1 in H as [X [Ha Hb]].
+    induction H0;intros;eapply perm_cons_1 in H as [X [Ha Hb]].
     - exists X. apply Ha.
+    - auto.
     - apply IHadj in Hb as [KK'].
       eapply adj_swap in Ha as [U [Ha1 Ha2]].
       2 : {  apply H. }
       exists U.
       apply Ha2.
+    - auto.
   Qed.
 
   Theorem adj_perm_full : forall J K JJ A,
@@ -863,8 +877,11 @@ Proof.
       exists KK, adj KK A K /\ perm JJ KK.
   Proof.
     intros. generalize dependent K.
-    induction H0;intros;apply perm_cons_1 in H as [X [Ha Hb]].
-    - exists X. split;auto.
+    induction H0;intros;eapply perm_cons_1 in H as [X [Ha Hb]].
+    - exists X. split.
+      -- apply Ha.
+      -- apply Hb.
+    - reflexivity.
     - apply IHadj in Hb as [KK' [IHadj1 IHadj2]].
       eapply adj_swap in Ha.
       2 : { apply IHadj1. }
@@ -872,12 +889,11 @@ Proof.
       exists U.
       split.
       -- apply Ha2.
-      -- apply perm_split.
-         exists B. exists K. exists KK'.
-         repeat split.
+      -- eapply perm_split.
          --- apply adj_hd.
          --- apply Ha1.
          --- apply IHadj2.
+    - reflexivity.
   Qed.
 
   (** ================== set-theoretic semantics =================== *)
@@ -971,13 +987,15 @@ Proof.
       member A K -> member A L.
   Proof.
     intros. generalize dependent L.
-    induction H0;intros;apply perm_cons_1 in H as [X [Ha Hb]].
+    induction H0;intros;eapply perm_cons_1 in H as [X [Ha Hb]].
     - eapply adj_member.
       apply Ha.
+    - auto.
     - apply IHmember in Hb.
       eapply adj_preserves_member.
       apply Hb.
       apply Ha.
+    - auto.
   Qed.
 
 End perm_abella.
@@ -1045,10 +1063,34 @@ Import perm_abella.
       adj KK A K /\ adj LL A L /\ merge J KK LL
 *)
 
+(** The direct translation (?) has a problematic indcution principle.
+
 Inductive merge : list o -> list o -> list o -> Prop :=
 | merge_nil : merge nil nil nil
 | merge_l J K L (H : exists A JJ LL, adj JJ A J /\ adj LL A L /\ merge JJ K LL) : merge J K L
-| merge_r J K L (H : exists A KK LL, adj KK A K /\ adj LL A L /\ merge J K LL) : merge J K L.
+| merge_r J K L (H : exists A KK LL, adj KK A K /\ adj LL A L /\ merge J KK LL) : merge J K L.
+
+Check merge_ind.
+
+merge_ind
+     : forall P : list o -> list o -> list o -> Prop,
+       P [] [] [] ->
+       (forall J K L : list o,
+        (exists (A : o) (JJ LL : list o), adj JJ A J /\ adj LL A L /\ merge JJ K LL) ->
+        P J K L) ->
+       (forall J K L : list o,
+        (exists (A : o) (KK LL : list o), adj KK A K /\ adj LL A L /\ merge J K LL) -> P J K L) ->
+       forall l l0 l1 : list o, merge l l0 l1 -> P l l0 l1
+
+    So, we write it as:
+ *)
+
+Inductive merge : list o -> list o -> list o -> Prop :=
+| merge_nil : merge nil nil nil
+| merge_l : forall J K L A JJ LL, adj JJ A J -> adj LL A L -> merge JJ K LL ->  merge J K L
+| merge_r : forall J K L A KK LL, adj KK A K -> adj LL A L -> merge J KK LL -> merge J K L.
+
+Check merge_ind.
 
 (** perm_merge *)
 Theorem perm_merge_1 : forall J K L JJ,
@@ -1056,18 +1098,26 @@ Theorem perm_merge_1 : forall J K L JJ,
   perm J JJ ->
   merge JJ K L.
 Proof.
-intros. generalize dependent JJ.
-induction H;intros.
-- inversion H0;subst.
-  -- apply merge_nil.
-  -- destruct H as [A [K' [L' [Ha [Hb Hc]]]]].
-     inversion Ha.
-- inversion H0;subst.
-  -- destruct H as [A [K' [L' [Ha [Hb Hc]]]]].
-     inversion Ha.
-  -- destruct H as [A [JJ' [LL' [Ha [Hb Hc]]]]].
-     destruct H1 as [A' [K'' [L'' [H1a [H1b H1c]]]]].
-     
+  intros. generalize dependent JJ.
+  induction H;intros.
+  - apply perm_nil_1 in H0. subst. apply merge_nil.
+  - eapply adj_perm in H2 as H3.
+    destruct H3 as [X].
+    eapply perm_invert in H3 as H4.
+    -- eapply IHmerge in H4.
+       eapply merge_l.
+       apply H3.
+       apply H0.
+       apply H4.
+    -- apply H2.
+    -- apply H.
+    -- apply H.
+  - eapply IHmerge in H2.
+    eapply merge_r.
+    apply H.
+    apply H0.
+    apply H2.
+Qed.
 (** induction on 1. intros.
     case H1.
     - case H2. search.
@@ -1076,26 +1126,65 @@ induction H;intros.
       apply perm_invert to H2 H3 H6.
       apply IH to H5 H7. search.
       apply IH to H5 H2. search. *)
-Admitted.
 
 Theorem perm_merge_2 : forall J K L KK,
   merge J K L ->
   perm K KK ->
   merge J KK L.
 Proof.
+  intros. generalize dependent KK.
+  induction H;intros.
+  - apply perm_nil_1 in H0;subst. apply merge_nil.
+  - eapply IHmerge in H2.
+    eapply merge_l.
+    -- apply H.
+    -- apply H0.
+    -- apply H2.
+  - eapply adj_perm in H as H3.
+    -- destruct H3 as [KK2].
+       eapply perm_invert in H3 as H4.
+       --- eapply IHmerge in H4.
+           eapply merge_r.
+           ---- apply H3.
+           ---- apply H0.
+           ---- apply H4.
+       --- apply H2.
+       --- apply H.
+    -- apply H2.
+Qed.
 (** induction on 1. intros. case H1.
   case H2. search. case H3.
   apply IH to H5 H2. search.
   apply adj_perm to H2 H3.
    apply perm_invert to H2 H3 H6.
    apply IH to H5 H7. search. *)
-Admitted.
+
 
 Theorem perm_merge_3 : forall J K L LL,
   merge J K L ->
   perm L LL ->
   merge J K LL.
 Proof.
+intros. generalize dependent LL.
+induction H;intros.
+- apply perm_nil_1 in H0;subst. apply merge_nil.
+- eapply adj_perm_result in H2 as H0a.
+  -- destruct H0a as [KK [H3 H4]].
+     eapply IHmerge in H4 as H5.
+     eapply merge_l.
+     --- apply H.
+     --- apply H3.
+     --- apply H5.
+  -- apply H0.
+- eapply adj_perm_result in H2 as H0a.
+  -- destruct H0a as [KK' [H3 H4]].
+     eapply IHmerge in H4 as H5.
+     eapply merge_r.
+     --- apply H.
+     --- apply H3.
+     --- apply H5.
+  -- apply H0.
+Qed.
 (** induction on 1. intros. case H1.
   case H2. search. case H3.
   apply adj_perm_result to H2 H4.
@@ -1103,40 +1192,82 @@ Proof.
   apply adj_perm_result to H2 H4.
    apply IH to H5 H7. search.
 *)
-Admitted.
 
 Theorem merge_sym : forall J K L,
   merge J K L ->
   merge K J L.
 Proof.
+  intros.
+  induction H.
+  - apply merge_nil.
+  - eapply merge_r.
+    -- apply H.
+    -- apply H0.
+    -- apply IHmerge.
+  - eapply merge_l.
+    -- apply H.
+    -- apply H0.
+    -- apply IHmerge.
+Qed.
 (** induction on 1. intros. case H1.
   search.
   apply IH to H4. search.
   apply IH to H4. search. *)
-Admitted.
 
 Theorem merge_nil_perm : forall K L,
   merge nil K L -> perm K L.
 Proof.
+  intros. remember nil.
+  induction H.
+  - apply perm_nil.
+  - subst.
+    inversion H.
+  - apply IHmerge in Heql as IH.
+    eapply perm_split.
+    -- apply H.
+    -- apply H0.
+    -- apply IH.
+Qed.
+(** Something weird is happening, regarding
+    induction again. There are 3 cases for the Abella proof.
+    Also, we don't know anything about adj K.
+    Fixed: remember nil
+ *)
 (** induction on 1. intros. case H1.
   search.
   case H2.
   apply IH to H4. search. *)
-Admitted.
 
 (** merge and adj *)
 Theorem merge_adj_1 : forall A JJ J K LL,
   merge JJ K LL -> adj JJ A J -> exists L, adj LL A L /\ merge J K L.
 Proof.
+  intros.
+  exists (A :: LL).
+  split.
+  - apply adj_hd.
+  - eapply merge_l.
+    apply H0.
+    apply adj_hd.
+    apply H.
+Qed.
 (** intros.
 apply adj_2_is_o to H2. apply merge_3_is_list to H1.
 apply adj_exists to *H3 *H4.
 search. *)
-Admitted.
 
 Theorem merge_unadj_1 : forall J K L JJ A,
   merge J K L -> adj JJ A J -> exists LL, adj LL A L /\ merge JJ K LL.
 Proof.
+  intros. generalize dependent A. generalize dependent JJ.
+  induction H;intros.
+  - inversion H0.
+  - inversion H0;subst.
+    -- eapply adj_same_result_diff in H2.
+       --- destruct H2 as [[H2a H2b] | H2c].
+       ---
+    --
+  -
 (** induction on 1. intros. case H1.
   case H2.
   apply adj_same_result_diff to H2 H3. case H6.

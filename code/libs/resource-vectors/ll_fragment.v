@@ -258,7 +258,9 @@ Inductive same_elts : lctx -> lctx -> Prop :=
     [TODO]
  *)
 
-(** Comment: This is a relation. We need to extract its computational content. *)
+(** Comment: This is a relation. We need to extract its computational content.
+    By which I mean, these shorthands could be written as definitions instead.
+ *)
 Inductive exch : lctx -> nat -> var -> nat -> var -> lctx -> Prop :=
 | exch_u :
   forall (n m : nat)  D n X Y A B a b D'' m D',
@@ -269,5 +271,11 @@ Inductive lookup : var -> var_type -> mult -> lctx -> Prop :=
 | look :
   forall D n X A a,
   upd D n X X A A a a D -> lookup X A a D.
+
+Definition lookup_ D n X A a := upd D n X X A A a a D.
+
+Inductive lookup_n : var -> lctx -> Prop :=
+| lookn : forall D X a b c d e f g,
+    upd D a X b c d e f g -> lookup_n X D.
 
 End lctx.
