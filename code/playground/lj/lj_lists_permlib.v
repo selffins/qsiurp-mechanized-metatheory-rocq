@@ -5,18 +5,25 @@ Export List.ListNotations.
 Set Implicit Arguments.
 Set Printing Parentheses.
 
-(* LJ lists with permutation from coq library *)
+(** * LJ (with implicit exchange via [Stdlib.Permutation])
+
+  - Sequent calculus version of NJ. Intuitionistic.
+  - Introduced by Gentzen. We follow a "modernized" presentation.
+  - Weakening, contraction are explicit rules.
+  - Exchange is implicit - we simulate this using [Permutation] from [Stdlib].
+  - Contexts are lists
+  - We also import the permutation solver from [OLlibs].
+
+ *)
+
+
 Module LJ_lists_permlib.
 
-  (** Atomic propositions *)
-  Section Var.
+  (** * Formulas *)
+
+  Section Formula.
 
     Parameter var: Set.
-
-  End Var.
-
-  (** Formulas *)
-  Section Formula.
 
     Inductive formula :=
     | Bot : formula
@@ -28,7 +35,8 @@ Module LJ_lists_permlib.
 
   End Formula.
 
-  (** Inference rules *)
+  (** * Inference rules *)
+
   Section InferenceRules.
     Definition ctx := list formula.
 
@@ -92,26 +100,14 @@ Module LJ_lists_permlib.
                          G |- Impl A B
     where " A '|-' B " := (rules A B).
 
-    (* Example proofs *)
-    Example double_negation : forall A, [Atom A] |- Not (Not (Atom A)).
-      intros.
-      apply rules_neg_r with (G_A := [Atom A; Not (Atom A)]).
-      - Permutation_solve.
-      - apply rules_neg_l with (G := [Atom A]) (A := (Atom A)).
-        -- Permutation_solve.
-        -- apply rules_id. auto.
-    Qed.
+    (** * Metatheorems
 
-    Example non_contradiction : forall A, [] |- Not (Conj (Atom A) (Not (Atom A))).
-      intros.
-      apply rules_neg_r with (G_A := [Conj (Atom A) (Not (Atom A))]). auto.
-      apply rules_conj_l with (G_A_B := [Atom A ; Not (Atom A)]) (G := []) (A := Atom A) (B := Not (Atom A)).
-      Permutation_solve. Permutation_solve.
-      apply rules_neg_l with (G := [Atom A]) (A := Atom A).
-      Permutation_solve. apply rules_id. Permutation_solve.
-    Qed.
+    - TBD: exchange proof, and others
 
-    (* Some metatheorems *)
+     *)
+
+    (** *** Identity expansion *)
+
     Theorem Init : forall G_Atom_A G A, Permutation G_Atom_A ((Atom A) :: G) -> G_Atom_A |- Atom A.
       intros. generalize dependent G_Atom_A.
       induction G as [| X G'];intros;subst.
@@ -149,6 +145,8 @@ Module LJ_lists_permlib.
         -- apply IHA2 with (G := []). auto.
     Qed.
 
+    (** *** Exchange admissibility *)
+
     Theorem Exchange : forall G D C, Permutation G D -> G |- C -> D |- C.
     Proof.
       intros. generalize dependent D.
@@ -160,6 +158,25 @@ Module LJ_lists_permlib.
       (* rules_cut *)
       Admitted.
 
+    (** * Example derivations *)
+
+    Example double_negation : forall A, [Atom A] |- Not (Not (Atom A)).
+      intros.
+      apply rules_neg_r with (G_A := [Atom A; Not (Atom A)]).
+      - Permutation_solve.
+      - apply rules_neg_l with (G := [Atom A]) (A := (Atom A)).
+        -- Permutation_solve.
+        -- apply rules_id. auto.
+    Qed.
+
+    Example non_contradiction : forall A, [] |- Not (Conj (Atom A) (Not (Atom A))).
+      intros.
+      apply rules_neg_r with (G_A := [Conj (Atom A) (Not (Atom A))]). auto.
+      apply rules_conj_l with (G_A_B := [Atom A ; Not (Atom A)]) (G := []) (A := Atom A) (B := Not (Atom A)).
+      Permutation_solve. Permutation_solve.
+      apply rules_neg_l with (G := [Atom A]) (A := Atom A).
+      Permutation_solve. apply rules_id. Permutation_solve.
+    Qed.
 
   End InferenceRules.
 

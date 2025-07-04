@@ -4,18 +4,22 @@ Export List.ListNotations.
 Set Implicit Arguments.
 Set Printing Parentheses.
 
-(* LJ lists *)
+(** * LJ
+
+  - Sequent calculus version of NJ. Intuitionistic.
+  - Introduced by Gentzen. We follow a "modernized" presentation.
+  - Exchange, weakening, contraction are explicit.
+  - Contexts are lists
+
+ *)
+
 Module LJ_lists.
 
-  (** Atomic propositions *)
-  Section Var.
+  (** * Formulas *)
+
+  Section Formula.
 
     Parameter var: Set.
-
-  End Var.
-
-  (** Formulas *)
-  Section Formula.
 
     Inductive formula :=
     | Bot  : formula
@@ -27,29 +31,66 @@ Module LJ_lists.
 
   End Formula.
 
-  (** Inference rules *)
+  (** * Inference rules *)
+
   Section InferenceRules.
     Definition ctx := list formula.
 
     Reserved Notation " A '|-' B " (at level 80).
     Inductive rules : ctx -> formula -> Prop :=
-    | rules_id     : forall G A, G ++ [Atom A] |- Atom A (* Modified from [A] |- A to this *)
-    | rules_cut    : forall G D A B, G |- A -> D ++ [A] |- B -> G ++ D |- B
-    | rules_bot_l  : forall G C, G ++ [Bot] |- C
-    | rules_w_l    : forall G D B, G |- B -> G ++ D |- B      (* Weakening : contexts level *)
-    | rules_w_r    : forall G A, G |- Bot -> G |- A
-    | rules_e_l    : forall G D C, G ++ D |- C -> D ++ G |- C (* Exchange : contexts level *)
-    | rules_c_l    : forall G A B, G ++ A ++ A |- B -> G ++ A |- B (* Contract : contexts level *)
-    | rules_neg_l  : forall G A, G |- A -> G ++ [Not A] |- Bot
-    | rules_neg_r  : forall G A, G ++ [A] |- Bot -> G |- Not A
-    | rules_and_l  : forall G A B C, G ++ [A] ++ [B] |- C -> G ++ [And A B] |- C
-    | rules_and_r  : forall G A B, G |- A -> G |- B -> G |- And A B
-    | rules_or_l   : forall G A B C, G ++ [A] |- C -> G ++ [B] |- C -> G ++ [Or A B] |- C
-    | rules_or_r_1 : forall G A B, G |- A -> G |- Or A B
-    | rules_or_r_2 : forall G A B, G |- B -> G |- Or A B
-    | rules_impl_l : forall G D A B C, G |- A -> D ++ [B] |- C -> G ++ D ++ [Impl A B] |- C
-    | rules_impl_r : forall G A B, G ++ [A] |- B -> G |- Impl A B
+    | rules_id     : forall G A,
+        G ++ [Atom A] |- Atom A
+    | rules_cut    : forall G D A B,
+        G |- A ->
+        D ++ [A] |- B ->
+        G ++ D |- B
+    | rules_bot_l  : forall G C,
+        G ++ [Bot] |- C
+    | rules_w_l    : forall G D B,
+        G |- B ->
+        G ++ D |- B
+    | rules_w_r    : forall G A,
+        G |- Bot ->
+        G |- A
+    | rules_e_l    : forall G D C,
+        G ++ D |- C ->
+        D ++ G |- C
+    | rules_c_l    : forall G A B,
+        G ++ A ++ A |- B ->
+        G ++ A |- B
+    | rules_neg_l  : forall G A,
+        G |- A ->
+        G ++ [Not A] |- Bot
+    | rules_neg_r  : forall G A,
+        G ++ [A] |- Bot ->
+        G |- Not A
+    | rules_and_l  : forall G A B C,
+        G ++ [A] ++ [B] |- C ->
+        G ++ [And A B] |- C
+    | rules_and_r  : forall G A B,
+        G |- A ->
+        G |- B ->
+        G |- And A B
+    | rules_or_l   : forall G A B C,
+        G ++ [A] |- C ->
+        G ++ [B] |- C ->
+        G ++ [Or A B] |- C
+    | rules_or_r_1 : forall G A B,
+        G |- A ->
+        G |- Or A B
+    | rules_or_r_2 : forall G A B,
+        G |- B ->
+        G |- Or A B
+    | rules_impl_l : forall G D A B C,
+        G |- A ->
+        D ++ [B] |- C ->
+        G ++ D ++ [Impl A B] |- C
+    | rules_impl_r : forall G A B,
+        G ++ [A] |- B ->
+        G |- Impl A B
     where " A '|-' B " := (rules A B).
+
+    (** TBD: throw these away *)
 
     Lemma cons_app_singleton : forall T (G : list T) a, a :: G = [a] ++ G.
       intros. reflexivity.
@@ -68,7 +109,10 @@ Module LJ_lists.
       split;intro;apply H.
     Qed.
 
-    Theorem shift : forall X Y Z C, X ++ Y ++ Z |- C -> Z ++ X ++ Y |- C.
+
+  (** * Metatheorems *)
+
+    Lemma shift : forall X Y Z C, X ++ Y ++ Z |- C -> Z ++ X ++ Y |- C.
     Proof.
       intros.
       rewrite app_assoc.
@@ -78,6 +122,7 @@ Module LJ_lists.
       apply H.
     Qed.
 
+    (** *** Identity expansion *)
 
     Theorem Identity : forall G A, G ++ [A] |- A.
     Proof.
@@ -108,6 +153,8 @@ Module LJ_lists.
         -- apply IHA2.
     Qed.
 
+    (** *** Exchange admissibility *)
+
     Theorem Exchange : forall G D C, Permutation G D -> G |- C -> D |- C.
     Proof.
       intros.
@@ -137,8 +184,8 @@ Module LJ_lists.
       apply rules_w_l with (D := G) in H. apply H.
     Qed.
 
+    (** * Example derivations *)
 
-    (* Example proofs *)
     Example double_negation : forall A, [A] |- Not (Not A).
       intros.
       apply rules_neg_r.
@@ -172,8 +219,6 @@ Module LJ_lists.
         -- apply H0.
         -- apply rules_w_l. apply H1.
     Qed.
-
-    Search "app_nil".
 
     Example invertibility_and_r :
       forall G A B,  G |- And A B -> ((G ++ [A] ++ [B] |- A) /\ (G ++ [A] ++ [B] |- B)).

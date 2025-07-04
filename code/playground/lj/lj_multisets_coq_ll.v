@@ -1,7 +1,3 @@
-(* NOTE:  This file was taken from the Linear Logic formalization in Coq:
-https://github.com/brunofx86/LL. *)
-
-(* Add LoadPath "../" . *)
 From Stdlib Require Import Relations.Relations.
 From Stdlib Require Import Arith.EqNat.
 From Stdlib Require Import Classes.Morphisms.
@@ -20,7 +16,21 @@ Require Export LL.FLLMetaTheory.
 #[local] Hint Resolve Nat.le_max_r : core .
 #[local] Hint Resolve Nat.le_max_l : core .
 
+(** * LJ
+
+  - Sequent calculus version of NJ. Intuitionistic.
+  - Introduced by Gentzen. We follow a "modernized" presentation.
+  - Weakening, contraction are explicit.
+  - Exchange is implicit and handled via multiset equality.
+  - Contexts are multisets
+  - This file is a modification taken from the Linear Logic formalization in Coq: https://github.com/brunofx86/LL.
+
+ *)
+
 Module PL.
+
+  (** * Formulas *)
+
   Inductive LForm :Set :=
   | bot (* false *)
   | atom : nat -> LForm (* atomic propositions are named with a natural number *)
@@ -28,6 +38,13 @@ Module PL.
   | disj : LForm -> LForm -> LForm (* disjunction *)
   | impl : LForm -> LForm -> LForm (* intuitionistic implication *)
   .
+
+  (** * Some infrastructure for multisets
+
+  - Refer to the documentation for coq-ll. In short, we need that formulas have decidable equality.
+  - These are defined in a module [F_dec], which is passed to the multiset module.
+
+   *)
 
   Theorem LForm_dec_eq : forall F G : LForm, {F = G} + {F <> G}.
     induction F;destruct G;try(right;discriminate);
@@ -58,7 +75,7 @@ Module PL.
   Declare Module MSFormulas : MultisetList F_dec.
   Export MSFormulas.
 
-
+(** * Inference rules *)
 
 Reserved Notation " G '|-' C " (at level 80).
 Inductive rules : list LForm -> LForm -> Prop :=
@@ -97,6 +114,14 @@ Inductive rules : list LForm -> LForm -> Prop :=
 
 where " G '|-' C " := (rules G C).
 
+(** * Example derivations
+
+    - TBD: more examples
+
+ *)
+
+(** *** An exchange example *)
+
 Example Ex1: [(atom 3)] |- impl (conj (atom 1) (atom 2)) (conj (atom 2) (conj (atom 3) (atom 1))).
 Proof.
   remember (atom 1) as A.
@@ -110,6 +135,14 @@ Proof.
   rewrite HeqC;eapply rules_init;eauto.        (* [A; B; C] |- C *)
   rewrite HeqA;eapply rules_init;eauto.        (* [A; B; C] |- A *)
 Qed.
+
+(** * Metatheorems
+
+    - TBD: cut
+
+ *)
+
+(** *** Exchange *)
 
 Theorem Exchange : forall G D C, G =mul= D -> G |- C -> D |- C.
 Proof.
@@ -169,6 +202,8 @@ Proof.
       -- apply H1.
 Qed.
 
+(** *** Identity *)
+
 Theorem Identity : forall GG G A, GG =mul= A :: G  -> GG |- A.
 Proof.
   intros. generalize dependent GG. generalize dependent G.
@@ -198,6 +233,8 @@ Proof.
     -- apply IHA1 with (G := GG). auto.
     -- apply IHA2 with (G := A1 :: G). auto.
 Qed.
+
+(** *** Cut elimination *)
 
 Theorem Cut : forall GG G A C, GG =mul= A :: G -> G |- A -> GG |- C -> G |- C.
 Proof.
