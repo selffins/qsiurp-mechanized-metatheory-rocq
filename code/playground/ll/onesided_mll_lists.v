@@ -50,6 +50,8 @@ Module Onesided_MLL_lists.
       - simpl. rewrite IHA1. rewrite IHA2. reflexivity.
     Qed.
 
+    (** * Context representation *)
+
     Definition ctx := list formula.
 
   End Formula.

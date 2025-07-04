@@ -259,7 +259,9 @@ Module LL_lists.
 
    (** * Metatheorems
 
-   - TBD
+   TBD:
+   - Exchange
+   - Cut
 
     *)
 

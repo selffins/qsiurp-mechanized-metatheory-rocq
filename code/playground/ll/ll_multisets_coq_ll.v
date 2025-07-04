@@ -98,7 +98,7 @@ Module PL.
     (** *** Questions
 
         Some rules require that the context contains only [YNot] formulas.
-        TBD: equivalence proof between the proposition form and the fixpoint form.
+        TBD: equivalence proof between the proposition form and the fixpoint boolean form.
 
      *)
 
