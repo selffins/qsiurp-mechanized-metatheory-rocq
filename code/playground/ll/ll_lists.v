@@ -16,7 +16,7 @@ Set Printing Parentheses.
 
 Module LL_lists.
 
-  (** * Syntax *)
+  (** * Formulas *)
 
   Section Formula.
   Definition var := nat.

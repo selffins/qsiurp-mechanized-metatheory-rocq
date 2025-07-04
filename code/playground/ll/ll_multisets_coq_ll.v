@@ -21,10 +21,12 @@ Require Export LL.FLLMetaTheory.
       - Following the presentation laid out in the Encyclopedia of Proof Systems)
       - Exchange behaves implicitly (no low-level shifting of elements), but is an explicit rule in the system.
       - Contexts are multisets - we use the multiset library from the paper "coq-ll".
-      - This file was is a modification taken from the Linear Logic formalization in Coq: https://github.com/brunofx86/LL.
+      - This file is a modification taken from the Linear Logic formalization in Coq: https://github.com/brunofx86/LL.
  *)
 
 Module PL.
+
+  (**  * Formulas *)
 
   Inductive LForm :=
   | PosA   : nat -> LForm
@@ -122,7 +124,7 @@ Module PL.
   Proof.
     Admitted.
 
-  (**  *** Inductive Definition for rules *)
+  (**  * Inference rules *)
 
   Reserved Notation " '|-' G " (at level 80).
   Inductive rules : list LForm -> Prop :=
@@ -207,13 +209,7 @@ Module PL.
 
   Definition Impl (A B : LForm) : LForm := Par (negation A) B.
 
-  (** * Examples
-
-  - TBD: derivation examples + metatheorems
-
-   *)
-
-  (** ** Metatheorems
+  (** * Metatheorems
       - TBD: cut admissibility, identity expansion, exchange, etc.
 
    *)
@@ -230,7 +226,7 @@ Module PL.
   Proof.
     Admitted.
 
-  (** ** Derivation examples *)
+  (** ** Example derivations *)
 
   (** *** Derivation 1:
 
