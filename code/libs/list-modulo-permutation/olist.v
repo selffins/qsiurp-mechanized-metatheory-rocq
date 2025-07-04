@@ -165,10 +165,10 @@ Module lists_abella.
     - destruct IHL as [K].
 
 
-      (*  The abella proof invokes "can_append" on K and (cons A nil).
-          They get that K ++ (cons A nil) = L1.
-          can_append here seems to be the way to show K == (cons A nil) is the append of K and (cons A nil). Which they use for the
-          evidence for rev_rel. We can of course provide K ++ (cons A nil) instead to rev_rel.
+      (* The abella proof invokes "can_append" on K and (cons A nil).
+         They get that K ++ (cons A nil) = L1.
+         can_append here seems to be the way to show K == (cons A nil) is the append of K and (cons A nil). Which they use for the
+         evidence for rev_rel. We can of course provide K ++ (cons A nil) instead to rev_rel.
        *)
       assert (H1 : exists L1, append_rel K [A] L1).
       {
