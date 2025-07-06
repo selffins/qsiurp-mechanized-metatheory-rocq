@@ -20,13 +20,19 @@
 
 From Stdlib Require Export Sets.Multiset.
 From Stdlib Require Export List.
+From Stdlib Require Import Arith.EqNat.
 Export ListNotations.
 
-Module lists_abella.
+Module Type Eqset_dec.
+  Parameter Eqset_T : Type.
+  Parameter eqA_dec : forall x y : Eqset_T, {x = y} + {x <> y}.
+End Eqset_dec.
 
-  (** [o] can be anything, but here it is a [nat] *)
+Module Type lists_abella (ELT : Eqset_dec).
 
-  Definition o := nat.
+  (** ** Elements *)
+  Import ELT.
+  Definition o := Eqset_T.
 
   (** ** Append *)
 
@@ -37,28 +43,36 @@ Module lists_abella.
   (** *** Examples *)
 
   Example append_rel_12_34_1234 :
-    append_rel ([1 ; 2]) ([3 ; 4]) ([1 ; 2 ; 3 ; 4]).
+    forall (o1 o2 o3 o4 : o),
+    append_rel ([o1 ; o2]) ([o3 ; o4]) ([o1 ; o2 ; o3 ; o4]).
   Proof.
+    intros.
     apply append_cons.
     apply append_cons.
     apply append_nil.
   Qed.
 
   Example append_rel_12_nil_12 :
-    append_rel ([1; 2]) ([]) ([1; 2]).
+    forall o1 o2,
+    append_rel ([o1; o2]) ([]) ([o1; o2]).
   Proof.
+    intros.
     apply append_cons.
     apply append_cons.
     apply append_nil.
   Qed.
 
   Example append_rel_12_nil_13_fail :
-    not (append_rel ([1 ; 2]) [] ([1 ; 3])).
+    forall o1 o2 o3,
+      o2 <> o3 ->
+    not (append_rel ([o1 ; o2]) [] ([o1 ; o3])).
   Proof.
+    intros.
     unfold not.
     intros.
-    inversion H;subst.
-    inversion H3;subst.
+    inversion H0;subst.
+    inversion H4.
+    contradiction.
   Qed.
 
   (** *** Equivalence to Rocq's [append] *)
@@ -108,13 +122,16 @@ Module lists_abella.
   | rev_nil_2 : rev_rel_2 [] []
   | rev_cons_2 : forall e J L K, rev_rel_2 J K -> append_rel K (e :: []) L -> rev_rel_2 (e :: J) L.
 
-  Example rev_123_321 : rev_rel [1 ; 2 ; 3] [3 ; 2 ; 1].
+  Example rev_123_321 :
+    forall o1 o2 o3,
+    rev_rel [o1 ; o2 ; o3] [o3 ; o2 ; o1].
   Proof.
+    intros.
     eapply rev_cons.
-    exists [3 ; 2].
+    exists [o3 ; o2].
     split.
     - eapply rev_cons.
-      exists [3].
+      exists [o3].
       split.
       -- eapply rev_cons. exists []. split.
          --- apply rev_nil.
@@ -225,15 +242,11 @@ Module lists_abella.
       apply rev_cons_singleton. apply IHJ. apply H0.
   Qed.
 
-End lists_abella.
-
 (** * Permutations
     -   Coq version of [abella-reasoning/lib/perm.thm]
  *)
 
-Module perm_abella.
-
-  Import lists_abella.
+Section perm_abella.
 
   (** ** Contains:
       [*] denotes my addition.
@@ -279,12 +292,10 @@ Module perm_abella.
     30. adj_preserves_member_lem
     31, adj_preserves_member
     32. perm_preserves_member
-
 >>
 
    For some proofs, induction on adj and especially induction on perm does not work.
    We will need to take a look at the inductive principle first...
-
    *)
 
   (** ** Adj *)
@@ -305,19 +316,27 @@ Module perm_abella.
 
   (** *** Examples of adj *)
 
-  Example adj_1_23_123 : adj ([2 ; 3]) 1 ([1 ; 2 ; 3]).
+  Example adj_1_23_123 :
+    forall o1 o2 o3,
+    adj ([o2 ; o3]) o1 ([o1 ; o2 ; o3]).
   Proof.
+    intros.
     apply adj_hd.
   Qed.
 
-  Example adj_1_23_213 : adj ([2 ; 3]) 1 ([2 ; 1 ; 3]).
+  Example adj_1_23_213 :
+    forall o1 o2 o3,
+    adj ([o2 ; o3]) o1 ([o2 ; o1 ; o3]).
   Proof.
+    intros.
     apply adj_tl.
     apply adj_hd.
   Qed.
 
-  Example adj_1_23_321 : adj ([2 ; 3]) 1 ([3 ; 2 ; 1]).
+  Example adj_1_23_321 : forall o1 o2 o3,
+      adj ([o2 ; o3]) o1 ([o3 ; o2 ; o1]).
   Proof.
+    intros.
     apply adj_cons_comm_1.
     apply adj_tl.
     apply adj_tl.
@@ -332,7 +351,6 @@ Module perm_abella.
   Qed.
 
   (** Note:
-
       Here is the Abella proof of [adj_swap] (annotations e.g. bullet points + comments mine):
   *)
 
@@ -523,8 +541,10 @@ Module perm_abella.
 
   (** *** Examples of [perm] *)
 
-  Example perm_123_321 : perm [1 ; 2 ; 3] [3 ; 2 ; 1].
+  Example perm_123_321 :
+    forall o1 o2 o3, perm [o1 ; o2 ; o3] [o3 ; o2 ; o1].
   Proof.
+    intros.
     eapply perm_split.
     - apply adj_tl. apply adj_tl. apply adj_hd.
     - apply adj_hd.
@@ -1049,11 +1069,7 @@ End perm_abella.
 >>
  *)
 
-Module merge_abella.
-
-  Import lists_abella.
-  Import perm_abella.
-
+Section merge_abella.
 
   (** ** Definition
 
@@ -1620,3 +1636,118 @@ induction on 1. intros. case H1.
   | subset_e : forall J L K, merge J K L  -> subset J L.
 
 End merge_abella.
+
+End lists_abella.
+
+(** * Proof of concept: LL using lists-modulo permutation *)
+Module PL.
+
+  (** * Formulas *)
+  Inductive formula : Set :=
+  | bot
+  | one
+  | atom : nat -> formula
+  | natom : nat -> formula
+  | tens : formula -> formula -> formula
+  | par : formula -> formula -> formula.
+
+  Theorem LForm_dec_eq : forall F G : formula, {F = G} + {F <> G}.
+    Admitted.
+
+  Module F_dec <: Eqset_dec.
+    Definition Eqset_T := formula.
+    Definition eqA_dec := LForm_dec_eq.
+  End F_dec.
+
+  Declare Module LMPFormulas : lists_abella F_dec.
+  Export LMPFormulas.
+
+  Fixpoint negation (A : formula) : formula :=
+    match A with
+    | bot => one
+    | one => bot
+    | atom v => natom v
+    | natom v => atom v
+    | tens A B => par (negation A) (negation B)
+    | par A B => tens (negation A) (negation B)
+    end.
+
+  (** * Context representation *)
+  Definition ctx := list formula.
+
+  (*
+
+Define mll : olist -> prop by
+; mll L :=
+    exists A, adj (natom A :: nil) (atom A) L
+
+; mll L :=
+    exists A B LL JJ KK J K,
+      adj LL (tens A B) L /\
+      merge JJ KK LL /\
+      adj JJ A J /\ mll J /\
+      adj KK B K /\ mll K
+
+; mll (one :: nil)
+
+; mll L :=
+    exists A B LL J K,
+      adj LL (par A B) L /\
+      adj LL A J /\
+      adj J B K /\
+      mll K
+
+; mll L :=
+    exists LL,
+      adj LL bot L /\
+      mll LL
+.
+
+   *)
+
+  (** * Inference rules *)
+  Reserved Notation " '|-' B " (at level 80).
+  Inductive mll : ctx -> Prop :=
+  | rules_id : forall L A, adj (natom A :: nil) (atom A) L -> mll L
+  | rules_tens : forall L A B LL JJ KK J K,
+      adj LL (tens A B) L ->
+      merge JJ KK LL ->
+      adj JJ A J -> mll J ->
+      adj KK B K -> mll K -> mll L
+  | rules_one : mll ([one])
+  | rules_par : forall L A B LL J K,
+      adj LL (par A B) L ->
+      adj LL A J ->
+      adj J B K ->
+      mll K ->
+      mll L
+  | rules_bot : forall L LL,
+      adj LL bot LL -> mll LL -> mll L
+    where " '|-' B " := (mll B).
+
+  (** ** Example derivations *)
+
+  (** Interesting things:
+      - [rules_par] can be applied in many ways due to how [adj] works.
+      If you apply [rules_par] using [eapply], you actually end up reversing the list.
+      But the hypothesis we have is in a different order (is sorted).
+      So it's important to be explicit about how you want the resulting list order to be afterwards.
+      (Well, that is, if you don't have the exchange theorem yet.)
+   *)
+
+  Example a1_par_a2_a3_par_a4_1 : forall A1 A2 A3 A4,
+        |- [A1 ; A2 ; A3 ; A4] -> |- [par A1 A2; par A3 A4].
+  Proof.
+    intros.
+    eapply rules_par with (K := [A1 ; A2 ; par A3 A4]).
+    - apply adj_hd.
+    - apply adj_hd.
+    - apply adj_tl. apply adj_hd.
+    - eapply rules_par with (J := [A1; A2; A3]) (K := [A1; A2; A3; A4]).
+    -- apply adj_tl. apply adj_tl. apply adj_hd.
+    -- apply adj_tl. apply adj_tl. apply adj_hd.
+    -- apply adj_tl. apply adj_tl. apply adj_tl. apply adj_hd.
+    -- apply H.
+  Qed.
+
+End PL.
