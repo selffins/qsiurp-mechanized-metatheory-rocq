@@ -166,7 +166,7 @@ Inductive mult_eq : mult -> mult -> Prop :=
   | mult_refl a : mult_eq a a.
 
 (* [added] *)
-Lemma mult_eq_eq :
+Theorem mult_eq_eq :
   forall a b, mult_eq a b -> a = b.
 Proof.
   intros.
@@ -174,7 +174,7 @@ Proof.
   reflexivity.
 Qed.
 
-Lemma eq_mult_eq :
+Theorem eq_mult_eq :
   forall a b, a = b -> mult_eq a b.
 Proof.
   intros.
@@ -186,16 +186,6 @@ Qed.
     correspondence with the Beluga code.
 
  *)
-
-Theorem m_zero_sum_free :  forall (a b c : mult),
-    op a b c ->
-    mult_eq c m_0 ->
-    mult_eq a m_0 /\ mult_eq b m_0.
-Proof.
-  intros.
-  (* case on [op a b c] -- follows immediately *)
-  split;inversion H;subst;auto;apply mult_refl.
-Qed.
 
 End lmult.
 
@@ -342,5 +332,163 @@ Definition lookup_ D n X A a := upd D n X X A A a a D.
 Inductive lookup_n : var -> lctx -> Prop :=
 | lookn : forall D X a b c d e f g,
     upd D a X b c d e f g -> lookup_n X D.
+
+
+(** * Algebraic properties of linear multiplicities
+      - file: [common/lemmas/mult/lin_aff.bel]
+    Most or all of the proofs proceed by enumerating the possible cases for [op].
+ *)
+
+(** ** Functionality
+    If [α₁ ∙ α₂ = α] and [α₁ ∙ α₂ = α'], then [α = α'].
+ *)
+
+Theorem lmult_functionality : forall a1 a2 a a', op a1 a2 a' -> op a1 a2 a -> mult_eq a a'.
+Proof.
+  intros.
+  inversion H;subst;inversion H0;subst;apply mult_refl.
+Qed.
+
+(** Interesting note: Beluga is like Agda in that proofs are done by providing the proof inhabitant.
+    This is the proof for functionality of op:
+
+<<
+  rec mult_func : [ ⊢ • α₁ α₂ α] → [ ⊢ • α₁ α₂ α'] → [ ⊢ mult_eq α α'] =
+  / total /
+  fn m1, m2 ⇒ case m1 of
+  | [ ⊢ •/00] ⇒ let [ ⊢ •/00] = m2 in [ ⊢ mult/refl]
+  | [ ⊢ •/10] ⇒ let [ ⊢ •/10] = m2 in [ ⊢ mult/refl]
+  | [ ⊢ •/01] ⇒ let [ ⊢ •/01] = m2 in [ ⊢ mult/refl]
+  ;
+>>
+
+  There is some odd syntax going on.
+  But again, the proof is essentially destructing the given op relations, which have finite cases.
+
+ *)
+
+
+(** ** Identity
+    If [α₁ ∙ α₂ = α] and [α₁] is an identity element, then [α₂ = α]
+    For any [α], obtain an identity element [β] such that [β • α = α]
+ *)
+
+Theorem lmult_identity :
+  forall a1 a2 a, op a1 a2 a -> ident_rel a1 -> mult_eq a2 a.
+Proof.
+  intros.
+  destruct H0.
+  inversion H;subst;apply mult_refl.
+Qed.
+
+(** ** Zero-sum-freedom
+    If [α₁ ∙ α₂ = α] and [α] is an identity element, then [α₁ = α].
+ *)
+
+Theorem lmult_zero_sum_free :  forall (a b c : mult),
+    op a b c ->
+    mult_eq c m_0 ->
+    mult_eq a m_0 /\ mult_eq b m_0.
+Proof.
+  intros.
+  split;inversion H;subst;auto;apply mult_refl.
+Qed.
+
+(** ** Commutativity
+    If [α₁ ∙ α₂ = α], then [α₂ ∙ α₁ = α] *)
+
+Theorem lmult_comm :
+  forall a1 a2 a, op a1 a2 a -> op a2 a1 a.
+Proof.
+  intros.
+  destruct H.
+  - apply op_00.
+  - apply op_01.
+  - apply op_10.
+Qed.
+
+(** TBD:
+    I'm not sure what's happening here.
+
+<<
+LF get_u∙ : mult → type =
+| get-u∙ : ident β → • β α α → get_u∙ α;
+
+rec mult_get_id : {α:[ ⊢ mult]} [ ⊢ get_u∙ α] =
+  / total /
+  mlam α ⇒ case [ ⊢ α] of
+  | [ ⊢ 𝟘] ⇒ [ ⊢ get-u∙ ident/0 •/00]
+  | [ ⊢ 𝟙] ⇒ [ ⊢ get-u∙ ident/0 •/01]
+  ;
+>>
+ *)
+
+(** ** Associativity
+        If [(α₁ • α₂) • α₃ = α], then [α₁ • (α₂ • α₃) = α]
+        TBD: slightly awkward to do when op is a relation
+ *)
+
+(** ** Cancellativity
+    If [α₁ ∙ α₂ = α] and [α₁ ∙ α₂' = α], then [α₂ = α₂'].
+ *)
+
+Theorem lmult_cancellative:
+  forall a1 a2 a2' a,
+    op a1 a2 a -> op a1 a2' a -> mult_eq a2 a2'.
+Proof.
+  intros.
+  inversion H;subst;inversion H0;subst;apply mult_refl.
+Qed.
+
+(** ** Corollaries *)
+
+Lemma lmult_ident_inv :
+  forall a2 a, op m_0 a2 a -> mult_eq a2 a.
+Proof.
+  intros.
+  inversion H;subst;apply mult_refl.
+Qed.
+
+Lemma lmult_zsf_inv :
+  forall a1 a2, op a1 a2 m_0 -> mult_eq a1 m_0.
+Proof.
+  intros.
+  inversion H;subst;apply mult_refl.
+Qed.
+
+(** TBD:
+<<
+rec mult_get_id_cor : {α:[ ⊢ mult]} [ ⊢ • 𝟘 α α] =
+  / total /
+  mlam α ⇒ let [ ⊢ get-u∙ ident/0 M] = mult_get_id [ ⊢ α] in [ ⊢ M]
+  ;
+>>
+ *)
+
+(** ** Properties of harmless elements *)
+
+Lemma mult_hal_id : forall a,
+    hal a -> op a a a.
+Proof.
+  intros.
+  inversion H; subst.
+  apply op_00.
+Qed.
+
+Lemma mult_ident_hal : forall a,
+    ident_rel a -> hal a.
+Proof.
+  intros.
+  inversion H; subst.
+  apply hal_0.
+Qed.
+
+Lemma mult_hal_ident : forall a,
+    hal a -> ident_rel a.
+Proof.
+  intros.
+  inversion H; subst.
+  apply ident_0.
+Qed.
 
 End lctx.
