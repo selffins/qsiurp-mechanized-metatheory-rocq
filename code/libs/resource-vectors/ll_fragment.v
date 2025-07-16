@@ -491,4 +491,184 @@ Proof.
   apply ident_0.
 Qed.
 
+(** * Algebraic properties of context merge
+    - files: [common/lemmas/merge/halid.bel]; [main.bel]; [cancl.bel]
+    The proofs are slightly more complicated.
+ *)
+
+(** ** Merge cancellativity
+    - file: [cancl.bel]
+    Note: this property depends on the resource algebra operation [op] being cancellative.
+ *)
+
+Theorem merge_cancellative :
+  forall D1 D2 D2' D, merge D1 D2 D -> merge D1 D2' D -> lctx_eq D2 D2'.
+Proof.
+  intros D1 D2 D2' D H1 H2.
+  inversion H1; subst.
+  - (* merge_lnil *)
+    inversion H2; subst.
+    apply lctx_refl.
+  - inversion H2;subst.
+    apply lmult_cancellative with (a2 := a2) in H11 as H12.
+    2 : { apply H0. }
+    apply mult_eq_eq in H12;subst.
+    apply lctx_refl.
+Qed.
+
+(** *** Compare with
+
+rec merge_cancl : (Ψ:ctx) (Δ:[Ψ ⊢ lctx N[]]) [Ψ ⊢ merge Δ₁ Δ₂ Δ] → [Ψ ⊢ merge Δ₁ Δ₂' Δ] → [Ψ ⊢ cx_eq Δ₂ Δ₂'] =
+  / total 1 /
+  fn m1, m2 ⇒ case m1 of
+  | [_ ⊢ mg/n] ⇒ let [_ ⊢ mg/n] = m2 in [_ ⊢ cx/refl]
+  | [_ ⊢ mg/c M1 T1[]] ⇒
+    let [_ ⊢ mg/c M2 T2[]] = m2 in
+    let [_ ⊢ cx/refl] = merge_cancl [_ ⊢ M1] [_ ⊢ M2] in
+    let [ ⊢ mult/refl] = mult_canc [ ⊢ T1] [ ⊢ T2] in
+    [_ ⊢ cx/refl]
+  ;
+ *)
+
+(**  ** Merge w/ harmless elements
+     - file: [halid.bel]
+     Note: These properties only hold if all harmless elements are identity elements
+ *)
+
+Theorem merge_id :
+  forall D1 D2 D, merge D1 D2 D -> exh D1 -> lctx_eq D2 D.
+Proof.
+  Admitted.
+
+Theorem merge_id_r :
+  forall D1 D2 D, merge D1 D2 D -> exh D2 -> lctx_eq D1 D.
+Proof.
+  Admitted.
+
+(** Note: this odd presentation has to do with the contextual modal type system of beluga. *)
+
+(** LF merge_ident : merge _ _ _ → type =
+  mg_ident : {M:merge Δ Δ Δ} merge_ident M;
+
+rec merge_zsfree : (Ψ:ctx) (Δ:[Ψ ⊢ lctx N[]]) [Ψ ⊢ exh Δ] → {M:[Ψ ⊢ merge Δ₁ Δ₂ Δ]} [Ψ ⊢ merge_ident M] =
+  / total 1 /
+  fn e ⇒ mlam M ⇒ case [_ ⊢ M] of
+  | [_ ⊢ mg/n] ⇒ [_ ⊢ mg_ident _]
+  | [_ ⊢ mg/c M1 T1[]] ⇒
+    let [_ ⊢ exh/c E1 U1[]] = e in
+    let [ ⊢ mult/refl] = mult_zsfree [ ⊢ T1] (mult_hal_ident [ ⊢ U1]) in
+    let [ ⊢ mult/refl] = mult_zsfree (mult_comm [ ⊢ T1]) (mult_hal_ident [ ⊢ U1]) in
+    let [_ ⊢ mg_ident _] = merge_zsfree [_ ⊢ E1] [_ ⊢ M1] in
+    [_ ⊢ mg_ident _]
+  ;
+ *)
+
+Inductive merge_ident_rel : Prop :=
+  | mg_ident : forall D, merge D D D -> merge_ident_rel.
+
+Theorem merge_zsfree :
+  forall D D1 D2, exh D -> merge D1 D2 D -> merge_ident_rel.
+Proof.
+  intros.
+  inversion H0; subst.
+  - apply mg_ident with (D := lnil).
+    apply merge_lnil.
+  - inversion H; subst.
+    inversion H8; subst.
+    apply lmult_zero_sum_free in H2 as [H2a H2b].
+    2 : { apply mult_refl. }
+    destruct H2a.
+    destruct H2b.
+    Admitted.
+
+(** ** Properties of context merge
+    Very TBD
+    file: [main.bel]
+ *)
+
+(** *** Prune merge
+    TBD
+ *)
+
+(** *** Functionality
+    If [Δ₁ ⋈ Δ₂ = Δ] and [Δ₁ ⋈ Δ₂ = Δ'], then [Δ = Δ'],
+ *)
+
+Theorem merge_functionality :
+  forall D1 D2 D D', merge D1 D2 D -> merge D1 D2 D' -> lctx_eq D D'.
+Proof.
+  intros.
+  inversion H;subst.
+  - inversion H0; subst. apply lctx_refl.
+  - Admitted.
+
+(** *** Commutativity
+    If [Δ₁ ⋈ Δ₂ = Δ], then [Δ₂ ⋈ Δ₁ = Δ].
+ *)
+
+Theorem merge_commutativity :
+  forall D1 D2 D, merge D1 D2 D -> merge D2 D1 D.
+Proof.
+  Admitted.
+
+(** *** Existence of identity context
+   [Δ ⋈ 0Δ = Δ] for any [Δ].
+ *)
+
+Inductive mg_getid : lctx -> Prop :=
+| mg_getid_c : forall D D', merge D D' D -> exh D' -> mg_getid D.
+
+Theorem merge_identity : forall D,
+    mg_getid D.
+Proof.
+  Admitted.
+
+(** *** Associativity
+    (1) If [(Δ₁ ⋈ Δ₂) ⋈ Δ₃ = Δ], then [Δ₁ ⋈ (Δ₂ ⋈ Δ₃)]
+    (2) If [(Δ₁ ⋈ Δ₂) ⋈ Δ₃ = Δ], then [(Δ₁ ⋈ Δ₃) ⋈ Δ₂] (corollary of (1) using commutativity)
+ *)
+
+(** How to actually write this? *)
+Inductive mg_assoc : Prop :=
+| mg_assoc_c : forall D1 D2 D3 D12 D23 D,
+    merge D2 D3 D23 -> merge D1 D23 D -> merge D12 D3 D -> merge D1 D2 D12 -> mg_assoc.
+
+Theorem merge_assoc : forall D1 D2 D12 D3 D,
+    merge D12 D3 D -> merge D1 D2 D12 -> mg_assoc.
+Proof.
+Admitted.
+
+Inductive mg_assoc_2 : Prop :=
+| mg_assoc_2_c : forall D1 D2 D3 D13 D12 D,
+    merge D1 D3 D12 -> merge D13 D2 D -> merge D12 D3 D -> merge D1 D2 D12 -> mg_assoc_2.
+
+Theorem merge_assoc_2 : forall D1 D2 D3 D12 D,
+    merge D12 D3 D -> merge D1 D2 D12 -> mg_assoc.
+Proof.
+  Admitted.
+
+(** ** Merge interaction with update *)
+
+(** *** Preservation of lookup under merge
+
+        AKA: Merging preserves elements and combines multiplicities
+
+    - (1) If [(x :α A) ∈ₙ (Δ₁ ⋈ Δ₂)], then [(x :α₁ A) ∈ₙ Δ₁] and [(x :α₂ A) ∈ₙ Δ₂] for some [α₁, α₂] such that [α₁ ∙ α₂ = α]
+      English: If an element with some multiplicity is in the merge of two contexts, then that same element is in both contexts, but with multiplicities split such that they add up correctly when merged.
+
+    - (2) If [(x :α₁ A) ∈ₙ Δ₁] and [Δ₁ ⋈ Δ₂ = Δ], then [(x :α₂ A) ∈ₙ Δ₂, (x :α A) ∈ₙ Δ] for [α₁, α₂] such that [α₁ ∙ α₂ = α]
+      English: If an element with some multiplicity is in a context, and then that context is merged with another, then that element is in both the other context and their merge but with multiplicities split such that they add up correctly when merged.
+
+TBD
+
+ *)
+
+(** *** Distributivity of updating
+TBD
+ *)
+
+(** ** Corollaries
+TBD
+ *)
+
 End lctx.

@@ -1639,7 +1639,7 @@ End merge_abella.
 
 End lists_abella.
 
-(** * Proof of concept: LL using lists-modulo permutation *)
+(** * Proof of concept: MLL using lists-modulo permutation *)
 Module PL.
 
   (** * Formulas *)
@@ -1652,7 +1652,7 @@ Module PL.
   | par : formula -> formula -> formula.
 
   Theorem LForm_dec_eq : forall F G : formula, {F = G} + {F <> G}.
-    Admitted.
+  Admitted.
 
   Module F_dec <: Eqset_dec.
     Definition Eqset_T := formula.
@@ -1729,7 +1729,7 @@ Define mll : olist -> prop by
 
   (** Interesting things:
       - [rules_par] can be applied in many ways due to how [adj] works.
-      If you apply [rules_par] using [eapply], you actually end up reversing the list.
+      If you apply [rules_par] using [eapply] (without specifying arguments), you actually end up reversing the list.
       But the hypothesis we have is in a different order (is sorted).
       So it's important to be explicit about how you want the resulting list order to be afterwards.
       (Well, that is, if you don't have the exchange theorem yet.)
@@ -1749,5 +1749,7 @@ Define mll : olist -> prop by
     -- apply adj_tl. apply adj_tl. apply adj_tl. apply adj_hd.
     -- apply H.
   Qed.
+
+
 
 End PL.
